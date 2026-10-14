@@ -9,10 +9,10 @@ const traffic=points=>route(points,[{endPolylinePointIndex:points.length-1,speed
 function setup({owner=OWNER,authStatus=200,upstream}={}){
  let time=Date.parse('2026-10-15T00:00:00+08:00'),calls=[],authCalls=0;
  const records=new Map(),budget=new TrafficBudget({storage:{get:async k=>records.get(k),put:async(k,v)=>records.set(k,v)}},{},{now:()=>time});
- const env={GOOGLE_ROUTES_KEY:'secret-key',GOOGLE_MAPS_BROWSER_KEY:'map-key',OWNER_AUTH:{fetch:async()=>{authCalls++;return json({ownerId:owner},authStatus)}},TRAFFIC_BUDGET:{idFromName:s=>s,get:()=>budget}};
+ const env={PAID_FEATURES_ENABLED:'true',GOOGLE_ROUTES_KEY:'secret-key',GOOGLE_MAPS_BROWSER_KEY:'map-key',OWNER_AUTH:{fetch:async()=>{authCalls++;return json({ownerId:owner},authStatus)}},TRAFFIC_BUDGET:{idFromName:s=>s,get:()=>budget}};
  const handler=createHandler({now:()=>time,fetch:async(url,options)=>{calls.push({url,options});if(upstream)return upstream();const body=JSON.parse(options.body),end=body.destination.location.latLng;return json({routes:[traffic([[end.longitude-.012,end.latitude],[end.longitude,end.latitude]])]});}});
  const request=({token='remembered.'+'a'.repeat(43),origin=ORIGIN,body='{}',method='POST',path='/api/refresh'}={})=>handler(new Request('https://test'+path,{method,headers:{Origin:origin,Authorization:'Bearer '+token,'Content-Type':'application/json'},...(method==='POST'?{body}:{})}),env);
- return {request,calls,records,budget,authCalls:()=>authCalls,advance:n=>time+=n};
+ return {request,calls,records,budget,env,authCalls:()=>authCalls,advance:n=>time+=n};
 }
 test('unauthenticated, wrong identity, spoofed origin and arbitrary body make zero billable calls',async()=>{
  for(const options of [{token:''},{token:'fake'},{origin:'https://evil.example'},{body:'{"stations":[1]}'}]){const s=setup();assert.ok((await s.request(options)).status>=400);assert.equal(s.calls.length,0);assert.equal(s.records.size,0);}
@@ -89,4 +89,48 @@ test('concurrent distinct requests cannot exceed the final daily check',async()=
  const s=setup();s.records.set('budget',{day:'2026-10-15',used:49,stationNextAt:{},groups:{}});
  const results=await Promise.all(ALL_STATIONS.slice(0,2).map(station=>s.request({body:JSON.stringify({stationIds:[station.id]})})));
  assert.deepEqual(results.map(r=>r.status).sort(),[200,429]);assert.equal(s.calls.length,1);assert.equal(s.records.get('budget').used,50);
+});
+
+test('monthly limit survives daily resets and atomically blocks the 901st check',async()=>{
+ const s=setup();s.records.set('budget',{day:'2026-10-15',used:0,month:'2026-10',monthlyUsed:899,stationNextAt:{},groups:{}});
+ const results=await Promise.all(ALL_STATIONS.slice(0,2).map(station=>s.request({body:JSON.stringify({stationIds:[station.id]})})));
+ assert.deepEqual(results.map(r=>r.status).sort(),[200,429]);assert.equal(s.calls.length,1);assert.equal(s.records.get('budget').monthlyUsed,900);
+ s.advance(86400000);assert.equal((await s.request()).status,429);assert.equal(s.calls.length,1);
+ const limits=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(limits.remainingChecks,50);assert.equal(limits.remainingMonthlyChecks,0);assert.equal(limits.monthlyResetAt,Date.parse('2026-11-01T00:00:00+08:00'));
+ s.advance(16*86400000);assert.equal((await s.request()).status,200);assert.equal(s.records.get('budget').monthlyUsed,5);
+});
+
+test('failed upstream requests consume the monthly budget, without retries',async()=>{
+ const s=setup({upstream:()=>json({},500)});s.records.set('budget',{day:'2026-10-15',used:0,month:'2026-10',monthlyUsed:895});
+ const data=await(await s.request()).json();assert.equal(data.remainingMonthlyChecks,0);assert.equal(s.calls.length,5);
+ s.advance(COOLDOWN);assert.equal((await s.request()).status,429);assert.equal(s.calls.length,5);
+});
+
+test('migrating the first usage day preserves charges even if first reconnect is tomorrow',async()=>{
+ const s=setup();s.records.set('budget',{day:'2026-10-15',used:22,stationNextAt:{},groups:{}});s.advance(86400000);
+ const data=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(data.monthlyUsed,22);assert.equal(data.remainingChecks,50);assert.equal(s.records.get('budget').monthlyUsed,22);
+});
+
+test('disabled or missing kill-switch configuration exposes no key and makes no paid calls',async()=>{
+ for(const enabled of ['false',undefined])for(const options of [{},{method:'GET',path:'/api/session'}]){
+  const s=setup();s.env.PAID_FEATURES_ENABLED=enabled;const response=await s.request(options);assert.equal(response.status,503);assert.ok(!(await response.text()).includes('map-key'));assert.equal(s.calls.length,0);assert.equal(s.authCalls(),0);
+ }
+});
+
+test('spending-guard failure and corrupt counters fail closed before key release or Google calls',async()=>{
+ for(const mode of ['unavailable','corrupt'])for(const options of [{},{method:'GET',path:'/api/session'}]){
+  const s=setup();if(mode==='unavailable')s.env.TRAFFIC_BUDGET.get=()=>({fetch:async()=>json({},503)});else s.records.set('budget',{day:'2026-10-15',used:-1,month:'2026-10',monthlyUsed:-1});
+  const r=await s.request(options);assert.equal(r.status,503);assert.ok(!(await r.text()).includes('map-key'));assert.equal(s.calls.length,0);
+ }
+});
+
+test('large bodies are rejected before identity lookups and paid requests',async()=>{
+ const s=setup();assert.equal((await s.request({body:' '.repeat(4096)+'{}'})).status,400);assert.equal(s.calls.length,0);assert.equal(s.authCalls(),0);
+});
+
+test('spoofed origin with a plausible fake session and wrong owner never reveal the display key',async()=>{
+ for(const options of [{authStatus:401},{owner:'other-user'}]){
+  const s=setup(options),response=await s.request({method:'GET',path:'/api/session'});
+  assert.ok([401,403].includes(response.status));assert.ok(!(await response.text()).includes('map-key'));assert.equal(s.calls.length,0);assert.equal(s.records.size,0);
+ }
 });

@@ -53,7 +53,7 @@ function initMap(){
  }catch{$('map-error').hidden=false;}
 }
 async function loadData(){
- try{const r=await fetch('stations.json?v=20261015-traffic-evidence',{cache:'no-store'});if(!r.ok)throw Error();dataset=await r.json();if(!dataset.stations?.length||!dataset.areas?.length)throw Error();applyChecks();
+ try{const r=await fetch('stations.json?v=20261015-cost-guards',{cache:'no-store'});if(!r.ok)throw Error();dataset=await r.json();if(!dataset.stations?.length||!dataset.areas?.length)throw Error();applyChecks();
  $('area').innerHTML='<option value="all">All Bali</option>'+dataset.areas.map(a=>`<option value="${a.id}">${e(a.name)}</option>`).join('');
  const wanted=new URL(location.href).searchParams.get('area');$('area').value=dataset.areas.some(a=>a.id===wanted)||wanted==='all'?wanted:'nusa-dua';
  const hash=location.hash.slice(1);if(stations.some(s=>s.id===hash)){selected=hash;if(!scopedStations().some(s=>s.id===hash))$('area').value='all';}

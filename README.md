@@ -18,9 +18,25 @@ The Cloudflare Worker validates the opaque device session through the cinema app
 
 The Routes API key is restricted to Routes and held in a Worker secret. It is never sent to browsers, committed, or logged. A separate Maps JavaScript display key is returned after owner authentication and is restricted to Maps JavaScript and `https://arthur-freedom.github.io/*` referrers. Display keys are necessarily visible to the owner's browser; they cannot invoke Routes.
 
-A globally shared SQLite-backed Durable Object enforces a 15-minute cooldown **per station** and **50 station checks per Bali day**, including concurrent devices. A single-station request uses one check; 15 stations use 15 checks. This preserves the previous maximum of ten five-query attempts. Migration conservatively charges each previous attempt as five checks and carries its cooldown to every station it contained.
+A globally shared SQLite-backed Durable Object enforces a 15-minute cooldown **per station**, **50 station checks per Bali day**, and **900 checks per Bali calendar month**, including concurrent devices. A single-station request uses one check; 15 stations use 15 checks. Daily resets do not reset the monthly balance. Failed Google requests consume both budgets; admission is persisted before calling Google and failures are not automatically retried. Migration preserves the first usage day's existing charges and cooldowns, including when the owner reconnects the next day. Ambiguous older legacy records exhaust the monthly balance until reviewed.
 
-Different stations can be checked immediately. Overlapping or reordered requests cannot bypass a station's cooldown. Each server request accepts at most five allowlisted station IDs. The client fetches current limits before starting a refresh and limits the selection to the remaining budget, shown beside the button. Invalid, duplicate, unknown or more than five IDs are rejected before Google calls. After Google's free allowance, five Compute Routes Enterprise requests currently cost US$0.075, with at most 50 requests / US$0.75 per Bali day through this service. Google map displays have a separate allowance and price. These application limits do not change Google project-wide quotas or account billing. Failed station queries count toward the cap.
+Different stations can be checked immediately. Overlapping or reordered requests cannot bypass a station's cooldown. Each server request accepts at most five allowlisted station IDs and reads at most 2,048 body bytes, including chunked requests. The client fetches current limits before starting a refresh and limits the selection to the remaining daily and monthly budgets, shown beside the button. Invalid, duplicate, unknown or more than five IDs are rejected before Google calls. After Google's free allowance, five Compute Routes Enterprise requests currently cost US$0.075. Google map displays have a separate allowance and price. The 900-check application limit leaves headroom below the published 1,000 monthly free Enterprise requests, but other projects share the billing account's free allowances and diagnostic calls are outside the application's counter.
+
+### Google-side limits
+
+On 15 October 2026, project `chessinbali` was changed from effectively unlimited daily quotas to the following provider-enforced limits. These apply to both services across this project, including requests that bypass the application:
+
+| Feature | Daily limit | Per-minute limit |
+| --- | ---: | ---: |
+| Compute Routes | 50 | 50 |
+| 2D map loads | 100 | 10 |
+| Compute Route Matrix elements | 0 | — |
+| 3D map loads | 0 | — |
+| Maps Grounding Widget | 0 | — |
+
+Inspect the effective values with `python scripts/protect-google-budget.py`; use `--apply` to restore these ceilings. The script uses an authenticated gcloud account, never reads API keys, and refuses to increase an existing stricter quota. Provider quotas can reset at a different time from the application's Bali-day counters, so Google can reject a request even when the app shows a remaining balance. These are request limits, not a promise about unrelated Google services or the whole billing account.
+
+Set `PAID_FEATURES_ENABLED = "false"` in the Worker configuration and redeploy to stop issuing Google display keys and making traffic calls. Missing configuration also fails closed. For an already disclosed display key or urgent complete provider shutdown, reduce the relevant Google quotas to zero or revoke the dedicated key; the application switch cannot revoke a key already in a browser. A spending-guard failure blocks both Routes calls and display-key release. Anonymous visits use the public OpenStreetMap map and make no paid Google requests.
 
 The service uses the existing **Workers Free** account, with no paid plan, observability or upgrades. Budget storage contains only counts, timestamps and catalogue station IDs for cooldown enforcement (plus legacy group IDs for open older clients). Google traffic content is held only in browser memory and is not persisted to GitHub, browser storage, or server storage. All API responses are `no-store`. Google-derived traffic is displayed only on a Google map. The public station catalogue uses an OpenFreeMap / OpenStreetMap basemap.
 

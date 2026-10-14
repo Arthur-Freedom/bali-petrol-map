@@ -5,6 +5,10 @@ account_id = "94cabf810cae12652da86b210cad8009"
 workers_dev = true
 preview_urls = false
 
+[vars]
+# Set false and redeploy to stop issuing map access and making traffic requests.
+PAID_FEATURES_ENABLED = "true"
+
 [observability]
 enabled = false
 

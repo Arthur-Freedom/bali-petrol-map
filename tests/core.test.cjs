@@ -67,3 +67,10 @@ test('compare the proportion sampled, then congestion severity, without inventin
  const a=station('half',0,{slowMetres:500,approachMetres:1000}),b=station('all',0,{slowMetres:500,approachMetres:500}),c=station('jam',500,{slowMetres:0,approachMetres:1000});
  assert.ok(P.compareTraffic(a,b)<0);assert.ok(P.compareTraffic(a,c)<0);assert.equal(P.status(a,now).waitMinutes,undefined);
 });
+
+test('refresh planning respects the monthly balance even after the daily counter resets',()=>{
+ const list=Array.from({length:5},(_,i)=>station('s'+i,null)),budget={remainingChecks:0,resetAt:now-1,remainingMonthlyChecks:2,monthlyResetAt:now+86400000,monthlyLimit:900};
+ assert.equal(P.refreshPlan(list,[115,-8],budget,'area',now).targets.length,2);
+ assert.equal(P.refreshPlan(list,[115,-8],{...budget,remainingMonthlyChecks:0},'area',now).targets.length,0);
+ assert.equal(P.refreshPlan(list,[115,-8],{...budget,monthlyResetAt:now-1},'area',now).targets.length,5);
+});
