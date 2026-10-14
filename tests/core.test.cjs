@@ -74,3 +74,10 @@ test('refresh planning respects the monthly balance even after the daily counter
  assert.equal(P.refreshPlan(list,[115,-8],{...budget,remainingMonthlyChecks:0},'area',now).targets.length,0);
  assert.equal(P.refreshPlan(list,[115,-8],{...budget,monthlyResetAt:now-1},'area',now).targets.length,5);
 });
+
+test('traffic responses require current timestamps, complete numbers and usable geometry',()=>{
+ const reading={id:'one',jamMetres:100,slowMetres:200,approachMetres:1000,checkedAt:at,segments:[{from:[115,-8],to:[115.01,-8],speed:'SLOW'}]},clock=Date.parse(at)+1000;
+ assert.equal(P.validReading(reading,'one',clock),true);
+ for(const patch of [{slowMetres:undefined},{jamMetres:-1},{approachMetres:0},{jamMetres:2000},{checkedAt:'not a date'},{checkedAt:new Date(clock+61000).toISOString()},{checkedAt:new Date(clock-300001).toISOString()},{segments:[]},{segments:[{from:[null,-8],to:[115,-8],speed:'NORMAL'}]}])assert.equal(P.validReading({...reading,...patch},'one',clock),false);
+ assert.equal(P.validReading(reading,'another-station',clock),false);
+});

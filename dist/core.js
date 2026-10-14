@@ -38,5 +38,12 @@
    return {targets,batches,total:list.length,eligible:wanted.length,cooling:cooling.length,nextAt:cooling.length?Math.min(...cooling.map(s=>stationNextAt[s.id])):0,limited:targets.length<wanted.length,remainingChecks:available};
  }
  function mergeLive(base,reading){return {...base,jamMetres:reading?.jamMetres??null,slowMetres:reading?.slowMetres??null,approachMetres:reading?.approachMetres??null,checkedAt:reading?.checkedAt??null,refreshFailed:!!reading?.refreshFailed,live:!!reading?.checkedAt};}
- const api={distance,fresh,opening,status,slowdown,compareTraffic,ordered,inScope,refreshPlan,placeUrl,mergeLive};if(typeof module!=='undefined'&&module.exports)module.exports=api;root.Petrol=api;
+ function validReading(reading,id,now=Date.now()){
+   if(!reading||reading.id!==id||reading.error)return false;
+   const {jamMetres:jam,slowMetres:slow,approachMetres:length,segments,checkedAt}=reading,time=Date.parse(checkedAt);
+   if(![jam,slow,length].every(Number.isFinite)||jam<0||slow<0||length<500||length>1001||jam+slow>length+10||!Number.isFinite(time)||time>now+60000||now-time>300000)return false;
+   const point=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)&&Math.abs(p[0])<=180&&Math.abs(p[1])<=90;
+   return Array.isArray(segments)&&segments.length>0&&segments.length<=10000&&segments.every(s=>s&&point(s.from)&&point(s.to)&&['NORMAL','SLOW','TRAFFIC_JAM'].includes(s.speed));
+ }
+ const api={distance,fresh,opening,status,slowdown,compareTraffic,ordered,inScope,refreshPlan,placeUrl,mergeLive,validReading};if(typeof module!=='undefined'&&module.exports)module.exports=api;root.Petrol=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -105,6 +105,7 @@ export function createHandler({fetch:send=globalThis.fetch,now=Date.now}={}){
               const stations=await Promise.all(requestedStations.map(async station=>{
                 try{
                   const result=await send('https://routes.googleapis.com/directions/v2:computeRoutes',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'Content-Type':'application/json','X-Goog-Api-Key':env.GOOGLE_ROUTES_KEY,'X-Goog-FieldMask':'routes.polyline.encodedPolyline,routes.travelAdvisory.speedReadingIntervals'},body:JSON.stringify({origin:waypoint(station.start),destination:waypoint(station.end),travelMode:'DRIVE',routingPreference:'TRAFFIC_AWARE_OPTIMAL',extraComputations:['TRAFFIC_ON_POLYLINE'],polylineQuality:'HIGH_QUALITY',computeAlternativeRoutes:false})});
+                  if(result.status===429)return {id:station.id,error:'Google request limit reached.',errorCode:'provider_limit'};
                   if(!result.ok)throw Error('Upstream failed');
                   const measured=measure((await result.json()).routes?.[0]||{},station.end);
                   return {id:station.id,...measured,checkedAt:new Date(now()).toISOString()};

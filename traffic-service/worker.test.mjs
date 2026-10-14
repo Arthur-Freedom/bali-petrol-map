@@ -32,6 +32,12 @@ test('daily budget survives cooldowns and resets at Bali midnight',async()=>{
 test('partial upstream failure does not invent clear roads or a fresh timestamp',async()=>{
  const s=setup({upstream:()=>json({error:{message:'secret-key internal'}},403)}),r=await s.request(),data=await r.json();assert.ok(data.stations.every(s=>s.error&&!s.checkedAt&&s.jamMetres===undefined));assert.ok(!JSON.stringify(data).includes('secret-key'));assert.equal(data.remaining,9);
 });
+
+test('Google quota errors are distinguishable so the client can stop the remaining area checks',async()=>{
+ const s=setup({upstream:()=>json({},429)}),data=await(await s.request()).json();
+ assert.equal(data.remainingChecks,45);assert.equal(s.calls.length,5);
+ assert.ok(data.stations.every(s=>s.errorCode==='provider_limit'&&!s.checkedAt&&s.jamMetres===undefined));
+});
 test('segment lengths use metres, shared endpoints once, clipped final kilometre',()=>{
  const points=[[0,0],[.004,0],[.008,0],[.012,0]],r=route(points,[{endPolylinePointIndex:1,speed:'TRAFFIC_JAM'},{startPolylinePointIndex:1,endPolylinePointIndex:2,speed:'SLOW'},{startPolylinePointIndex:2,endPolylinePointIndex:3,speed:'NORMAL'}]),m=measure(r,points.at(-1));
  assert.equal(m.approachMetres,1000);assert.ok(Math.abs(m.jamMetres-(1000-2*metres(points[0],points[1])))<6);assert.equal(m.slowMetres,440);assert.equal(m.segments.length,3);

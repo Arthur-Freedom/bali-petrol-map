@@ -46,6 +46,12 @@ The service uses the existing **Workers Free** account, with no paid plan, obser
 
 GitHub credentials remain encrypted in the cinema service's private session object. Google calls accept no user-provided URLs, stations or coordinates. Refresh requests accept only a `stationIds` array of one to five unique allowlisted IDs, a valid session and the expected origin. The old empty-body request remains compatible with the original five stations. Unauthorized failures are sanitized and do not call Google.
 
+## Refresh recovery
+
+API requests time out after 35 seconds and never retry automatically. A failed in-flight station check keeps its prior values and original timestamp, marks it failed, and removes it from current recommendations. Missing, duplicate, unrequested, malformed, or implausibly dated readings are not accepted as successful checks. An incomplete response or a Google quota error stops the remaining area batches and optional repeat checks. Sign-out aborts pending browser requests; an old session response cannot revoke a newer session or restore signed-out readings. Google script loading has a separate 25-second timeout and explicit retry, with paid refresh controls locked until the map is ready.
+
+These checks establish error handling, not real-world traffic accuracy. The disagreement between Google road colours and all-NORMAL route intervals remains unresolved; a successful HTTP response alone is not evidence that automatic station comparisons work. An alternative traffic feed must be validated against real Bali roads before claiming the core comparison goal is complete.
+
 ## Measurement
 
 `traffic-service/worker.mjs` calls Compute Routes with `TRAFFIC_AWARE_OPTIMAL` and `TRAFFIC_ON_POLYLINE`. It decodes the route geometry, validates interval coverage and the endpoint, and sums geodesic metres within the final kilometre (or the available approach when shorter). It counts interval edges rather than points and clips the boundary segment. The list ranks the proportion of the sample reported SLOW or TRAFFIC_JAM, then the TRAFFIC_JAM proportion. The chosen approach does not cover every entrance/direction or queues inside the forecourt. It reflects car traffic, not a specific motorcycle queue.
