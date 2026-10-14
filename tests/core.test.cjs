@@ -17,11 +17,40 @@ test('unknown, failed and stale readings cannot beat current observations',()=>{
  const old=station('old',0,{checkedAt:'2026-10-14T00:00:00+08:00'}),failed=station('failed',0,{refreshFailed:true}),unknown=station('unknown',null),fresh=station('fresh',900);
  assert.equal(P.ordered([old,failed,unknown,fresh],null,now)[0].id,'fresh');assert.equal(P.status(old,now).label,'Was less busy');assert.equal(P.status(unknown,now).label,'Not checked');
 });
-test('all requested areas contain mapped locations and groups cap at five',()=>{
- for(const id of ['kuta','legian','seminyak','canggu','denpasar','pererenan','ubud','gianyar']){const area=catalog.areas.find(a=>a.id===id),list=P.inScope(catalog.stations,area);assert.ok(list.length>0,id);assert.ok(P.batch(list,area.center).length<=5);}
- const area=catalog.areas.find(a=>a.id==='denpasar'),list=P.inScope(catalog.stations,area),a=P.batch(list,area.center),b=P.batch(list,area.center,1);assert.ok(!a.some(s=>b.some(t=>s.id===t.id)));
+test('all requested areas contain mapped locations and API batches cap at five',()=>{
+ for(const id of ['kuta','legian','seminyak','canggu','denpasar','pererenan','ubud','gianyar']){const area=catalog.areas.find(a=>a.id===id),list=P.inScope(catalog.stations,area);assert.ok(list.length>0,id);assert.ok(P.refreshPlan(list,area.center).batches.every(b=>b.length<=5));}
+ const area=catalog.areas.find(a=>a.id==='denpasar'),list=P.inScope(catalog.stations,area),[a,b]=P.refreshPlan(list,area.center).batches;assert.ok(!a.some(s=>b.some(t=>s.id===t.id)));
 });
 test('catalogue locations are unique, finite and traceable; new locations have no assumed hours',()=>{
  assert.ok(catalog.stations.length>200);assert.equal(new Set(catalog.stations.map(s=>s.id)).size,catalog.stations.length);
  for(const s of catalog.stations){assert.ok(s.coordinates.every(Number.isFinite));assert.ok(s.sourceUrl.startsWith('https://'));assert.ok(s.approachStart.every(Number.isFinite));if(s.id.startsWith('osm-'))assert.equal(s.operatingStatus,'unknown');}
+});
+
+test('one area refresh schedules all 15 stations immediately; cooldown only skips those already checked',()=>{
+ const list=Array.from({length:15},(_,i)=>station('s'+i,null));
+ let plan=P.refreshPlan(list,[115,-8],{remainingChecks:50},'area',now);
+ assert.equal(plan.targets.length,15);assert.deepEqual(plan.batches.map(b=>b.length),[5,5,5]);
+ const stationNextAt=Object.fromEntries(plan.batches[0].map(s=>[s.id,now+900000]));
+ plan=P.refreshPlan(list,[115,-8],{remainingChecks:45,stationNextAt},'area',now);
+ assert.equal(plan.targets.length,10);assert.equal(plan.cooling,5);
+ assert.ok(plan.targets.every(s=>!stationNextAt[s.id]));
+});
+
+test('oldest mode prioritizes unchecked, then oldest readings, and respects cooldown and exact remaining checks',()=>{
+ const list=[station('recent',0),station('old',0,{checkedAt:'2026-10-13T00:00:00Z'}),station('unchecked',null,{checkedAt:null}),station('cooling',null,{checkedAt:null})];
+ const budget={remainingChecks:2,stationNextAt:{cooling:now+900000}};
+ const plan=P.refreshPlan(list,[115,-8],budget,'oldest',now);
+ assert.deepEqual(plan.targets.map(s=>s.id),['unchecked','old']);assert.equal(plan.limited,true);
+ assert.equal(P.refreshPlan([list[1]],[115,-8],{remainingChecks:1},'area',now).targets.length,1);
+ assert.equal(P.refreshPlan(list,[115,-8],{remainingChecks:0},'area',now).targets.length,0);
+ assert.equal(P.refreshPlan(list,[115,-8],{...budget,remainingChecks:0,resetAt:now-1},'area',now).targets.length,4);
+});
+
+test('Google Maps links open the place or coordinate pin, never a directions request',()=>{
+ for(const s of [catalog.stations[0],catalog.stations.find(s=>s.id.startsWith('osm-'))]){
+  const url=new URL(P.placeUrl(s));assert.equal(url.pathname,'/maps/search/');assert.equal(url.searchParams.get('api'),'1');
+  assert.equal(url.searchParams.get('query'),`${s.coordinates[1]},${s.coordinates[0]}`);
+  assert.equal(url.searchParams.get('query_place_id'),s.placeId||null);
+  assert.ok(!url.searchParams.has('origin')&&!url.searchParams.has('destination')&&!url.searchParams.has('dir_action'));
+ }
 });

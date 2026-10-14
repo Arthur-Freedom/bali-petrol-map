@@ -1,19 +1,24 @@
 'use strict';
 (()=>{
  const service='https://bali-petrol-traffic.honeymooninbali.workers.dev',auth='https://bali-cinema-owner-refresh.honeymooninbali.workers.dev',owner=window.PetrolOwner;
- let verified=false,pending=false,dailyNextAt=0,groupNextAt={},remaining=10,gmap=null,gmarkers=[],lines=[],auto=false,epoch=0,googleLoading=null;
- const live={active:false,readings:new Map(),controls,scopeChanged(){auto=false;$('auto-refresh').checked=false;controls();},focus(s){gmap?.panTo({lat:s.coordinates[1],lng:s.coordinates[0]});gmap?.setZoom(15)},fit(){if(!gmap)return;const list=scopedStations();if(!list.length)return;const bounds=new google.maps.LatLngBounds();list.forEach(s=>bounds.extend({lng:s.coordinates[0],lat:s.coordinates[1]}));gmap.fitBounds(bounds,70)},updateMarkers(){const visible=new Set(scopedStations().map(s=>s.id)),targets=new Set(refreshTargets().map(s=>s.id));gmarkers.forEach(({id,element})=>{const s=stations.find(s=>s.id===id);updateMarker(s,element,visible.has(id),targets.has(id),gmap?.getZoom()||0);});lines.forEach(({id,line})=>line.setMap(visible.has(id)?gmap:null));},clear(){live.readings.clear();live.active=false;lines.forEach(({line})=>line.setMap(null));lines=[];$('google-map').hidden=true;$('map').hidden=false;if(dataset){applyChecks();renderList();renderDetail();map?.resize();}updateSnapshot();}};
+ let verified=false,pending=false,budget={remainingChecks:50,stationNextAt:{}},progress=null,scopeVersion=0,gmap=null,gmarkers=[],lines=[],auto=false,autoNextAt=0,epoch=0,googleLoading=null;
+ const live={active:false,readings:new Map(),controls,refreshStation(id){auto=false;$('auto-refresh').checked=false;return refresh(id);},scopeChanged(){scopeVersion++;auto=false;$('auto-refresh').checked=false;if(!pending&&verified)status('Ready to compare this area.');controls();},focus(s){gmap?.panTo({lat:s.coordinates[1],lng:s.coordinates[0]});gmap?.setZoom(15)},fit(){if(!gmap)return;const list=scopedStations();if(!list.length)return;const bounds=new google.maps.LatLngBounds();list.forEach(s=>bounds.extend({lng:s.coordinates[0],lat:s.coordinates[1]}));gmap.fitBounds(bounds,70)},updateMarkers(){const visible=new Set(scopedStations().map(s=>s.id));gmarkers.forEach(({id,element})=>{const s=stations.find(s=>s.id===id);updateMarker(s,element,visible.has(id),gmap?.getZoom()||0);});lines.forEach(({id,line})=>line.setMap(visible.has(id)?gmap:null));},clear(){live.readings.clear();live.active=false;lines.forEach(({line})=>line.setMap(null));lines=[];$('google-map').hidden=true;$('map').hidden=false;if(dataset){applyChecks();renderList();renderDetail();map?.resize();}updateSnapshot();}};
  window.PetrolLive=live;
  function status(message){$('owner-status').textContent=message;}
- function allowedAt(){return Math.max(dailyNextAt,groupNextAt[refreshTargets().map(s=>s.id).sort().join(',')]||0);}
- function limits(data){if(data.groups)groupNextAt=data.groups;if(Number.isFinite(data.dailyNextAt))dailyNextAt=data.dailyNextAt;if(Number.isFinite(data.remaining))remaining=data.remaining;}
+ function mode(){return $('refresh-mode').value;}
+ function plan(id){return P.refreshPlan(id?stations.filter(s=>s.id===id):scopedStations(),scopeCenter(),budget,id?'area':mode());}
+ function limits(data){if(data.stationNextAt)budget.stationNextAt=data.stationNextAt;if(Number.isFinite(data.resetAt))budget.resetAt=data.resetAt;if(Number.isFinite(data.remainingChecks))budget.remainingChecks=data.remainingChecks;}
+ function waitLabel(p){return `Recheck in ${Math.max(1,Math.ceil((p.nextAt-Date.now())/60000))} min`;}
  function controls(){
-   if(dailyNextAt&&Date.now()>=dailyNextAt){dailyNextAt=0;remaining=10;groupNextAt={};}
+   if(budget.resetAt&&Date.now()>=budget.resetAt)budget={remainingChecks:50,stationNextAt:{}};
    $('owner-login').hidden=verified;$('traffic-refresh').hidden=!verified;$('owner-logout').hidden=!owner.get();$('auto-wrap').hidden=!verified;
    $('owner-login').textContent=owner.get()?'Retry connection':'Sign in with GitHub';
-   const wait=Math.max(0,Math.ceil((allowedAt()-Date.now())/60000));
-   const count=refreshTargets().length;$('traffic-refresh').disabled=pending||wait>0||!verified||!count;
-   $('traffic-refresh').textContent=pending?'Checking traffic…':remaining===0?'Daily limit reached':wait>0?`Refresh in ${wait} min`:`Refresh ${count} stations`;
+   const p=plan(),count=p.targets.length;
+   $('traffic-refresh').disabled=pending||!verified||!count;
+   $('traffic-refresh').textContent=pending?(progress?`Checking ${progress.done}/${progress.total}…`:'Preparing checks…'):!p.total?'No stations here':p.remainingChecks===0?'Daily budget used':!count?waitLabel(p):mode()==='oldest'?`Refresh oldest ${count}`:p.limited?`Refresh next ${count}`:p.cooling?`Refresh remaining ${count}`:`Refresh area · ${count}`;
+   $('refresh-summary').textContent=!verified?`Sign in to refresh all ${p.total} stations here, or choose the oldest checks.`:p.remainingChecks===0?'More checks after midnight in Bali.':!p.total?'Choose another area or search.':!count?'These stations were checked recently. Other areas can be checked now.':mode()==='oldest'?'Unchecked stations first, then the oldest readings.':p.limited?`The daily budget allows ${count} of ${p.eligible} due stations now.`:p.cooling?`${p.cooling} checked recently; ${count} can be checked now.`:`One click checks all ${count} stations. No wait between stations.`;
+   $('check-budget').hidden=!verified;$('check-budget').textContent=`${p.remainingChecks} station checks left today`;
+   const button=$('refresh-station');if(button){const one=plan(button.dataset.id);button.hidden=!verified;button.disabled=pending||!one.targets.length;button.textContent=pending?'Checking traffic…':one.remainingChecks===0?'Daily budget used':one.targets.length?'Refresh this station':waitLabel(one);}
  }
  async function request(path,method='GET',body={}){
    const response=await fetch(service+path,{method,cache:'no-store',headers:{Authorization:'Bearer '+owner.get(),...(method==='POST'?{'Content-Type':'application/json'}:{})},...(method==='POST'?{body:JSON.stringify(body)}:{})});
@@ -40,27 +45,37 @@
  async function connect(){
    if(!owner.get()){status(owner.error||'Only Arthur-Freedom can request live traffic.');controls();return;}
    const generation=++epoch;status('Verifying your GitHub account…');
-   try{const data=await request('/api/session');if(generation!==epoch)return;limits(data);verified=true;await loadGoogle(data.mapsKey);await window.petrolReady;if(generation!==epoch)return;showGoogle();status('Signed in as Arthur-Freedom · '+remaining+' refreshes left today.');}
+   try{const data=await request('/api/session');if(generation!==epoch)return;limits(data);verified=true;await loadGoogle(data.mapsKey);await window.petrolReady;if(generation!==epoch)return;showGoogle();status('Signed in as Arthur-Freedom.');}
    catch(error){verified=false;status(error.message);}finally{controls();}
  }
- async function refresh(){
-   const ids=refreshTargets().map(s=>s.id);if(!verified||pending||Date.now()<allowedAt()||!ids.length)return;pending=true;controls();status(`Measuring ${ids.length} station approaches…`);const generation=epoch;
+ async function refresh(id){
+   if(!verified||pending||!plan(id).targets.length)return;
+   pending=true;progress=null;autoNextAt=Date.now()+15*60000;controls();status('Checking the available refresh budget…');const generation=epoch,scope=scopeVersion;
    try{
-     const data=await request('/api/refresh','POST',{stationIds:ids});if(generation!==epoch)return;limits(data);
-     let success=0;for(const reading of data.stations){if(!reading.error){live.readings.set(reading.id,reading);success++;}else{const previous=live.readings.get(reading.id);if(previous)previous.refreshFailed=true;else live.readings.set(reading.id,{id:reading.id,refreshFailed:true});}}
-     showGoogle();applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();
-     status(`${success} of ${ids.length} approaches updated · ${remaining} refreshes left today.${success<ids.length?' Unavailable readings are marked; previous readings retain their original time.':''}`);
-   }catch(error){status(error.message);}finally{pending=false;controls();}
+     // Synchronize limits across devices before making any paid calls.
+     const session=await request('/api/session');if(generation!==epoch||scope!==scopeVersion)return;limits(session);
+     const current=plan(id);progress={done:0,total:current.targets.length};let success=0;
+     if(!current.targets.length){status('These stations were checked recently, or today’s budget is used.');return;}
+     for(const batch of current.batches){
+       if(generation!==epoch||scope!==scopeVersion||(auto&&document.hidden))break;
+       controls();status(`Checking traffic · ${progress.done} of ${progress.total} stations completed…`);
+       const data=await request('/api/refresh','POST',{stationIds:batch.map(s=>s.id)});if(generation!==epoch)return;limits(data);
+       for(const reading of data.stations){if(!reading.error){live.readings.set(reading.id,reading);success++;}else{const previous=live.readings.get(reading.id);if(previous)previous.refreshFailed=true;else live.readings.set(reading.id,{id:reading.id,refreshFailed:true});}}
+       progress.done+=batch.length;applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();
+     }
+     if(generation===epoch)status(`${success} of ${progress.done} stations updated.${progress.done>success?' Unavailable readings keep their original times.':''}${scope!==scopeVersion?' Area changed; remaining checks stopped.':''}`);
+   }catch(error){auto=false;$('auto-refresh').checked=false;status(error.message);}finally{pending=false;progress=null;autoNextAt=Date.now()+15*60000;controls();}
  }
  $('owner-login').addEventListener('click',()=>{if(owner.get()){connect();return;}location.href=auth+'/auth/login?return='+encodeURIComponent('https://arthur-freedom.github.io/bali-petrol-map/');});
- $('traffic-refresh').addEventListener('click',refresh);
+ $('traffic-refresh').addEventListener('click',()=>refresh());
+ $('refresh-mode').addEventListener('change',()=>live.scopeChanged());
  $('auto-refresh').addEventListener('change',()=>{auto=$('auto-refresh').checked;if(auto)refresh();});
  $('owner-logout').addEventListener('click',async()=>{
    const handle=owner.get();++epoch;verified=false;auto=false;$('auto-refresh').checked=false;owner.clear();live.clear();controls();status('Signing out…');
    try{const r=await fetch(auth+'/api/logout',{method:'POST',headers:{Authorization:'Bearer '+handle,'Content-Type':'application/json'},body:'{}'});if(!r.ok)throw Error();status('Signed out. Live traffic is locked.');}catch{status('Signed out on this device. Server revocation could not be confirmed; retry signing in and out when connected.');}
  });
  addEventListener('owner-session-change',()=>{++epoch;verified=false;live.clear();connect();});
- setInterval(()=>{controls();if(auto&&verified&&!document.hidden&&Date.now()>=allowedAt())refresh();},15000);
- document.addEventListener('visibilitychange',()=>{if(auto&&verified&&!document.hidden&&Date.now()>=allowedAt())refresh();});
+ setInterval(()=>{controls();if(auto&&verified&&!document.hidden&&Date.now()>=autoNextAt&&plan().targets.length)refresh();},15000);
+ document.addEventListener('visibilitychange',()=>{if(auto&&verified&&!document.hidden&&Date.now()>=autoNextAt&&plan().targets.length)refresh();});
  connect();
 })();

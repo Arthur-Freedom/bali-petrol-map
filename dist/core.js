@@ -19,7 +19,20 @@
  function inScope(stations,area,query=''){
    const q=query.trim().toLowerCase();return stations.filter(s=>(!area||distance(area.center,s.coordinates)<=area.radius)&&(!q||[s.name,s.shortName,s.area,s.address].join(' ').toLowerCase().includes(q)));
  }
- function batch(stations,center,page=0){return [...stations].sort((a,b)=>distance(center,a.coordinates)-distance(center,b.coordinates)||a.id.localeCompare(b.id)).slice(page*5,page*5+5);}
+ function placeUrl(s){const query=`${s.coordinates[1]},${s.coordinates[0]}`;return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}${s.placeId?'&query_place_id='+encodeURIComponent(s.placeId):''}`;}
+ function refreshPlan(stations,center,budget={},mode='area',now=Date.now()){
+   const byDistance=(a,b)=>distance(center,a.coordinates)-distance(center,b.coordinates)||a.id.localeCompare(b.id);
+   const oldest=s=>{const time=Date.parse(s.checkedAt);return Number.isFinite(time)?time:0;};
+   const list=[...stations].sort(mode==='oldest'?(a,b)=>oldest(a)-oldest(b)||byDistance(a,b):byDistance);
+   const stationNextAt=budget.resetAt&&now>=budget.resetAt?{}:budget.stationNextAt||{};
+   const cooling=list.filter(s=>(stationNextAt[s.id]||0)>now);
+   const ready=list.filter(s=>(stationNextAt[s.id]||0)<=now);
+   const wanted=mode==='oldest'?ready.slice(0,5):ready;
+   const available=budget.resetAt&&now>=budget.resetAt?50:Math.max(0,budget.remainingChecks??50);
+   const targets=wanted.slice(0,available),batches=[];
+   for(let i=0;i<targets.length;i+=5)batches.push(targets.slice(i,i+5));
+   return {targets,batches,total:list.length,eligible:wanted.length,cooling:cooling.length,nextAt:cooling.length?Math.min(...cooling.map(s=>stationNextAt[s.id])):0,limited:targets.length<wanted.length,remainingChecks:available};
+ }
  function mergeLive(base,reading){return {...base,jamMetres:reading?.jamMetres??null,slowMetres:reading?.slowMetres??null,approachMetres:reading?.approachMetres??null,checkedAt:reading?.checkedAt??null,refreshFailed:!!reading?.refreshFailed,live:!!reading?.checkedAt};}
- const api={distance,fresh,opening,status,ordered,inScope,batch,mergeLive};if(typeof module!=='undefined'&&module.exports)module.exports=api;root.Petrol=api;
+ const api={distance,fresh,opening,status,ordered,inScope,refreshPlan,placeUrl,mergeLive};if(typeof module!=='undefined'&&module.exports)module.exports=api;root.Petrol=api;
 })(typeof window!=='undefined'?window:globalThis);

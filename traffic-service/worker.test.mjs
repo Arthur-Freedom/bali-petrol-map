@@ -57,3 +57,36 @@ test('worker catalogue matches the public locations exactly',async()=>{
  const {readFile}=await import('node:fs/promises'),data=JSON.parse(await readFile(new URL('../dist/stations.json',import.meta.url)));
  assert.deepEqual(ALL_STATIONS,data.stations.map(s=>({id:s.id,end:s.coordinates,start:s.approachStart})));
 });
+
+test('15 distinct stations can be checked back-to-back at the same time',async()=>{
+ const s=setup(),ids=ALL_STATIONS.slice(0,15).map(s=>s.id);let data;
+ for(let i=0;i<15;i+=5){const r=await s.request({body:JSON.stringify({stationIds:ids.slice(i,i+5)})});assert.equal(r.status,200);data=await r.json();}
+ assert.equal(s.calls.length,15);assert.equal(data.remainingChecks,35);
+});
+
+test('single station uses one check and cannot bypass cooldown by changing groups',async()=>{
+ const s=setup(),ids=ALL_STATIONS.slice(0,2).map(s=>s.id);
+ let r=await s.request({body:JSON.stringify({stationIds:[ids[0]]})});assert.equal((await r.json()).remainingChecks,49);
+ assert.equal((await s.request({body:JSON.stringify({stationIds:ids})})).status,429);assert.equal(s.calls.length,1);
+ r=await s.request({body:JSON.stringify({stationIds:[ids[1]]})});assert.equal(r.status,200);assert.equal((await r.json()).remainingChecks,48);
+});
+
+test('single-station refreshes still stop at exactly 50 daily Google queries',async()=>{
+ const s=setup();for(const station of ALL_STATIONS.slice(0,50))assert.equal((await s.request({body:JSON.stringify({stationIds:[station.id]})})).status,200);
+ assert.equal((await s.request({body:JSON.stringify({stationIds:[ALL_STATIONS[50].id]})})).status,429);assert.equal(s.calls.length,50);
+});
+
+test('migration preserves previous spending and cooldowns across overlapping selections',async()=>{
+ const s=setup(),day='2026-10-15',id=STATIONS[0].id,nextAt=Date.parse(day+'T00:15:00+08:00');
+ s.records.set('budget',{day,count:3,groups:{[STATIONS.map(s=>s.id).sort().join(',')]:nextAt}});
+ let data=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(data.remainingChecks,35);assert.equal(data.stationNextAt[id],nextAt);
+ assert.equal((await s.request({body:JSON.stringify({stationIds:[id]})})).status,429);
+ assert.equal((await s.request({body:JSON.stringify({stationIds:[ALL_STATIONS[10].id]})})).status,200);
+ data=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(data.remainingChecks,34);
+});
+
+test('concurrent distinct requests cannot exceed the final daily check',async()=>{
+ const s=setup();s.records.set('budget',{day:'2026-10-15',used:49,stationNextAt:{},groups:{}});
+ const results=await Promise.all(ALL_STATIONS.slice(0,2).map(station=>s.request({body:JSON.stringify({stationIds:[station.id]})})));
+ assert.deepEqual(results.map(r=>r.status).sort(),[200,429]);assert.equal(s.calls.length,1);assert.equal(s.records.get('budget').used,50);
+});

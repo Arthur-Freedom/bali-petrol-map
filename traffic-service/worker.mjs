@@ -1,6 +1,6 @@
 export const ORIGIN='https://arthur-freedom.github.io';
 export const OWNER='18115558';
-export const COOLDOWN=15*60*1000, DAILY_LIMIT=10;
+export const COOLDOWN=15*60*1000, DAILY_LIMIT=50;
 const AUTH='https://bali-cinema-owner-refresh.honeymooninbali.workers.dev';
 import CATALOGUE from './stations.mjs';
 export const ALL_STATIONS=CATALOGUE;
@@ -29,25 +29,32 @@ export function measure(route,end){
 }
 
 // One globally named object. Admission serializes the shared daily budget and
-// per-group cooldown across tabs. Google content is never persisted.
+// per-station cooldown across tabs. Google content is never persisted.
 export class TrafficBudget {
   constructor(state,env,{now=Date.now}={}){this.storage=state.storage;this.now=now;this.pending=Promise.resolve();}
   fetch(request){const run=this.pending.then(()=>this.admit(request));this.pending=run.catch(()=>{});return run;}
   async admit(request){
     const now=this.now(),day=new Date(now+8*3600000).toISOString().slice(0,10);
-    const saved=await this.storage.get('budget')||{day,count:0,groups:{}};
-    const count=saved.day===day?saved.count:0;
+    const saved=await this.storage.get('budget')||{day,used:0};
+    // Conservatively charge each old five-station attempt as five checks.
+    const used=saved.day===day?(saved.used??(saved.count||0)*5):0;
     const midnight=Date.parse(day+'T00:00:00+08:00')+86400000;
     const groups=saved.day===day?{...saved.groups}:{};
     if(saved.day===day&&saved.nextAt&&!saved.groups)groups[STATIONS.map(s=>s.id).sort().join(',')]=saved.nextAt;
-    const limits={groups,dailyNextAt:count>=DAILY_LIMIT?midnight:0,remaining:Math.max(0,DAILY_LIMIT-count)};
-    if(request.method==='GET')return json(limits);
+    const stationNextAt=saved.day===day?{...saved.stationNextAt}:{};
+    for(const [group,time] of Object.entries(groups))for(const id of group.split(','))stationNextAt[id]=Math.max(stationNextAt[id]||0,time);
+    const limits=(spent=used)=>({groups,stationNextAt,resetAt:midnight,dailyNextAt:spent>=DAILY_LIMIT?midnight:0,remainingChecks:Math.max(0,DAILY_LIMIT-spent),remaining:Math.max(0,Math.floor((DAILY_LIMIT-spent)/5))});
+    if(request.method==='GET')return json(limits());
     const group=(await request.json()).group;
     if(typeof group!=='string'||group.length>700)return json({error:'Invalid group.'},400);
-    if(now<Math.max(groups[group]||0,limits.dailyNextAt))return json({...limits,error:count>=DAILY_LIMIT?'Daily limit reached. More refreshes tomorrow.':'This group was checked recently. Choose another group or wait 15 minutes.'},429);
+    const ids=group.split(',');
+    if(ids.length>5||new Set(ids).size!==ids.length||!ids.every(id=>CATALOGUE.some(s=>s.id===id)))return json({error:'Invalid stations.'},400);
+    if(used+ids.length>DAILY_LIMIT)return json({...limits(),error:'Daily station-check budget reached. More checks after midnight in Bali.'},429);
+    if(ids.some(id=>now<(stationNextAt[id]||0)))return json({...limits(),error:'A station in this request was checked recently. Other stations can be checked now.'},429);
     groups[group]=now+COOLDOWN;
-    await this.storage.put('budget',{day,count:count+1,groups});
-    return json({groups,dailyNextAt:count+1>=DAILY_LIMIT?midnight:0,remaining:DAILY_LIMIT-count-1});
+    for(const id of ids)stationNextAt[id]=now+COOLDOWN;
+    await this.storage.put('budget',{day,used:used+ids.length,groups,stationNextAt});
+    return json(limits(used+ids.length));
   }
 }
 export function createHandler({fetch:send=globalThis.fetch,now=Date.now}={}){
