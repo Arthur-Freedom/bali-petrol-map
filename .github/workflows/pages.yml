@@ -1,0 +1,97 @@
+name: Publish map / update observation
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      station:
+        description: Station to update, or deploy existing data
+        type: choice
+        default: deploy-only
+        options: [deploy-only, nusa-dua, bypass-30x, bypass-27, dharmawangsa, jimbaran-02]
+      minimum:
+        description: Shortest estimated red stretch (metres); blank for fuel-only check
+        type: string
+      maximum:
+        description: Longest estimated red stretch (metres); blank for fuel-only check
+        type: string
+      pertalite:
+        description: Pertalite availability actually observed
+        type: choice
+        default: unknown
+        options: [unknown, available, out]
+      pertamax:
+        description: Pertamax availability actually observed
+        type: choice
+        default: unknown
+        options: [unknown, available, out]
+      observed_at:
+        description: Actual observation time in Bali (YYYY-MM-DDTHH:mm); required for updates
+        type: string
+      note:
+        description: What you observed; required for updates
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: petrol-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_dispatch' || github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Update the observed station
+        if: github.event_name == 'workflow_dispatch' && inputs.station != 'deploy-only'
+        env:
+          STATION: ${{ inputs.station }}
+          MINIMUM: ${{ inputs.minimum }}
+          MAXIMUM: ${{ inputs.maximum }}
+          PERTALITE: ${{ inputs.pertalite }}
+          PERTAMAX: ${{ inputs.pertamax }}
+          OBSERVED_AT: ${{ inputs.observed_at }}
+          NOTE: ${{ inputs.note }}
+        run: node scripts/update-observation.cjs
+      - name: Check application and observation validation
+        run: |
+          node --check dist/app.js
+          node --check dist/core.js
+          node --test tests/*.test.cjs
+      - name: Save the observation to GitHub
+        if: github.event_name == 'workflow_dispatch' && inputs.station != 'deploy-only'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dist/observations.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update petrol station observation'
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

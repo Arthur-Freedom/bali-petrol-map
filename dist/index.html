@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#17483e">
+  <meta name="description" content="Compare petrol stations around Nusa Dua and Jimbaran using dated congestion observations. Find a station, check live traffic and get directions.">
+  <title>Bali Petrol Map</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;650;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script defer src="core.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#stations">Skip to stations</a>
+  <main class="app">
+    <aside class="panel" aria-label="Station finder">
+      <header class="brand"><div><p class="eyebrow">BALI · PETROL</p><h1>Bali petrol map</h1><p>Less time in the queue.</p></div><button class="icon-button" id="help-toggle" aria-expanded="false" aria-controls="help" aria-label="Settings and help">☰</button></header>
+      <section class="controls" aria-label="Find and compare stations">
+        <label class="small-label" for="search">FIND A STATION</label>
+        <div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="Station or area…" autocomplete="off"></div>
+        <div class="control-pair"><div><label for="fuel">Fuel</label><select id="fuel"><option value="either">Either fuel</option><option value="pertalite">Pertalite</option><option value="pertamax">Pertamax</option></select></div><div><label for="sort">Compare by</label><select id="sort"><option value="congestion">Shortest red stretch</option><option value="distance">Nearest to start</option><option value="name">Station name</option></select></div></div>
+        <div class="origin-heading"><span class="small-label">YOUR STARTING POINT</span><button class="text-button" id="clear-origin" hidden>Clear</button></div>
+        <div class="origin-actions"><button id="choose-point" aria-pressed="false">Choose on map</button><button id="locate">Use my location</button></div>
+        <p class="hint" id="origin-status" role="status">Set a starting point to compare distances.</p>
+        <div class="snapshot"><span class="clock-icon" aria-hidden="true">◷</span><div><strong id="snapshot-title">Saved observations · not live</strong><span id="snapshot-time">Loading observation times…</span><button class="text-button" id="update-help">How to update</button></div><button id="reload" class="icon-button" aria-label="Reload saved data" title="Reload the published measurements; does not remeasure traffic">↻</button></div>
+      </section>
+      <section class="list-section" aria-labelledby="list-title"><div class="list-heading"><h2 id="list-title">Nearby stations</h2><span id="count"></span></div><p class="list-caption" id="list-caption">Ranked by observed red-road length</p><ul id="stations" tabindex="-1"></ul></section>
+      <footer class="panel-footer">Nusa Dua &amp; Jimbaran <span>·</span> <button class="text-button" id="method-link">How this comparison works</button></footer>
+    </aside>
+    <section class="map-wrap" aria-label="Petrol station map">
+      <div id="map" role="region" aria-label="Map of petrol stations"></div>
+      <div class="map-toolbar"><button id="show-all">All stations <span aria-hidden="true">↗</span></button><a href="https://www.google.com/maps/@-8.792,115.202,14z/data=!5m1!1e1" target="_blank" rel="noopener noreferrer">Google live traffic <span aria-hidden="true">↗</span></a></div>
+      <div class="map-error" id="map-error" hidden>Map tiles could not load. The station list and directions still work. <button id="retry-map">Retry map</button></div>
+      <div class="map-prompt" id="map-prompt" hidden>Tap the map to set your starting point</div>
+      <div class="legend" aria-label="Map marker legend"><span><i class="short"></i>Shorter red stretch</span><span><i class="long"></i>Longer</span><span><i class="unknown"></i>Unchecked</span></div>
+      <div class="map-label">SAVED OBSERVATIONS <span>Live traffic opens in Google Maps ↗</span></div>
+    </section>
+    <section class="detail" id="detail" aria-label="Selected petrol station" tabindex="-1"></section>
+  </main>
+  <section class="help" id="help" hidden aria-labelledby="help-title"><header><h2 id="help-title">Settings &amp; help</h2><button id="help-close" class="icon-button" aria-label="Close settings">×</button></header>
+    <details open id="update-instructions"><summary>How to update</summary><p><strong>Google live traffic</strong> opens Google’s current traffic view. Reload that Google Maps view to request traffic again.</p><p>To update your comparison: open a station, check its red stretch against the map scale, then use <strong>Add your check</strong>. It saves on this device.</p><p>To update the map for everyone, the owner can <a href="https://github.com/Arthur-Freedom/bali-petrol-map/actions/workflows/pages.yml" target="_blank" rel="noopener">publish a shared observation ↗</a>: choose <strong>Run workflow</strong>, select the station, enter the length, actual Bali observation time and a short note. GitHub validates, saves and publishes it.</p><p><strong>Reload saved data ↻</strong> fetches those published measurements. It does not remeasure Google traffic. This site has no automatic traffic feed.</p></details>
+    <details><summary>How the comparison works</summary><p>Lengths are approximate measurements of red/dark-red stretches against Google Maps’ scale. Each station shows its actual observation time. The initial observations are from 14 October 2026, around 10:45 WITA.</p><p>A red stretch ending at a station, with green beyond, can indicate a fuel queue. Junctions, through traffic and separate pump lines also affect it. The pin colours compare recorded lengths; this map does not receive a live Google traffic feed.</p><p>Open <strong>Google live traffic</strong> to check conditions now. Recorded lengths are a starting comparison, not confirmation that petrol is available.</p><p>Observations more than one hour old are marked as older. Reload fetches the latest saved dataset; it does not remeasure Google’s traffic.</p></details>
+    <details><summary>Your checks and privacy</summary><p>Use <strong>Add your check</strong> on a station to record what you see. These checks and your selected starting point stay in this browser. They are not sent to other visitors. A newer published observation takes priority over an older personal check. Checks saved on the original Sites address do not transfer to this address.</p><p>Your location is requested only when you press “Use my location”. Directions open Google Maps with the starting point you selected.</p><button id="reset-checks" class="secondary">Clear my saved checks</button><p id="reset-status" role="status"></p></details>
+    <details><summary>Distances and waiting estimates</summary><p>Distances are straight-line distances from your selected starting point. Driving routes can be longer.</p><p>The optional waiting calculator assumes that the entire entered red stretch is a motorbike queue. It estimates bikes ahead from spacing and rows, then divides by the combined service rate of the active pumps. All inputs are adjustable. It excludes any queue inside the station and cannot account for an empty tank at the station or a stopped pump.</p></details>
+    <details><summary>Coverage and sources</summary><p>Five mapped stations around Nusa Dua and Jimbaran. Unchecked stations are left unranked. Fuel availability is unknown until someone records a check; every report can become outdated.</p><p>Station names, coordinates and traffic observations: Google Maps. Basemap: OpenFreeMap / OpenStreetMap. This is an independent comparison tool.</p><p><a href="https://github.com/Arthur-Freedom/bali-petrol-map" target="_blank" rel="noopener">Source on GitHub ↗</a></p><p><a href="https://arthur-freedom.github.io/bali-cinema-map/" target="_blank" rel="noopener">Bali Cinema Map ↗</a> · <a href="https://arthur-freedom.github.io/au-462-work-map/" target="_blank" rel="noopener">Australia 462 map ↗</a></p></details>
+  </section>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <noscript><p class="noscript">Enable JavaScript to use the interactive map. <a href="https://www.google.com/maps/search/SPBU+near+Nusa+Dua/">Open petrol stations in Google Maps</a>.</p></noscript>
+</body></html>
