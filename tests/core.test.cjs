@@ -3,7 +3,7 @@ const now=Date.parse('2026-10-15T02:10:00+08:00'),at='2026-10-15T02:00:00+08:00'
 const station=(id,jamMetres,extra={})=>({id,name:id,shortName:id,coordinates:[115,-8],jamMetres,checkedAt:at,...extra});
 test('Google listed closures never override congestion or exclude a station',()=>{
  const low=station('quiet',0,{operatingStatus:'closed',operatingSource:'google_listing',operatingCheckedAt:at}),busy=station('busy',700);
- assert.equal(P.status(low,now).label,'Less busy');assert.equal(P.status(low,now).blocked,false);assert.equal(P.opening(low,now).label,'Listed closed · unverified');assert.equal(P.ordered([busy,low],null,now)[0].id,'quiet');
+ assert.equal(P.status(low,now).label,'No slowdown returned');assert.equal(P.status(low,now).blocked,false);assert.equal(P.opening(low,now).label,'Listed closed · unverified');assert.equal(P.ordered([busy,low],null,now)[0].id,'quiet');
 });
 test('only a recent explicit firsthand closure can block, never a legacy unsourced closure',()=>{
  const s=station('x',0,{operatingStatus:'closed',operatingCheckedAt:at});assert.equal(P.status(s,now).blocked,false);
@@ -15,7 +15,7 @@ test('traffic refresh never freshens opening information or invents waiting minu
 });
 test('unknown, failed and stale readings cannot beat current observations',()=>{
  const old=station('old',0,{checkedAt:'2026-10-14T00:00:00+08:00'}),failed=station('failed',0,{refreshFailed:true}),unknown=station('unknown',null),fresh=station('fresh',900);
- assert.equal(P.ordered([old,failed,unknown,fresh],null,now)[0].id,'fresh');assert.equal(P.status(old,now).label,'Was less busy');assert.equal(P.status(unknown,now).label,'Not checked');
+ assert.equal(P.ordered([old,failed,unknown,fresh],null,now)[0].id,'fresh');assert.equal(P.status(old,now).label,'Earlier: no slowdown returned');assert.equal(P.status(unknown,now).label,'Not checked');
 });
 test('all requested areas contain mapped locations and API batches cap at five',()=>{
  for(const id of ['kuta','legian','seminyak','canggu','denpasar','pererenan','ubud','gianyar']){const area=catalog.areas.find(a=>a.id===id),list=P.inScope(catalog.stations,area);assert.ok(list.length>0,id);assert.ok(P.refreshPlan(list,area.center).batches.every(b=>b.length<=5));}
@@ -53,4 +53,17 @@ test('Google Maps links open the place or coordinate pin, never a directions req
   assert.equal(url.searchParams.get('query_place_id'),s.placeId||null);
   assert.ok(!url.searchParams.has('origin')&&!url.searchParams.has('destination')&&!url.searchParams.has('dir_action'));
  }
+});
+
+test('all-NORMAL responses stay neutral, and orange-only traffic affects classification and ranking',()=>{
+ const zero=station('zero',0,{slowMetres:0}),orange=station('orange',0,{slowMetres:600}),red=station('red',10,{slowMetres:0});
+ assert.equal(P.status(zero,now).tone,'neutral');assert.equal(P.status(zero,now).label,'No slowdown returned');
+ assert.equal(P.status(orange,now).tone,'medium');assert.equal(P.status(red,now).tone,'long');
+ assert.deepEqual(P.ordered([orange,zero,red],null,now).map(s=>s.id),['zero','red','orange']);
+ assert.equal(P.compareTraffic(zero,station('also-zero',0,{slowMetres:0})),0);
+});
+
+test('compare the proportion sampled, then congestion severity, without inventing a queue estimate',()=>{
+ const a=station('half',0,{slowMetres:500,approachMetres:1000}),b=station('all',0,{slowMetres:500,approachMetres:500}),c=station('jam',500,{slowMetres:0,approachMetres:1000});
+ assert.ok(P.compareTraffic(a,b)<0);assert.ok(P.compareTraffic(a,c)<0);assert.equal(P.status(a,now).waitMinutes,undefined);
 });

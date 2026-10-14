@@ -2,18 +2,18 @@ const test=require('node:test'),assert=require('node:assert/strict'),vm=require(
 const source=fs.readFileSync('dist/live.js','utf8');
 
 async function setup({onPost}={}){
- const elements=new Map(),events=new Map(),posts=[];
+ const elements=new Map(),events=new Map(),posts=[],polylines=[],layers=[];
  const element=id=>({id,hidden:false,disabled:false,checked:false,value:id==='refresh-mode'?'area':'',dataset:{},style:{},addEventListener:(name,fn)=>events.set(id+':'+name,fn),querySelector:()=>({textContent:''})});
  const $=id=>id==='refresh-station'&&!elements.has(id)?null:(elements.has(id)?elements.get(id):(elements.set(id,element(id)),elements.get(id)));
  const base=Array.from({length:15},(_,i)=>({id:'s'+i,coordinates:[115+i*.001,-8],shortName:'Station '+i,checkedAt:null}));
  let remainingChecks=50,stationNextAt={};
  const limits=()=>({remainingChecks,stationNextAt:{...stationNextAt},resetAt:Date.now()+86400000});
  class MapStub{panTo(){}setZoom(){}fitBounds(){}addListener(){}getZoom(){return 13}}
- const context={P,$,stations:base,dataset:{stations:base},map:{resize(){}},scopeCenter:()=>[115,-8],scopedStations:()=>context.stations,
+ const context={P,$,selected:null,stations:base,dataset:{stations:base},map:{resize(){}},scopeCenter:()=>[115,-8],scopedStations:()=>context.stations,
   updateMarker(){},renderList(){},renderDetail(){},updateSnapshot(){},selectStation(){},
   applyChecks(){context.stations=base.map(s=>P.mergeLive(s,context.PetrolLive.readings.get(s.id)));},
   Date,Map,Set,Promise,URLSearchParams,encodeURIComponent,Error,
-  google:{maps:{Map:MapStub,ControlPosition:{RIGHT_CENTER:1},LatLngBounds:class{extend(){}},OverlayView:class{setMap(){}},Polyline:class{setMap(){}}}},
+  google:{maps:{Map:MapStub,TrafficLayer:class{constructor(options){this.options=options;layers.push(this)}setMap(map){this.map=map}},ControlPosition:{RIGHT_CENTER:1},LatLngBounds:class{extend(){}},OverlayView:class{setMap(){}},Polyline:class{constructor(options){this.options=options;polylines.push(this)}setMap(map){this.map=map}}}},
   PetrolOwner:{get:()=> 'remembered.'+'a'.repeat(43),clear(){}},petrolReady:Promise.resolve(),
   document:{hidden:false,createElement:()=>element('pin'),addEventListener(){},head:{appendChild(){}}},addEventListener(){},setInterval(){},location:{},
   fetch:async(url,options)=>{
@@ -21,10 +21,10 @@ async function setup({onPost}={}){
    const ids=JSON.parse(options.body).stationIds;posts.push(ids);
    if(onPost)await onPost({ids,posts,context});
    remainingChecks-=ids.length;for(const id of ids)stationNextAt[id]=Date.now()+900000;
-   return new Response(JSON.stringify({...limits(),stations:ids.map(id=>({id,jamMetres:0,slowMetres:0,approachMetres:1000,checkedAt:new Date().toISOString(),segments:[]}))}));
+   return new Response(JSON.stringify({...limits(),stations:ids.map(id=>({id,jamMetres:0,slowMetres:0,approachMetres:1000,checkedAt:new Date().toISOString(),segments:[{from:[115,-8],to:[115.01,-8],speed:'NORMAL'}]}))}));
   }};
  context.window=context;vm.runInNewContext(source,context);await new Promise(setImmediate);
- return {context,elements,events,posts,$};
+ return {context,elements,events,posts,polylines,layers,$};
 }
 
 test('area button actually checks all 15 back-to-back without timers or paid page-load calls',async()=>{
@@ -45,4 +45,13 @@ test('changing areas stops further paid batches after the in-flight batch finish
  const s=await setup({onPost:({context})=>context.PetrolLive.scopeChanged()});
  await s.events.get('traffic-refresh:click')();assert.equal(s.posts.length,1);assert.equal(s.context.PetrolLive.readings.size,5);
  assert.match(s.$('owner-status').textContent,/remaining checks stopped/);
+});
+
+test('native traffic auto-refreshes; sampled NORMAL routes never paint green over it',async()=>{
+ const s=await setup();assert.equal(s.layers.length,1);assert.equal(s.layers[0].options.autoRefresh,true);assert.ok(s.layers[0].map);
+ await s.context.PetrolLive.refreshStation('s3');
+ assert.equal(s.polylines.length,1);const line=s.polylines[0];assert.equal(line.options.strokeOpacity,0);assert.equal(line.options.strokeColor,'#285cab');assert.ok(line.options.icons.length);assert.equal(line.map,null);
+ s.context.selected='s3';s.context.PetrolLive.updateMarkers();assert.ok(line.map);
+ s.context.selected='s4';s.context.PetrolLive.updateMarkers();assert.equal(line.map,null);
+ s.context.PetrolLive.clear();assert.equal(s.layers[0].map,null);assert.equal(s.$('road-legend').hidden,true);
 });

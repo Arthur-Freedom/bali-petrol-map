@@ -1,8 +1,8 @@
 'use strict';
 (()=>{
  const service='https://bali-petrol-traffic.honeymooninbali.workers.dev',auth='https://bali-cinema-owner-refresh.honeymooninbali.workers.dev',owner=window.PetrolOwner;
- let verified=false,pending=false,budget={remainingChecks:50,stationNextAt:{}},progress=null,scopeVersion=0,gmap=null,gmarkers=[],lines=[],auto=false,autoNextAt=0,epoch=0,googleLoading=null;
- const live={active:false,readings:new Map(),controls,refreshStation(id){auto=false;$('auto-refresh').checked=false;return refresh(id);},scopeChanged(){scopeVersion++;auto=false;$('auto-refresh').checked=false;if(!pending&&verified)status('Ready to compare this area.');controls();},focus(s){gmap?.panTo({lat:s.coordinates[1],lng:s.coordinates[0]});gmap?.setZoom(15)},fit(){if(!gmap)return;const list=scopedStations();if(!list.length)return;const bounds=new google.maps.LatLngBounds();list.forEach(s=>bounds.extend({lng:s.coordinates[0],lat:s.coordinates[1]}));gmap.fitBounds(bounds,70)},updateMarkers(){const visible=new Set(scopedStations().map(s=>s.id));gmarkers.forEach(({id,element})=>{const s=stations.find(s=>s.id===id);updateMarker(s,element,visible.has(id),gmap?.getZoom()||0);});lines.forEach(({id,line})=>line.setMap(visible.has(id)?gmap:null));},clear(){live.readings.clear();live.active=false;lines.forEach(({line})=>line.setMap(null));lines=[];$('google-map').hidden=true;$('map').hidden=false;if(dataset){applyChecks();renderList();renderDetail();map?.resize();}updateSnapshot();}};
+ let verified=false,pending=false,budget={remainingChecks:50,stationNextAt:{}},progress=null,scopeVersion=0,gmap=null,gmarkers=[],lines=[],trafficLayer=null,auto=false,autoNextAt=0,epoch=0,googleLoading=null;
+ const live={active:false,readings:new Map(),controls,refreshStation(id){auto=false;$('auto-refresh').checked=false;return refresh(id);},scopeChanged(){scopeVersion++;auto=false;$('auto-refresh').checked=false;if(!pending&&verified)status('Ready to compare this area.');controls();},focus(s){gmap?.panTo({lat:s.coordinates[1],lng:s.coordinates[0]});gmap?.setZoom(15)},fit(){if(!gmap)return;const list=scopedStations();if(!list.length)return;const bounds=new google.maps.LatLngBounds();list.forEach(s=>bounds.extend({lng:s.coordinates[0],lat:s.coordinates[1]}));gmap.fitBounds(bounds,70)},updateMarkers(){const visible=new Set(scopedStations().map(s=>s.id));gmarkers.forEach(({id,element})=>{const s=stations.find(s=>s.id===id);updateMarker(s,element,visible.has(id),gmap?.getZoom()||0);});lines.forEach(({id,line})=>line.setMap(visible.has(id)&&id===selected?gmap:null));},clear(){live.readings.clear();live.active=false;lines.forEach(({line})=>line.setMap(null));lines=[];$('google-map').hidden=true;$('map').hidden=false;trafficLayer?.setMap(null);$('road-legend').hidden=true;$('map-layer-title').textContent='PETROL LOCATIONS';$('map-layer-note').textContent='Sign in to see Google road traffic. Petrol queues unconfirmed.';if(dataset){applyChecks();renderList();renderDetail();map?.resize();}updateSnapshot();}};
  window.PetrolLive=live;
  function status(message){$('owner-status').textContent=message;}
  function mode(){return $('refresh-mode').value;}
@@ -17,7 +17,7 @@
    $('traffic-refresh').disabled=pending||!verified||!count;
    $('traffic-refresh').textContent=pending?(progress?`Checking ${progress.done}/${progress.total}…`:'Preparing checks…'):!p.total?'No stations here':p.remainingChecks===0?'Daily budget used':!count?waitLabel(p):mode()==='oldest'?`Refresh oldest ${count}`:p.limited?`Refresh next ${count}`:p.cooling?`Refresh remaining ${count}`:`Refresh area · ${count}`;
    $('refresh-summary').textContent=!verified?`Sign in to refresh all ${p.total} stations here, or choose the oldest checks.`:p.remainingChecks===0?'More checks after midnight in Bali.':!p.total?'Choose another area or search.':!count?'These stations were checked recently. Other areas can be checked now.':mode()==='oldest'?'Unchecked stations first, then the oldest readings.':p.limited?`The daily budget allows ${count} of ${p.eligible} due stations now.`:p.cooling?`${p.cooling} checked recently; ${count} can be checked now.`:`One click checks all ${count} stations. No wait between stations.`;
-   $('check-budget').hidden=!verified;$('check-budget').textContent=`${p.remainingChecks} station checks left today`;
+   $('check-budget').hidden=!verified;$('check-budget').textContent=`${p.remainingChecks} station checks left today · ${50-p.remainingChecks}/50 used`;
    const button=$('refresh-station');if(button){const one=plan(button.dataset.id);button.hidden=!verified;button.disabled=pending||!one.targets.length;button.textContent=pending?'Checking traffic…':one.remainingChecks===0?'Daily budget used':one.targets.length?'Refresh this station':waitLabel(one);}
  }
  async function request(path,method='GET',body={}){
@@ -31,6 +31,7 @@
  function initGoogle(){
    if(gmap)return;
    gmap=new google.maps.Map($('google-map'),{center:{lat:-8.787,lng:115.201},zoom:13,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,gestureHandling:'greedy',zoomControlOptions:{position:google.maps.ControlPosition.RIGHT_CENTER}});
+   trafficLayer=new google.maps.TrafficLayer({autoRefresh:true});
    class Pin extends google.maps.OverlayView{
      constructor(s){super();this.s=s;this.element=document.createElement('button');this.element.className='map-pin google-pin';this.element.dataset.side=s.id==='bypass-27'?'left':'right';this.element.innerHTML=`<span class="pin-number">${s.number}</span><span class="pin-caption"></span>`;this.element.addEventListener('click',()=>selectStation(s.id,true,true));this.setMap(gmap);}
      onAdd(){this.getPanes().overlayMouseTarget.appendChild(this.element);google.maps.OverlayView.preventMapHitsFrom(this.element);}
@@ -40,8 +41,8 @@
    gmarkers=stations.map(s=>{const pin=new Pin(s);return {id:s.id,element:pin.element,pin};});
    gmap.addListener('zoom_changed',()=>live.updateMarkers());
  }
- function showGoogle(){$('google-map').hidden=false;initGoogle();live.active=true;$('map').hidden=true;$('map-error').hidden=true;live.fit();live.updateMarkers();}
- function drawTraffic(){lines.forEach(({line})=>line.setMap(null));lines=[];for(const data of live.readings.values())for(const segment of data.segments||[]){lines.push({id:data.id,line:new google.maps.Polyline({map:gmap,path:[segment.from,segment.to].map(p=>({lng:p[0],lat:p[1]})),strokeColor:{NORMAL:'#40854c',SLOW:'#e8a52e',TRAFFIC_JAM:'#bc4039'}[segment.speed],strokeWeight:5,strokeOpacity:.85,clickable:false,zIndex:1})});}live.updateMarkers();}
+ function showGoogle(){$('google-map').hidden=false;initGoogle();trafficLayer.setMap(gmap);$('road-legend').hidden=false;$('map-layer-title').textContent='GOOGLE ROAD TRAFFIC';$('map-layer-note').textContent='Road colours update automatically. Pins reflect route checks; petrol queues are unknown.';live.active=true;$('map').hidden=true;$('map-error').hidden=true;live.fit();live.updateMarkers();}
+ function drawTraffic(){lines.forEach(({line})=>line.setMap(null));lines=[];for(const data of live.readings.values())for(const segment of data.segments||[]){lines.push({id:data.id,line:new google.maps.Polyline({map:gmap,path:[segment.from,segment.to].map(p=>({lng:p[0],lat:p[1]})),strokeColor:'#285cab',strokeWeight:2,strokeOpacity:0,icons:[{icon:{path:'M 0,-1 0,1',strokeOpacity:.8,strokeWeight:2,scale:1.5},offset:'0',repeat:'14px'}],clickable:false,zIndex:1})});}live.updateMarkers();}
  async function connect(){
    if(!owner.get()){status(owner.error||'Only Arthur-Freedom can request live traffic.');controls();return;}
    const generation=++epoch;status('Verifying your GitHub account…');
