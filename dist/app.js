@@ -39,7 +39,7 @@ function renderDetail(){
 function selectStation(id,fly=true,scroll=false){
  const s=stations.find(s=>s.id===id);if(!s)return;selected=id;history.replaceState(null,'',location.pathname+location.search+'#'+id);renderList();renderDetail();
  if(fly&&window.PetrolLive?.active)window.PetrolLive.focus(s);else if(fly&&map)map.flyTo({center:s.coordinates,zoom:14.5,duration:matchMedia('(prefers-reduced-motion:reduce)').matches?0:500});
- if(scroll&&matchMedia('(max-width:760px)').matches){$('detail').scrollIntoView({behavior:'smooth',block:'start'});$('detail').focus({preventScroll:true});}
+ if(scroll&&matchMedia('(max-width:760px)').matches){const region=document.querySelector('.map-wrap');region.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'});region.focus({preventScroll:true});}
 }
 function fitAll(){if(window.PetrolLive?.active){window.PetrolLive.fit();return;}if(!map)return;const list=scopedStations();if(!list.length)return;const bounds=new maplibregl.LngLatBounds();list.forEach(s=>bounds.extend(s.coordinates));map.fitBounds(bounds,{padding:{top:110,bottom:65,left:55,right:70},maxZoom:14,duration:0});}
 function initMap(){

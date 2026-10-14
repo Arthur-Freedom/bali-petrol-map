@@ -7,9 +7,9 @@
  <title>Bali Petrol Map</title><link rel="icon" type="image/svg+xml" href="icon.svg">
  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;650;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css"><link rel="stylesheet" href="style.css?v=20261015-refresh-recovery">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css"><link rel="stylesheet" href="style.css?v=20261015-mobile-selection">
  <script defer src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
- <script defer src="core.js?v=20261015-refresh-recovery"></script><script defer src="app.js?v=20261015-refresh-recovery"></script><script defer src="live.js?v=20261015-refresh-recovery"></script>
+ <script defer src="core.js?v=20261015-refresh-recovery"></script><script defer src="app.js?v=20261015-mobile-selection"></script><script defer src="live.js?v=20261015-refresh-recovery"></script>
 </head>
 <body>
  <a class="skip" href="#stations">Skip to stations</a>
@@ -30,7 +30,7 @@
    <section class="list-section" aria-labelledby="list-title"><div class="list-heading"><h2 id="list-title">Stations in this area</h2><span id="count"></span></div><p class="list-caption" id="list-caption">Recent traffic first</p><ul id="stations" tabindex="-1"></ul></section>
    <footer class="panel-footer"><span id="coverage-label">Across Bali</span><span>·</span><button class="text-button" id="method-link">How it works</button></footer>
   </aside>
-  <section class="map-wrap" aria-label="Petrol station map">
+  <section class="map-wrap" aria-label="Petrol station map" tabindex="-1">
    <div id="google-map" hidden aria-label="Google map with live road traffic"></div><div id="map" role="region" aria-label="Map of petrol stations"></div>
    <div class="map-toolbar"><button id="show-all">Fit this area <span aria-hidden="true">↗</span></button></div>
    <div class="map-error" id="map-error" hidden>Map tiles could not load. The station list and Google Maps links still work. <button id="retry-map">Retry map</button></div>

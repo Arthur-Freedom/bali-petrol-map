@@ -66,6 +66,8 @@ The standard Google Routes policies restrict caching traffic results; the permit
 
 ## Development and deployment
 
+On phones, choosing a station in the list scrolls to and focuses the map with its highlighted pin. Selected-station details follow immediately below the map, before the station list. Selection respects the device's reduced-motion preference.
+
 Static source is `dist/`; no build is required. Run `python -m http.server 8794 --directory dist` for public UI checks. Owner login, Google display restrictions and CORS intentionally work only at the production Pages origin. Pushes to `main` test and publish Pages through `.github/workflows/pages.yml`. The owner can also dispatch that workflow to republish the app; it no longer accepts manual observations.
 
 Run `node --test tests/*.test.cjs traffic-service/worker.test.mjs`. Tests cover 15-station refreshes without delays, single-station requests, oldest-first selection, budget migration, concurrent and overlapping cooldowns, exact daily limits, stopping on area changes, place links, identity rejection, Bali-day rollover, data minimization, interval lengths and incomplete coverage, unverified opening reports, catalogue coverage, source alignment and fragment removal.

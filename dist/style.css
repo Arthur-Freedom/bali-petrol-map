@@ -25,3 +25,4 @@
 .station-row[aria-pressed=true]{background:#eaf0fa;box-shadow:inset 4px 0 #174a9b}
 .row-busyness{flex-wrap:wrap;gap:3px}.row-busyness>span{width:100%;white-space:normal}.row-busyness strong{font-size:14px}.busy-measure>strong{font-size:26px}.traffic-caveat{font-size:11px;color:var(--muted);line-height:1.55}.traffic-evidence{font-size:12px;line-height:1.6}.legend .medium{background:var(--medium)}.sample-key{width:100%;color:#285cab}.map-label strong{font-size:9px;font-weight:600}.map-label{max-width:285px}
 @media(max-width:760px){.map-pin[aria-pressed=true] .pin-caption{top:calc(100% + 10px);left:50%;right:auto;transform:translateX(-50%);max-width:200px;text-align:center}.map-label{max-width:230px}}
+@media(max-width:760px){.map-wrap{scroll-margin-top:12px}.detail{order:4;margin-top:12px}.list-section{order:5}}
