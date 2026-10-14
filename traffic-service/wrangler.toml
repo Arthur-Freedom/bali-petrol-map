@@ -1,0 +1,24 @@
+name = "bali-petrol-traffic"
+main = "worker.mjs"
+compatibility_date = "2026-10-06"
+account_id = "94cabf810cae12652da86b210cad8009"
+workers_dev = true
+preview_urls = false
+
+[observability]
+enabled = false
+
+[[services]]
+binding = "OWNER_AUTH"
+service = "bali-cinema-owner-refresh"
+
+[[durable_objects.bindings]]
+name = "TRAFFIC_BUDGET"
+class_name = "TrafficBudget"
+
+[[migrations]]
+tag = "traffic-budget-v1"
+new_sqlite_classes = ["TrafficBudget"]
+
+# Workers Free only. Secrets: GOOGLE_ROUTES_KEY, GOOGLE_MAPS_BROWSER_KEY.
+# Budget storage contains counts/times only, never Google's traffic content.

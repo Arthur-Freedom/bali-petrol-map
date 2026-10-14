@@ -1,0 +1,88 @@
+export const ORIGIN='https://arthur-freedom.github.io';
+export const OWNER='18115558';
+export const COOLDOWN=15*60*1000, DAILY_LIMIT=10;
+const AUTH='https://bali-cinema-owner-refresh.honeymooninbali.workers.dev';
+export const STATIONS=[
+  {id:'nusa-dua',end:[115.215228,-8.7934188],start:[115.2205,-8.7996]},
+  {id:'bypass-30x',end:[115.1878323,-8.7841012],start:[115.1973,-8.7856]},
+  {id:'bypass-27',end:[115.2143216,-8.7918632],start:[115.2069,-8.7860]},
+  {id:'dharmawangsa',end:[115.2011719,-8.806721],start:[115.1928,-8.8108]},
+  {id:'jimbaran-02',end:[115.1781471,-8.7702518],start:[115.1790,-8.7620]}
+];
+const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});
+export function metres(a,b){const r=Math.PI/180,dlat=(b[1]-a[1])*r,dlon=(b[0]-a[0])*r,h=Math.sin(dlat/2)**2+Math.cos(a[1]*r)*Math.cos(b[1]*r)*Math.sin(dlon/2)**2;return 6371000*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));}
+export function decodePolyline(value){let i=0,lat=0,lng=0,points=[];const next=()=>{let shift=0,result=0,b;do{if(i>=value.length||shift>30)throw Error('Invalid polyline');b=value.charCodeAt(i++)-63;result|=(b&31)<<shift;shift+=5;}while(b>=32);return result&1?~(result>>1):result>>1;};while(i<value.length){lat+=next();lng+=next();points.push([lng/1e5,lat/1e5]);}return points;}
+export function measure(route,end){
+  const points=decodePolyline(route.polyline?.encodedPolyline||'');
+  const intervals=route.travelAdvisory?.speedReadingIntervals;
+  if(points.length<2||metres(points.at(-1),end)>150||!Array.isArray(intervals)||!intervals.length)throw Error('No verified approach traffic');
+  const speeds=new Array(points.length-1);
+  for(const part of intervals){const start=part.startPolylinePointIndex??0,end=part.endPolylinePointIndex;if(!Number.isInteger(start)||!Number.isInteger(end)||start<0||end>points.length-1||end<=start||!['NORMAL','SLOW','TRAFFIC_JAM'].includes(part.speed))throw Error('Invalid intervals');for(let i=start;i<end;i++){if(speeds[i])throw Error('Overlapping intervals');speeds[i]=part.speed;}}
+  let covered=0,jam=0,slow=0;const segments=[];
+  for(let i=points.length-2;i>=0&&covered<1000;i--){const length=metres(points[i],points[i+1]);if(!length)continue;if(!speeds[i])throw Error('Incomplete coverage');const take=Math.min(length,1000-covered),ratio=take/length;const from=[points[i+1][0]+(points[i][0]-points[i+1][0])*ratio,points[i+1][1]+(points[i][1]-points[i+1][1])*ratio];segments.push({from,to:points[i+1],speed:speeds[i]});covered+=take;if(speeds[i]==='TRAFFIC_JAM')jam+=take;else if(speeds[i]==='SLOW')slow+=take;}
+  if(covered<500)throw Error('Approach too short');
+  return {jamMetres:Math.round(jam/10)*10,slowMetres:Math.round(slow/10)*10,approachMetres:Math.round(covered),segments};
+}
+
+// One globally named object. Serial admission prevents concurrent tabs from
+// each spending the cooldown allowance. Google content is never persisted.
+export class TrafficBudget {
+  constructor(state,env,{now=Date.now}={}){this.storage=state.storage;this.now=now;this.pending=Promise.resolve();}
+  fetch(request){const run=this.pending.then(()=>this.admit(request));this.pending=run.catch(()=>{});return run;}
+  async admit(request){
+    const now=this.now(),day=new Date(now+8*3600000).toISOString().slice(0,10);
+    const saved=await this.storage.get('budget')||{day,count:0,nextAt:0};
+    const count=saved.day===day?saved.count:0;
+    const nextAt=Math.max(saved.nextAt||0,count>=DAILY_LIMIT?Date.parse(day+'T00:00:00+08:00')+86400000:0);
+    if(request.method==='GET')return json({nextAt,remaining:Math.max(0,DAILY_LIMIT-count)});
+    if(now<nextAt)return json({error:count>=DAILY_LIMIT?'Daily limit reached. More refreshes tomorrow.':'A traffic refresh was recently requested. Please wait.',nextAt,remaining:Math.max(0,DAILY_LIMIT-count)},429);
+    await this.storage.put('budget',{day,count:count+1,nextAt:now+COOLDOWN});
+    return json({nextAt:now+COOLDOWN,remaining:DAILY_LIMIT-count-1});
+  }
+}
+export function createHandler({fetch:send=globalThis.fetch,now=Date.now}={}){
+ return async(request,env)=>{
+  let response;
+  try{
+    const path=new URL(request.url).pathname;
+    if(request.headers.get('Origin')!==ORIGIN)response=json({error:'Owner website access required.'},403);
+    else if(request.method==='OPTIONS')response=new Response(null,{status:204});
+    else if(!((path==='/api/session'&&request.method==='GET')||(path==='/api/refresh'&&request.method==='POST')))response=json({error:'Not found.'},404);
+    else if(request.method==='POST'&&(request.headers.get('Content-Type')!=='application/json'||(await request.text())!=='{}'))response=json({error:'Invalid refresh request.'},400);
+    else{
+      const authorization=request.headers.get('Authorization')||'';
+      if(!/^Bearer remembered\.[A-Za-z0-9_-]{43}$/.test(authorization))response=json({error:'Sign in as Arthur-Freedom to refresh traffic.'},401);
+      else{
+        const verified=await env.OWNER_AUTH.fetch(new Request(AUTH+'/api/session',{headers:{Origin:ORIGIN,Authorization:authorization}}));
+        if(!verified.ok)response=json({error:verified.status===401||verified.status===403?'Please sign in as Arthur-Freedom.':'GitHub verification is temporarily unavailable.'},verified.status===401||verified.status===403?verified.status:503);
+        else if(String((await verified.json()).ownerId)!==OWNER)response=json({error:'Only Arthur-Freedom can refresh traffic.'},403);
+        else{
+          const budget=env.TRAFFIC_BUDGET.get(env.TRAFFIC_BUDGET.idFromName('owner-global'));
+          if(path==='/api/session')response=json({ownerId:OWNER,login:'Arthur-Freedom',mapsKey:env.GOOGLE_MAPS_BROWSER_KEY,...await(await budget.fetch(new Request('https://budget/',{method:'GET'}))).json()});
+          else if(!env.GOOGLE_ROUTES_KEY)response=json({error:'Traffic service is not configured.'},503);
+          else{
+            const allowance=await budget.fetch(new Request('https://budget/',{method:'POST'})),limits=await allowance.json();
+            if(!allowance.ok)response=json(limits,allowance.status);
+            else{
+              const waypoint=coordinate=>({location:{latLng:{latitude:coordinate[1],longitude:coordinate[0]}}});
+              const stations=await Promise.all(STATIONS.map(async station=>{
+                try{
+                  const result=await send('https://routes.googleapis.com/directions/v2:computeRoutes',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'Content-Type':'application/json','X-Goog-Api-Key':env.GOOGLE_ROUTES_KEY,'X-Goog-FieldMask':'routes.polyline.encodedPolyline,routes.travelAdvisory.speedReadingIntervals'},body:JSON.stringify({origin:waypoint(station.start),destination:waypoint(station.end),travelMode:'DRIVE',routingPreference:'TRAFFIC_AWARE_OPTIMAL',extraComputations:['TRAFFIC_ON_POLYLINE'],polylineQuality:'HIGH_QUALITY',computeAlternativeRoutes:false})});
+                  if(!result.ok)throw Error('Upstream failed');
+                  const measured=measure((await result.json()).routes?.[0]||{},station.end);
+                  return {id:station.id,...measured,checkedAt:new Date(now()).toISOString()};
+                }catch{return {id:station.id,error:'Traffic unavailable for this approach.'};}
+              }));
+              response=json({stations,...limits});
+            }
+          }
+        }
+      }
+    }
+  }catch{response=json({error:'Traffic service is temporarily unavailable.'},503);}
+  const headers=new Headers(response.headers);headers.set('Cache-Control','no-store');headers.set('Vary','Origin');headers.set('X-Content-Type-Options','nosniff');
+  if(request.headers.get('Origin')===ORIGIN){headers.set('Access-Control-Allow-Origin',ORIGIN);headers.set('Access-Control-Allow-Methods','GET, POST, OPTIONS');headers.set('Access-Control-Allow-Headers','Authorization, Content-Type');}
+  return new Response(response.body,{status:response.status,headers});
+ };
+}
+export default {fetch:createHandler()};

@@ -17,12 +17,17 @@ function updateObservation(data, input, now = Date.now()) {
   if (timestamp > now + 600000) throw Error('Observation time cannot be more than 10 minutes in the future.');
   if (station.checkedAt && timestamp < Date.parse(station.checkedAt)) throw Error('An older observation cannot replace a newer one.');
   const length = min === '' ? null : [Number(min), Number(max)];
+  const waitMin = String(input.WAIT_MINIMUM ?? '').trim();
+  const waitMax = String(input.WAIT_MAXIMUM ?? '').trim();
+  if ((waitMin === '') !== (waitMax === '')) throw Error('Provide both ends of the observed wait range, or leave both blank.');
+  const waitMinutes = waitMin === '' ? null : [Number(waitMin), Number(waitMax)];
+  const operatingStatus = input.OPERATING_STATUS || 'unknown';
   const stock = {pertalite: input.PERTALITE || 'unknown', pertamax: input.PERTAMAX || 'unknown'};
-  if (!P.validCheck({length, stock, checkedAt})) throw Error('Use a length from 0 to 10,000 metres, in ascending order, and valid fuel statuses.');
-  if (!length && Object.values(stock).every(v => v === 'unknown')) throw Error('Record a length or a fuel availability check.');
+  if (!P.validCheck({length, waitMinutes, operatingStatus, stock, checkedAt})) throw Error('Use valid ascending ranges: 0–10,000 metres, 0–720 minutes; and valid opening/fuel statuses.');
+  if (!length && !waitMinutes && operatingStatus === 'unknown' && Object.values(stock).every(v => v === 'unknown')) throw Error('Record a wait, length, opening status or fuel check.');
   const note = String(input.NOTE ?? '').trim();
   if (!note || note.length > 1000) throw Error('Describe what you observed in 1–1,000 characters.');
-  const stations = data.stations.map(s => s.id === station.id ? {...s, length, stock, checkedAt, note} : s);
+  const stations = data.stations.map(s => s.id === station.id ? {...s, length, waitMinutes, operatingStatus, stock, checkedAt, note} : s);
   const latest = stations.filter(s => s.checkedAt).sort((a,b) => Date.parse(b.checkedAt)-Date.parse(a.checkedAt))[0].checkedAt;
   return {...data, checkedAt: latest, stations};
 }

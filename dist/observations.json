@@ -1,10 +1,119 @@
 {
-  "checkedAt":"2026-10-14T10:45:00+08:00",
-  "stations":[
-    {"id":"nusa-dua","name":"SPBU Pertamina Nusa Dua","shortName":"Nusa Dua / Siligita","area":"Nusa Dua","address":"Gg. Permata, beside the Siligita junction","coordinates":[115.215228,-8.7934188],"placeId":"ChIJr2xmtj9D0i0RqT7btDIMtAU","length":[100,200],"note":"Short red section near the Siligita junction. Some of it may be intersection traffic.","checkedAt":"2026-10-14T10:45:00+08:00"},
-    {"id":"bypass-30x","name":"Pertamina · Bypass No.30X","shortName":"Bypass No.30X","area":"Jimbaran / Mumbul","address":"Jl. Bypass Ngurah Rai No.30X, Jimbaran","coordinates":[115.1878323,-8.7841012],"placeId":"ChIJFTTEzYJE0i0RrAH_r6eQKzw","length":[600,800],"note":"Long red stretch east of the station on the bypass. Congestion appears in both directions.","checkedAt":"2026-10-14T10:45:00+08:00"},
-    {"id":"bypass-27","name":"SPBU Pertamina 54.803.27","shortName":"Bypass 54.803.27","area":"Nusa Dua / toll exit","address":"6657+7P4, Jl. Bypass Ngurah Rai, Benoa","coordinates":[115.2143216,-8.7918632],"placeId":"ChIJJ-MdYBVD0i0Ro-j7c1GxzUQ","length":[1100,1300],"note":"Dark-red approach from the northwest ends around this station; the road beyond turns green. Consistent with a fuel queue, but not confirmed.","checkedAt":"2026-10-14T10:45:00+08:00"},
-    {"id":"dharmawangsa","name":"Pertamina · Dharmawangsa","shortName":"Dharmawangsa","area":"Benoa","address":"Jl. Dharmawangsa, Benoa","coordinates":[115.2011719,-8.806721],"placeId":"ChIJc0AHIk5D0i0R-AiP495k4BI","length":null,"note":"No traffic observation recorded yet. Open the live view or add your own check.","checkedAt":null},
-    {"id":"jimbaran-02","name":"SPBU 54.803.02","shortName":"Jimbaran 54.803.02","area":"Jimbaran","address":"Jl. Bypass Ngurah Rai No.6","coordinates":[115.1781471,-8.7702518],"placeId":null,"length":null,"note":"No traffic observation recorded yet. Open the live view or add your own check.","checkedAt":null}
+  "checkedAt": "2026-10-15T01:36:00+08:00",
+  "stations": [
+    {
+      "id": "nusa-dua",
+      "name": "SPBU Pertamina Nusa Dua",
+      "shortName": "Nusa Dua / Siligita",
+      "area": "Nusa Dua",
+      "address": "Gg. Permata, beside the Siligita junction",
+      "coordinates": [
+        115.215228,
+        -8.7934188
+      ],
+      "placeId": "ChIJr2xmtj9D0i0RqT7btDIMtAU",
+      "length": [
+        100,
+        200
+      ],
+      "note": "Google Maps lists this station closed, opening at 06:00. About 100–200 m of red traffic is visible around the Siligita junction. The junction traffic does not establish a petrol queue.",
+      "checkedAt": "2026-10-15T01:28:00+08:00",
+      "operatingStatus": "closed",
+      "waitMinutes": null,
+      "stock": {
+        "pertalite": "unknown",
+        "pertamax": "unknown"
+      }
+    },
+    {
+      "id": "bypass-30x",
+      "name": "Pertamina · Bypass No.30X",
+      "shortName": "Bypass No.30X",
+      "area": "Jimbaran / Mumbul",
+      "address": "Jl. Bypass Ngurah Rai No.30X, Jimbaran",
+      "coordinates": [
+        115.1878323,
+        -8.7841012
+      ],
+      "placeId": "ChIJFTTEzYJE0i0RrAH_r6eQKzw",
+      "length": [
+        75,
+        150
+      ],
+      "note": "Google Maps lists this station closed, opening at 06:00. A short red section is visible immediately east of the entrance; the broader bypass is mainly green. Approximate length from the map scale.",
+      "checkedAt": "2026-10-15T01:30:00+08:00",
+      "operatingStatus": "closed",
+      "waitMinutes": null,
+      "stock": {
+        "pertalite": "unknown",
+        "pertamax": "unknown"
+      }
+    },
+    {
+      "id": "bypass-27",
+      "name": "SPBU Pertamina 54.803.27",
+      "shortName": "Bypass 54.803.27",
+      "area": "Nusa Dua / toll exit",
+      "address": "6657+7P4, Jl. Bypass Ngurah Rai, Benoa",
+      "coordinates": [
+        115.2143216,
+        -8.7918632
+      ],
+      "placeId": "ChIJJ-MdYBVD0i0Ro-j7c1GxzUQ",
+      "length": [
+        200,
+        300
+      ],
+      "note": "Google Maps lists this station open 24 hours. Roughly 200–300 m of dark-red road runs from the toll junction toward the station; green continues beyond. Fuel stock, the queue inside and service speed have not been verified.",
+      "checkedAt": "2026-10-15T01:32:00+08:00",
+      "operatingStatus": "open",
+      "waitMinutes": null,
+      "stock": {
+        "pertalite": "unknown",
+        "pertamax": "unknown"
+      }
+    },
+    {
+      "id": "dharmawangsa",
+      "name": "Pertamina · Dharmawangsa",
+      "shortName": "Dharmawangsa",
+      "area": "Benoa",
+      "address": "Jl. Dharmawangsa, Benoa",
+      "coordinates": [
+        115.2011719,
+        -8.806721
+      ],
+      "placeId": "ChIJc0AHIk5D0i0R-AiP495k4BI",
+      "length": null,
+      "note": "Google Maps lists this station closed, opening at 05:00. Red sections appear southwest of the entrance, with gaps in the traffic overlay. No continuous queue length or waiting time could be verified.",
+      "checkedAt": "2026-10-15T01:35:00+08:00",
+      "operatingStatus": "closed",
+      "waitMinutes": null,
+      "stock": {
+        "pertalite": "unknown",
+        "pertamax": "unknown"
+      }
+    },
+    {
+      "id": "jimbaran-02",
+      "name": "SPBU 54.803.02",
+      "shortName": "Jimbaran 54.803.02",
+      "area": "Jimbaran",
+      "address": "Jl. Bypass Ngurah Rai No.6",
+      "coordinates": [
+        115.1781471,
+        -8.7702518
+      ],
+      "placeId": null,
+      "length": null,
+      "note": "Google Maps lists this station closed, opening at 05:00. Traffic is mainly green/yellow at the entrance, with a short red section farther north. No petrol queue or waiting time has been verified.",
+      "checkedAt": "2026-10-15T01:36:00+08:00",
+      "operatingStatus": "closed",
+      "waitMinutes": null,
+      "stock": {
+        "pertalite": "unknown",
+        "pertamax": "unknown"
+      }
+    }
   ]
 }

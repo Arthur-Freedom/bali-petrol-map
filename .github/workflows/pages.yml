@@ -16,6 +16,17 @@ on:
       maximum:
         description: Longest estimated red stretch (metres); blank for fuel-only check
         type: string
+      wait_minimum:
+        description: Shortest observed wait (minutes); leave blank if unknown
+        type: string
+      wait_maximum:
+        description: Longest observed wait (minutes); leave blank if unknown
+        type: string
+      operating_status:
+        description: Station opening status actually observed or listed
+        type: choice
+        default: unknown
+        options: [unknown, open, closed]
       pertalite:
         description: Pertalite availability actually observed
         type: choice
@@ -59,6 +70,9 @@ jobs:
           STATION: ${{ inputs.station }}
           MINIMUM: ${{ inputs.minimum }}
           MAXIMUM: ${{ inputs.maximum }}
+          WAIT_MINIMUM: ${{ inputs.wait_minimum }}
+          WAIT_MAXIMUM: ${{ inputs.wait_maximum }}
+          OPERATING_STATUS: ${{ inputs.operating_status }}
           PERTALITE: ${{ inputs.pertalite }}
           PERTAMAX: ${{ inputs.pertamax }}
           OBSERVED_AT: ${{ inputs.observed_at }}
@@ -68,7 +82,9 @@ jobs:
         run: |
           node --check dist/app.js
           node --check dist/core.js
-          node --test tests/*.test.cjs
+          node --check dist/live.js
+          node --check dist/owner-session.js
+          node --test tests/*.test.cjs traffic-service/worker.test.mjs
       - name: Save the observation to GitHub
         if: github.event_name == 'workflow_dispatch' && inputs.station != 'deploy-only'
         run: |

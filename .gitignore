@@ -6,3 +6,5 @@ qa/
 .openai/
 *.tar
 *.tar.gz
+.local/
+.wrangler/
