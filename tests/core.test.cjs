@@ -1,8 +1,27 @@
-const {test}=require('node:test');const assert=require('node:assert/strict');const P=require('../dist/core.js');const published=require('../dist/observations.json');const data={stations:published.stations.map((s,i)=>({...s,operatingStatus:'unknown',waitMinutes:null,checkedAt:new Date().toISOString(),length:[[100,200],[600,800],[1100,1300],null,null][i]}))};
-test('unknown congestion never outranks measured lengths',()=>{const list=P.ordered(data.stations,'congestion',null,'either');assert.equal(list[0].id,'nusa-dua');assert.equal(list[1].id,'bypass-30x');assert.equal(list[2].id,'bypass-27');assert.ok(list.slice(3).every(s=>s.length===null));});
-test('a reported empty station moves behind alternatives for the chosen fuel',()=>{const list=data.stations.map(s=>({...s,stock:s.id==='nusa-dua'?{pertalite:'out',pertamax:'available'}:{}}));assert.equal(P.ordered(list,'congestion',null,'pertalite').at(-1).id,'nusa-dua');assert.equal(P.ordered(list,'congestion',null,'either')[0].id,'nusa-dua');assert.equal(P.availability({stock:{pertalite:'out',pertamax:'unknown'}},'either'),'unknown');});
-test('scenario accounts for rows, spacing and all active attendants',()=>{assert.deepEqual(P.waitRange([100,200],2.5,1,2,45),[15,30]);assert.deepEqual(P.waitRange([100,200],2.5,2,2,45),[30,60]);assert.equal(P.waitRange([100,200],2.5,1,0,45),null);});
-test('nearby station distances are meaningful, not travel distance claims',()=>{assert.equal(P.distance([115,-8],[115,-8]),0);const km=P.distance(data.stations[0].coordinates,data.stations[2].coordinates);assert.ok(km>.15&&km<.25);});
-test('invalid reports cannot corrupt the comparison',()=>{const c={length:[100,200],checkedAt:'2026-10-14T10:45:00+08:00',stock:{pertalite:'unknown',pertamax:'available'}};assert.ok(P.validCheck(c));assert.ok(P.validCheck({...c,length:null}));assert.ok(!P.validCheck({...c,length:[200,100]}));assert.ok(!P.validCheck({...c,length:[-10,100]}));assert.ok(!P.validCheck({...c,checkedAt:'invalid'}));assert.ok(!P.validCheck({...c,stock:{pertalite:'out'}}));});
-
-test('published observations retain valid station locations, ranges, and individual timestamps',()=>{assert.equal(new Set(published.stations.map(s=>s.id)).size,published.stations.length);for(const s of published.stations){assert.ok(s.coordinates.every(Number.isFinite));assert.ok(s.coordinates[0]>114&&s.coordinates[0]<116&&s.coordinates[1]>-10&&s.coordinates[1]<-7);if(s.length||s.checkedAt)assert.ok(P.validCheck({...s,stock:s.stock||{pertalite:'unknown',pertamax:'unknown'}}));}assert.equal(Date.parse(published.checkedAt),Math.max(...published.stations.filter(s=>s.checkedAt).map(s=>Date.parse(s.checkedAt))));});
+const test=require('node:test'),assert=require('node:assert/strict'),P=require('../dist/core.js'),catalog=require('../dist/stations.json');
+const now=Date.parse('2026-10-15T02:10:00+08:00'),at='2026-10-15T02:00:00+08:00';
+const station=(id,jamMetres,extra={})=>({id,name:id,shortName:id,coordinates:[115,-8],jamMetres,checkedAt:at,...extra});
+test('Google listed closures never override congestion or exclude a station',()=>{
+ const low=station('quiet',0,{operatingStatus:'closed',operatingSource:'google_listing',operatingCheckedAt:at}),busy=station('busy',700);
+ assert.equal(P.status(low,now).label,'Less busy');assert.equal(P.status(low,now).blocked,false);assert.equal(P.opening(low,now).label,'Listed closed · unverified');assert.equal(P.ordered([busy,low],null,now)[0].id,'quiet');
+});
+test('only a recent explicit firsthand closure can block, never a legacy unsourced closure',()=>{
+ const s=station('x',0,{operatingStatus:'closed',operatingCheckedAt:at});assert.equal(P.status(s,now).blocked,false);
+ assert.equal(P.status({...s,operatingSource:'firsthand'},now).blocked,true);
+ assert.equal(P.status({...s,operatingSource:'firsthand',operatingCheckedAt:'2026-10-14T00:00:00+08:00'},now).blocked,false);
+});
+test('traffic refresh never freshens opening information or invents waiting minutes',()=>{
+ const s=station('x',null,{operatingStatus:'closed',operatingSource:'firsthand',operatingCheckedAt:'2026-10-14T00:00:00+08:00'}),merged=P.mergeLive(s,{jamMetres:0,checkedAt:at});assert.equal(P.status(merged,now).blocked,false);assert.equal(merged.operatingCheckedAt,s.operatingCheckedAt);assert.equal(merged.waitMinutes,undefined);
+});
+test('unknown, failed and stale readings cannot beat current observations',()=>{
+ const old=station('old',0,{checkedAt:'2026-10-14T00:00:00+08:00'}),failed=station('failed',0,{refreshFailed:true}),unknown=station('unknown',null),fresh=station('fresh',900);
+ assert.equal(P.ordered([old,failed,unknown,fresh],null,now)[0].id,'fresh');assert.equal(P.status(old,now).label,'Was less busy');assert.equal(P.status(unknown,now).label,'Not checked');
+});
+test('all requested areas contain mapped locations and groups cap at five',()=>{
+ for(const id of ['kuta','legian','seminyak','canggu','denpasar','pererenan','ubud','gianyar']){const area=catalog.areas.find(a=>a.id===id),list=P.inScope(catalog.stations,area);assert.ok(list.length>0,id);assert.ok(P.batch(list,area.center).length<=5);}
+ const area=catalog.areas.find(a=>a.id==='denpasar'),list=P.inScope(catalog.stations,area),a=P.batch(list,area.center),b=P.batch(list,area.center,1);assert.ok(!a.some(s=>b.some(t=>s.id===t.id)));
+});
+test('catalogue locations are unique, finite and traceable; new locations have no assumed hours',()=>{
+ assert.ok(catalog.stations.length>200);assert.equal(new Set(catalog.stations.map(s=>s.id)).size,catalog.stations.length);
+ for(const s of catalog.stations){assert.ok(s.coordinates.every(Number.isFinite));assert.ok(s.sourceUrl.startsWith('https://'));assert.ok(s.approachStart.every(Number.isFinite));if(s.id.startsWith('osm-'))assert.equal(s.operatingStatus,'unknown');}
+});

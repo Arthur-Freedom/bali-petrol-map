@@ -1,0 +1,107 @@
+[
+  {
+    "id": "nusa-dua",
+    "name": "SPBU Pertamina Nusa Dua",
+    "shortName": "Nusa Dua / Siligita",
+    "coordinates": [
+      115.215228,
+      -8.7934188
+    ],
+    "address": "Gg. Permata, beside the Siligita junction",
+    "area": "Nusa Dua",
+    "placeId": "ChIJr2xmtj9D0i0RqT7btDIMtAU",
+    "source": "Google Maps listing",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=SPBU%20Pertamina%20Nusa%20Dua%20Bali&query_place_id=ChIJr2xmtj9D0i0RqT7btDIMtAU",
+    "operatingStatus": "closed",
+    "operatingSource": "google_listing",
+    "operatingCheckedAt": "2026-10-15T01:28:00+08:00",
+    "approachStart": [
+      115.2205,
+      -8.7996
+    ]
+  },
+  {
+    "id": "bypass-30x",
+    "name": "Pertamina · Bypass No.30X",
+    "shortName": "Bypass No.30X",
+    "coordinates": [
+      115.1878323,
+      -8.7841012
+    ],
+    "address": "Jl. Bypass Ngurah Rai No.30X, Jimbaran",
+    "area": "Jimbaran / Mumbul",
+    "placeId": "ChIJFTTEzYJE0i0RrAH_r6eQKzw",
+    "source": "Google Maps listing",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Pertamina%20%C2%B7%20Bypass%20No.30X%20Bali&query_place_id=ChIJFTTEzYJE0i0RrAH_r6eQKzw",
+    "operatingStatus": "closed",
+    "operatingSource": "google_listing",
+    "operatingCheckedAt": "2026-10-15T01:30:00+08:00",
+    "approachStart": [
+      115.1973,
+      -8.7856
+    ]
+  },
+  {
+    "id": "bypass-27",
+    "name": "SPBU Pertamina 54.803.27",
+    "shortName": "Bypass 54.803.27",
+    "coordinates": [
+      115.2143216,
+      -8.7918632
+    ],
+    "address": "6657+7P4, Jl. Bypass Ngurah Rai, Benoa",
+    "area": "Nusa Dua / toll exit",
+    "placeId": "ChIJJ-MdYBVD0i0Ro-j7c1GxzUQ",
+    "source": "Google Maps listing",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=SPBU%20Pertamina%2054.803.27%20Bali&query_place_id=ChIJJ-MdYBVD0i0Ro-j7c1GxzUQ",
+    "operatingStatus": "open",
+    "operatingSource": "google_listing",
+    "operatingCheckedAt": "2026-10-15T01:32:00+08:00",
+    "approachStart": [
+      115.2069,
+      -8.786
+    ]
+  },
+  {
+    "id": "dharmawangsa",
+    "name": "Pertamina · Dharmawangsa",
+    "shortName": "Dharmawangsa",
+    "coordinates": [
+      115.2011719,
+      -8.806721
+    ],
+    "address": "Jl. Dharmawangsa, Benoa",
+    "area": "Benoa",
+    "placeId": "ChIJc0AHIk5D0i0R-AiP495k4BI",
+    "source": "Google Maps listing",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Pertamina%20%C2%B7%20Dharmawangsa%20Bali&query_place_id=ChIJc0AHIk5D0i0R-AiP495k4BI",
+    "operatingStatus": "closed",
+    "operatingSource": "google_listing",
+    "operatingCheckedAt": "2026-10-15T01:35:00+08:00",
+    "approachStart": [
+      115.1928,
+      -8.8108
+    ]
+  },
+  {
+    "id": "jimbaran-02",
+    "name": "SPBU 54.803.02",
+    "shortName": "Jimbaran 54.803.02",
+    "coordinates": [
+      115.1781471,
+      -8.7702518
+    ],
+    "address": "Jl. Bypass Ngurah Rai No.6",
+    "area": "Jimbaran",
+    "placeId": null,
+    "source": "Google Maps listing",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=-8.7702518,115.1781471",
+    "operatingStatus": "closed",
+    "operatingSource": "google_listing",
+    "operatingCheckedAt": "2026-10-15T01:36:00+08:00",
+    "approachStart": [
+      115.179,
+      -8.762
+    ]
+  }
+]

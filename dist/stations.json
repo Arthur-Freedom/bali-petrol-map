@@ -1,0 +1,6404 @@
+{
+  "importedAt": "2026-10-14T18:13:40.476Z",
+  "sourceDate": "2026-10-14T18:08:21Z",
+  "areas": [
+    {
+      "id": "nusa-dua",
+      "name": "Nusa Dua / Benoa",
+      "center": [
+        115.21,
+        -8.798
+      ],
+      "radius": 6
+    },
+    {
+      "id": "jimbaran",
+      "name": "Jimbaran",
+      "center": [
+        115.171,
+        -8.781
+      ],
+      "radius": 6
+    },
+    {
+      "id": "uluwatu",
+      "name": "Uluwatu / Ungasan",
+      "center": [
+        115.132,
+        -8.824
+      ],
+      "radius": 8
+    },
+    {
+      "id": "kuta",
+      "name": "Kuta",
+      "center": [
+        115.173,
+        -8.723
+      ],
+      "radius": 3.5
+    },
+    {
+      "id": "legian",
+      "name": "Legian",
+      "center": [
+        115.171,
+        -8.706
+      ],
+      "radius": 2.5
+    },
+    {
+      "id": "seminyak",
+      "name": "Seminyak",
+      "center": [
+        115.166,
+        -8.688
+      ],
+      "radius": 3.5
+    },
+    {
+      "id": "canggu",
+      "name": "Canggu",
+      "center": [
+        115.139,
+        -8.647
+      ],
+      "radius": 4
+    },
+    {
+      "id": "pererenan",
+      "name": "Pererenan",
+      "center": [
+        115.124,
+        -8.644
+      ],
+      "radius": 3.5
+    },
+    {
+      "id": "denpasar",
+      "name": "Denpasar",
+      "center": [
+        115.216,
+        -8.655
+      ],
+      "radius": 8
+    },
+    {
+      "id": "sanur",
+      "name": "Sanur",
+      "center": [
+        115.262,
+        -8.689
+      ],
+      "radius": 5
+    },
+    {
+      "id": "ubud",
+      "name": "Ubud",
+      "center": [
+        115.263,
+        -8.507
+      ],
+      "radius": 7
+    },
+    {
+      "id": "gianyar",
+      "name": "Gianyar",
+      "center": [
+        115.326,
+        -8.542
+      ],
+      "radius": 9
+    },
+    {
+      "id": "sukawati",
+      "name": "Sukawati",
+      "center": [
+        115.283,
+        -8.6
+      ],
+      "radius": 5
+    },
+    {
+      "id": "mengwi",
+      "name": "Mengwi",
+      "center": [
+        115.171,
+        -8.545
+      ],
+      "radius": 8
+    },
+    {
+      "id": "tabanan",
+      "name": "Tabanan",
+      "center": [
+        115.128,
+        -8.54
+      ],
+      "radius": 10
+    },
+    {
+      "id": "bangli",
+      "name": "Bangli",
+      "center": [
+        115.355,
+        -8.455
+      ],
+      "radius": 12
+    },
+    {
+      "id": "kintamani",
+      "name": "Kintamani",
+      "center": [
+        115.327,
+        -8.242
+      ],
+      "radius": 18
+    },
+    {
+      "id": "klungkung",
+      "name": "Klungkung",
+      "center": [
+        115.405,
+        -8.535
+      ],
+      "radius": 10
+    },
+    {
+      "id": "candidasa",
+      "name": "Candidasa",
+      "center": [
+        115.568,
+        -8.507
+      ],
+      "radius": 12
+    },
+    {
+      "id": "karangasem",
+      "name": "Karangasem",
+      "center": [
+        115.614,
+        -8.447
+      ],
+      "radius": 15
+    },
+    {
+      "id": "amed",
+      "name": "Amed / Tulamben",
+      "center": [
+        115.629,
+        -8.335
+      ],
+      "radius": 15
+    },
+    {
+      "id": "singaraja",
+      "name": "Singaraja",
+      "center": [
+        115.089,
+        -8.112
+      ],
+      "radius": 15
+    },
+    {
+      "id": "lovina",
+      "name": "Lovina",
+      "center": [
+        115.024,
+        -8.161
+      ],
+      "radius": 12
+    },
+    {
+      "id": "pemuteran",
+      "name": "Pemuteran",
+      "center": [
+        114.658,
+        -8.145
+      ],
+      "radius": 18
+    },
+    {
+      "id": "negara",
+      "name": "Negara / West Bali",
+      "center": [
+        114.624,
+        -8.356
+      ],
+      "radius": 25
+    },
+    {
+      "id": "penida",
+      "name": "Nusa Penida",
+      "center": [
+        115.551,
+        -8.724
+      ],
+      "radius": 18
+    },
+    {
+      "id": "lembongan",
+      "name": "Nusa Lembongan",
+      "center": [
+        115.45,
+        -8.684
+      ],
+      "radius": 5
+    }
+  ],
+  "stations": [
+    {
+      "id": "nusa-dua",
+      "name": "SPBU Pertamina Nusa Dua",
+      "shortName": "Nusa Dua / Siligita",
+      "coordinates": [
+        115.215228,
+        -8.7934188
+      ],
+      "address": "Gg. Permata, beside the Siligita junction",
+      "area": "Nusa Dua",
+      "placeId": "ChIJr2xmtj9D0i0RqT7btDIMtAU",
+      "source": "Google Maps listing",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=SPBU%20Pertamina%20Nusa%20Dua%20Bali&query_place_id=ChIJr2xmtj9D0i0RqT7btDIMtAU",
+      "operatingStatus": "closed",
+      "operatingSource": "google_listing",
+      "operatingCheckedAt": "2026-10-15T01:28:00+08:00",
+      "approachStart": [
+        115.2205,
+        -8.7996
+      ]
+    },
+    {
+      "id": "bypass-30x",
+      "name": "Pertamina · Bypass No.30X",
+      "shortName": "Bypass No.30X",
+      "coordinates": [
+        115.1878323,
+        -8.7841012
+      ],
+      "address": "Jl. Bypass Ngurah Rai No.30X, Jimbaran",
+      "area": "Jimbaran / Mumbul",
+      "placeId": "ChIJFTTEzYJE0i0RrAH_r6eQKzw",
+      "source": "Google Maps listing",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Pertamina%20%C2%B7%20Bypass%20No.30X%20Bali&query_place_id=ChIJFTTEzYJE0i0RrAH_r6eQKzw",
+      "operatingStatus": "closed",
+      "operatingSource": "google_listing",
+      "operatingCheckedAt": "2026-10-15T01:30:00+08:00",
+      "approachStart": [
+        115.1973,
+        -8.7856
+      ]
+    },
+    {
+      "id": "bypass-27",
+      "name": "SPBU Pertamina 54.803.27",
+      "shortName": "Bypass 54.803.27",
+      "coordinates": [
+        115.2143216,
+        -8.7918632
+      ],
+      "address": "6657+7P4, Jl. Bypass Ngurah Rai, Benoa",
+      "area": "Nusa Dua / toll exit",
+      "placeId": "ChIJJ-MdYBVD0i0Ro-j7c1GxzUQ",
+      "source": "Google Maps listing",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=SPBU%20Pertamina%2054.803.27%20Bali&query_place_id=ChIJJ-MdYBVD0i0Ro-j7c1GxzUQ",
+      "operatingStatus": "open",
+      "operatingSource": "google_listing",
+      "operatingCheckedAt": "2026-10-15T01:32:00+08:00",
+      "approachStart": [
+        115.2069,
+        -8.786
+      ]
+    },
+    {
+      "id": "dharmawangsa",
+      "name": "Pertamina · Dharmawangsa",
+      "shortName": "Dharmawangsa",
+      "coordinates": [
+        115.2011719,
+        -8.806721
+      ],
+      "address": "Jl. Dharmawangsa, Benoa",
+      "area": "Benoa",
+      "placeId": "ChIJc0AHIk5D0i0R-AiP495k4BI",
+      "source": "Google Maps listing",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Pertamina%20%C2%B7%20Dharmawangsa%20Bali&query_place_id=ChIJc0AHIk5D0i0R-AiP495k4BI",
+      "operatingStatus": "closed",
+      "operatingSource": "google_listing",
+      "operatingCheckedAt": "2026-10-15T01:35:00+08:00",
+      "approachStart": [
+        115.1928,
+        -8.8108
+      ]
+    },
+    {
+      "id": "jimbaran-02",
+      "name": "SPBU 54.803.02",
+      "shortName": "Jimbaran 54.803.02",
+      "coordinates": [
+        115.1781471,
+        -8.7702518
+      ],
+      "address": "Jl. Bypass Ngurah Rai No.6",
+      "area": "Jimbaran",
+      "placeId": null,
+      "source": "Google Maps listing",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=-8.7702518,115.1781471",
+      "operatingStatus": "closed",
+      "operatingSource": "google_listing",
+      "operatingCheckedAt": "2026-10-15T01:36:00+08:00",
+      "approachStart": [
+        115.179,
+        -8.762
+      ]
+    },
+    {
+      "id": "osm-node-274750656",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Negara / West Bali",
+      "coordinates": [
+        114.6039488,
+        -8.3525551
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/274750656",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.6039488,
+        -8.3405551
+      ]
+    },
+    {
+      "id": "osm-node-274813078",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Negara / West Bali",
+      "coordinates": [
+        114.5409782,
+        -8.3247965
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/274813078",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.5409782,
+        -8.3127965
+      ]
+    },
+    {
+      "id": "osm-node-274853846",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        115.0320289,
+        -8.3398013
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/274853846",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0320289,
+        -8.3278013
+      ]
+    },
+    {
+      "id": "osm-node-610371699",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Bypass Ngurah Rai",
+      "coordinates": [
+        115.1942868,
+        -8.721233
+      ],
+      "address": "Jalan Bypass Ngurah Rai, Denpasar",
+      "area": "Kuta",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/610371699",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1942868,
+        -8.709233
+      ]
+    },
+    {
+      "id": "osm-node-610371788",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sanur",
+      "coordinates": [
+        115.2231589,
+        -8.7137109
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/610371788",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2231589,
+        -8.7017109
+      ]
+    },
+    {
+      "id": "osm-node-641643890",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Tabanan",
+      "coordinates": [
+        115.1350278,
+        -8.502495
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/641643890",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1350278,
+        -8.490495
+      ]
+    },
+    {
+      "id": "osm-node-941307526",
+      "name": "SPBU Gas Station Sunset Road 54.803.31",
+      "shortName": "SPBU Gas Station Sunset Road 54.803.31",
+      "coordinates": [
+        115.1859091,
+        -8.7129491
+      ],
+      "address": "Sunset Road, 27, Kuta, Kabupaten Badung, Bali, Indonesia",
+      "area": "Kuta",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/941307526",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1859091,
+        -8.7009491
+      ]
+    },
+    {
+      "id": "osm-node-945648527",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Nusa Dua / Benoa",
+      "coordinates": [
+        115.2180897,
+        -8.7526054
+      ],
+      "address": "Near Nusa Dua / Benoa",
+      "area": "Nusa Dua / Benoa",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/945648527",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2180897,
+        -8.7406054
+      ]
+    },
+    {
+      "id": "osm-node-963276323",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kuta",
+      "coordinates": [
+        115.1750055,
+        -8.7433555
+      ],
+      "address": "Near Kuta",
+      "area": "Kuta",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/963276323",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1750055,
+        -8.7313555
+      ]
+    },
+    {
+      "id": "osm-node-1291386618",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Karangasem",
+      "coordinates": [
+        115.6157588,
+        -8.4770841
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1291386618",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.6157588,
+        -8.4650841
+      ]
+    },
+    {
+      "id": "osm-node-1292872676",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kuta",
+      "coordinates": [
+        115.1801911,
+        -8.7208505
+      ],
+      "address": "Near Kuta",
+      "area": "Kuta",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1292872676",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1801911,
+        -8.7088505
+      ]
+    },
+    {
+      "id": "osm-node-1456289125",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Mengwi",
+      "coordinates": [
+        115.2145568,
+        -8.5449924
+      ],
+      "address": "Near Mengwi",
+      "area": "Mengwi",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1456289125",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2145568,
+        -8.5329924
+      ]
+    },
+    {
+      "id": "osm-node-1502919830",
+      "name": "Pertamina Gas Station 54.803.20",
+      "shortName": "Pertamina Gas Station 54.803.20",
+      "coordinates": [
+        115.1757054,
+        -8.7026066
+      ],
+      "address": "Jalan Dewi Sri, Legian, Kuta, Kabupaten Badung, Bali, Indonesia",
+      "area": "Legian",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1502919830",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1757054,
+        -8.6906066
+      ]
+    },
+    {
+      "id": "osm-node-1534960000",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Bypass Ngurah Rai",
+      "coordinates": [
+        115.2588015,
+        -8.6723394
+      ],
+      "address": "Jalan Bypass Ngurah Rai, Denpasar",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1534960000",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2588015,
+        -8.6603394
+      ]
+    },
+    {
+      "id": "osm-node-1675080290",
+      "name": "SPBU Pertamina 54.801.32",
+      "shortName": "SPBU Pertamina 54.801.32",
+      "coordinates": [
+        115.1867265,
+        -8.687005
+      ],
+      "address": "Jalan Gunung Soputan, 29, Denpasar",
+      "area": "Seminyak",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1675080290",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1867265,
+        -8.675005
+      ]
+    },
+    {
+      "id": "osm-node-1830362205",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Uluwatu 2",
+      "coordinates": [
+        115.1748485,
+        -8.7819795
+      ],
+      "address": "Jalan Uluwatu 2, Jimbaran",
+      "area": "Jimbaran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1830362205",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1748485,
+        -8.7699795
+      ]
+    },
+    {
+      "id": "osm-node-1963414951",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Ubud",
+      "coordinates": [
+        115.1954396,
+        -8.384301
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1963414951",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1954396,
+        -8.372301
+      ]
+    },
+    {
+      "id": "osm-node-1963414988",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Mengwi",
+      "coordinates": [
+        115.153967,
+        -8.560268
+      ],
+      "address": "Near Mengwi",
+      "area": "Mengwi",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1963414988",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.153967,
+        -8.548268
+      ]
+    },
+    {
+      "id": "osm-node-1963415557",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Pererenan",
+      "coordinates": [
+        115.132762,
+        -8.6308861
+      ],
+      "address": "Near Pererenan",
+      "area": "Pererenan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1963415557",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.132762,
+        -8.6188861
+      ]
+    },
+    {
+      "id": "osm-node-1963471597",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Sukawati",
+      "coordinates": [
+        115.2608468,
+        -8.6023075
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1963471597",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2608468,
+        -8.5903075
+      ]
+    },
+    {
+      "id": "osm-node-1963471634",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Bypass Ngurah Rai",
+      "coordinates": [
+        115.2541822,
+        -8.6516352
+      ],
+      "address": "Jalan Bypass Ngurah Rai, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/1963471634",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2541822,
+        -8.6396352
+      ]
+    },
+    {
+      "id": "osm-node-2000869724",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Mengwi",
+      "coordinates": [
+        115.214653,
+        -8.5439737
+      ],
+      "address": "Near Mengwi",
+      "area": "Mengwi",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2000869724",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.214653,
+        -8.5319737
+      ]
+    },
+    {
+      "id": "osm-node-2148876485",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Karangasem",
+      "coordinates": [
+        115.5928175,
+        -8.437493
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2148876485",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5928175,
+        -8.425493
+      ]
+    },
+    {
+      "id": "osm-node-2272949196",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Sukawati",
+      "coordinates": [
+        115.2571205,
+        -8.6241762
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2272949196",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2571205,
+        -8.6121762
+      ]
+    },
+    {
+      "id": "osm-node-2276389503",
+      "name": "Pom Bensin",
+      "shortName": "Pom Bensin · Canggu",
+      "coordinates": [
+        115.1729756,
+        -8.6294555
+      ],
+      "address": "Near Canggu",
+      "area": "Canggu",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2276389503",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1729756,
+        -8.6174555
+      ]
+    },
+    {
+      "id": "osm-node-2279234528",
+      "name": "Pompa Bensin",
+      "shortName": "Pompa Bensin · Denpasar",
+      "coordinates": [
+        115.1863788,
+        -8.6490072
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2279234528",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1863788,
+        -8.6370072
+      ]
+    },
+    {
+      "id": "osm-node-2279259061",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sunset Road",
+      "coordinates": [
+        115.1863077,
+        -8.7151528
+      ],
+      "address": "Sunset Road, Kuta",
+      "area": "Kuta",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2279259061",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1863077,
+        -8.7031528
+      ]
+    },
+    {
+      "id": "osm-node-2487421311",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Tabanan",
+      "coordinates": [
+        115.1407313,
+        -8.5436342
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2487421311",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1407313,
+        -8.5316342
+      ]
+    },
+    {
+      "id": "osm-node-2487421377",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Mengwi",
+      "coordinates": [
+        115.1743476,
+        -8.5200644
+      ],
+      "address": "Near Mengwi",
+      "area": "Mengwi",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2487421377",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1743476,
+        -8.5080644
+      ]
+    },
+    {
+      "id": "osm-node-2487421443",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kintamani",
+      "coordinates": [
+        115.1866722,
+        -8.3337155
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2487421443",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1866722,
+        -8.3217155
+      ]
+    },
+    {
+      "id": "osm-node-2487544914",
+      "name": "SPBU Pertamina 54.803.19",
+      "shortName": "SPBU Pertamina 54.803.19",
+      "coordinates": [
+        115.1717806,
+        -8.6890239
+      ],
+      "address": "Sunset Road, Seminyak, Benoa, Kuta Selatan, Kabupaten Badung, Bali, Indonesia",
+      "area": "Seminyak",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2487544914",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1717806,
+        -8.6770239
+      ]
+    },
+    {
+      "id": "osm-node-2488170415",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sanur",
+      "coordinates": [
+        115.2542247,
+        -8.6742892
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2488170415",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2542247,
+        -8.6622892
+      ]
+    },
+    {
+      "id": "osm-node-2498046486",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Denpasar",
+      "coordinates": [
+        115.2321022,
+        -8.6772839
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2498046486",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2321022,
+        -8.6652839
+      ]
+    },
+    {
+      "id": "osm-node-2498046487",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Raya Puputan",
+      "coordinates": [
+        115.2262101,
+        -8.6730122
+      ],
+      "address": "Raya Puputan, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2498046487",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2262101,
+        -8.6610122
+      ]
+    },
+    {
+      "id": "osm-node-2498046488",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sanur",
+      "coordinates": [
+        115.2401219,
+        -8.67308
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2498046488",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2401219,
+        -8.66108
+      ]
+    },
+    {
+      "id": "osm-node-2845852089",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Karangasem",
+      "coordinates": [
+        115.5884173,
+        -8.4043468
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2845852089",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5884173,
+        -8.3923468
+      ]
+    },
+    {
+      "id": "osm-node-2847473231",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        114.9774711,
+        -8.1863162
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2847473231",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9774711,
+        -8.1743162
+      ]
+    },
+    {
+      "id": "osm-node-2849702811",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Jimbaran",
+      "coordinates": [
+        115.1687409,
+        -8.757882
+      ],
+      "address": "Near Jimbaran",
+      "area": "Jimbaran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2849702811",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1687409,
+        -8.745882
+      ]
+    },
+    {
+      "id": "osm-node-2872212679",
+      "name": "Pertamina 54.803.06 Gas Station",
+      "shortName": "Pertamina 54.803.06 Gas Station",
+      "coordinates": [
+        115.1651785,
+        -8.6729773
+      ],
+      "address": "Jalan Raya Kerobokan, Kerobokan Kelod, Kuta Utara, Kabupaten Badung, Bali, Indonesia",
+      "area": "Seminyak",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/2872212679",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1651785,
+        -8.6609773
+      ]
+    },
+    {
+      "id": "osm-node-3175963462",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Denpasar",
+      "coordinates": [
+        115.2315163,
+        -8.6668111
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3175963462",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2315163,
+        -8.6548111
+      ]
+    },
+    {
+      "id": "osm-node-3217531312",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Uluwatu / Ungasan",
+      "coordinates": [
+        115.1498481,
+        -8.8201644
+      ],
+      "address": "Near Uluwatu / Ungasan",
+      "area": "Uluwatu / Ungasan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3217531312",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1498481,
+        -8.8081644
+      ]
+    },
+    {
+      "id": "osm-node-3219129615",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sanur",
+      "coordinates": [
+        115.2312805,
+        -8.7240617
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3219129615",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2312805,
+        -8.7120617
+      ]
+    },
+    {
+      "id": "osm-node-3292077086",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Kamboja",
+      "coordinates": [
+        115.2250801,
+        -8.6566631
+      ],
+      "address": "Jalan Kamboja, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3292077086",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2250801,
+        -8.6446631
+      ]
+    },
+    {
+      "id": "osm-node-3299570661",
+      "name": "SPBU",
+      "shortName": "SPBU",
+      "coordinates": [
+        114.9326709,
+        -8.1910932
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3299570661",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9326709,
+        -8.1790932
+      ]
+    },
+    {
+      "id": "osm-node-3329762011",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Klungkung",
+      "coordinates": [
+        115.4859176,
+        -8.5469299
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3329762011",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4859176,
+        -8.5349299
+      ]
+    },
+    {
+      "id": "osm-node-3530974108",
+      "name": "Pertamina 54.805.12",
+      "shortName": "Pertamina 54.805.12",
+      "coordinates": [
+        115.2759405,
+        -8.5231597
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3530974108",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2759405,
+        -8.5111597
+      ]
+    },
+    {
+      "id": "osm-node-3646990902",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Hayam Wuruk",
+      "coordinates": [
+        115.2415592,
+        -8.6663729
+      ],
+      "address": "Jalan Hayam Wuruk, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3646990902",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2415592,
+        -8.6543729
+      ]
+    },
+    {
+      "id": "osm-node-3671677724",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Tukad Pakerisan",
+      "coordinates": [
+        115.2263815,
+        -8.6862208
+      ],
+      "address": "Tukad Pakerisan, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3671677724",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2263815,
+        -8.6742208
+      ]
+    },
+    {
+      "id": "osm-node-3675164637",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Hayam Wuruk",
+      "coordinates": [
+        115.2393983,
+        -8.6603673
+      ],
+      "address": "Jalan Hayam Wuruk, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3675164637",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2393983,
+        -8.6483673
+      ]
+    },
+    {
+      "id": "osm-node-3718349380",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Raya Sesetan",
+      "coordinates": [
+        115.2149141,
+        -8.678971
+      ],
+      "address": "Jalan Raya Sesetan, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3718349380",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2149141,
+        -8.666971
+      ]
+    },
+    {
+      "id": "osm-node-3749170052",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Candidasa",
+      "coordinates": [
+        115.5018786,
+        -8.5117953
+      ],
+      "address": "Near Candidasa",
+      "area": "Candidasa",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3749170052",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5018786,
+        -8.4997953
+      ]
+    },
+    {
+      "id": "osm-node-3749171670",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Candidasa",
+      "coordinates": [
+        115.5583389,
+        -8.5034634
+      ],
+      "address": "Near Candidasa",
+      "area": "Candidasa",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3749171670",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5583389,
+        -8.4914634
+      ]
+    },
+    {
+      "id": "osm-node-3754488727",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Singaraja",
+      "coordinates": [
+        115.1432434,
+        -8.0824813
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3754488727",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1432434,
+        -8.0704813
+      ]
+    },
+    {
+      "id": "osm-node-3754488728",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Lovina",
+      "coordinates": [
+        115.0499465,
+        -8.1450122
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3754488728",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0499465,
+        -8.1330122
+      ]
+    },
+    {
+      "id": "osm-node-3754491925",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Singaraja",
+      "coordinates": [
+        115.0797277,
+        -8.1152738
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3754491925",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0797277,
+        -8.1032738
+      ]
+    },
+    {
+      "id": "osm-node-3775472294",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Amed / Tulamben",
+      "coordinates": [
+        115.5520696,
+        -8.2345393
+      ],
+      "address": "Near Amed / Tulamben",
+      "area": "Amed / Tulamben",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3775472294",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5520696,
+        -8.2225393
+      ]
+    },
+    {
+      "id": "osm-node-3780445716",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Suwung Batan Kendal",
+      "coordinates": [
+        115.2234888,
+        -8.7107789
+      ],
+      "address": "Suwung Batan Kendal, Denpasar",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3780445716",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2234888,
+        -8.6987789
+      ]
+    },
+    {
+      "id": "osm-node-3781991815",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kuta",
+      "coordinates": [
+        115.2158046,
+        -8.714504
+      ],
+      "address": "Near Kuta",
+      "area": "Kuta",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3781991815",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2158046,
+        -8.702504
+      ]
+    },
+    {
+      "id": "osm-node-3784338063",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Gunung Batukaru",
+      "coordinates": [
+        115.2031647,
+        -8.6597129
+      ],
+      "address": "Jalan Gunung Batukaru, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3784338063",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2031647,
+        -8.6477129
+      ]
+    },
+    {
+      "id": "osm-node-3785230436",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Klungkung",
+      "coordinates": [
+        115.4402817,
+        -8.5526988
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3785230436",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4402817,
+        -8.5406988
+      ]
+    },
+    {
+      "id": "osm-node-3787237309",
+      "name": "SPBU Pertamina 54.801.35",
+      "shortName": "SPBU Pertamina 54.801.35",
+      "coordinates": [
+        115.2089748,
+        -8.6382619
+      ],
+      "address": "Jalan Bypass Gatot Subroto, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3787237309",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2089748,
+        -8.6262619
+      ]
+    },
+    {
+      "id": "osm-node-3788508644",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Ubud",
+      "coordinates": [
+        115.1910254,
+        -8.3621622
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3788508644",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1910254,
+        -8.3501622
+      ]
+    },
+    {
+      "id": "osm-node-3791203569",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Bypass Gatot Subroto",
+      "coordinates": [
+        115.2187343,
+        -8.6359432
+      ],
+      "address": "Jalan Bypass Gatot Subroto, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3791203569",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2187343,
+        -8.6239432
+      ]
+    },
+    {
+      "id": "osm-node-3791297306",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Raya Semebaung",
+      "coordinates": [
+        115.306609,
+        -8.5349986
+      ],
+      "address": "Jalan Raya Semebaung",
+      "area": "Gianyar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3791297306",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.306609,
+        -8.5229986
+      ]
+    },
+    {
+      "id": "osm-node-3791477572",
+      "name": "SPBU 54.803.18",
+      "shortName": "SPBU 54.803.18",
+      "coordinates": [
+        115.2385702,
+        -8.5490905
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3791477572",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2385702,
+        -8.5370905
+      ]
+    },
+    {
+      "id": "osm-node-3800945890",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Tabanan",
+      "coordinates": [
+        115.034218,
+        -8.4989099
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3800945890",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.034218,
+        -8.4869099
+      ]
+    },
+    {
+      "id": "osm-node-3828371871",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Denpasar",
+      "coordinates": [
+        115.2377311,
+        -8.6359364
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3828371871",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2377311,
+        -8.6239364
+      ]
+    },
+    {
+      "id": "osm-node-3834339466",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Denpasar",
+      "coordinates": [
+        115.2519375,
+        -8.6364386
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3834339466",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2519375,
+        -8.6244386
+      ]
+    },
+    {
+      "id": "osm-node-3921459354",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Karangasem",
+      "coordinates": [
+        115.5896916,
+        -8.4020067
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/3921459354",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5896916,
+        -8.3900067
+      ]
+    },
+    {
+      "id": "osm-node-4157284889",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Imam Bonjol",
+      "coordinates": [
+        115.2023412,
+        -8.675199
+      ],
+      "address": "Jalan Imam Bonjol, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4157284889",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2023412,
+        -8.663199
+      ]
+    },
+    {
+      "id": "osm-node-4198773706",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sukawati",
+      "coordinates": [
+        115.2762409,
+        -8.5748859
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4198773706",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2762409,
+        -8.5628859
+      ]
+    },
+    {
+      "id": "osm-node-4198773752",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sukawati",
+      "coordinates": [
+        115.2747603,
+        -8.5668758
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4198773752",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2747603,
+        -8.5548758
+      ]
+    },
+    {
+      "id": "osm-node-4217406976",
+      "name": "Pertamina Petrol Station",
+      "shortName": "Pertamina Petrol Station",
+      "coordinates": [
+        115.18713,
+        -8.6958654
+      ],
+      "address": "Jalan Imam Bonjol, Denpasar",
+      "area": "Legian",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4217406976",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.18713,
+        -8.6838654
+      ]
+    },
+    {
+      "id": "osm-node-4236778069",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Pura Demak",
+      "coordinates": [
+        115.1926231,
+        -8.6814158
+      ],
+      "address": "Jalan Pura Demak, Denpasar",
+      "area": "Seminyak",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4236778069",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1926231,
+        -8.6694158
+      ]
+    },
+    {
+      "id": "osm-node-4247757589",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Bangli",
+      "coordinates": [
+        115.3460944,
+        -8.3628769
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4247757589",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3460944,
+        -8.3508769
+      ]
+    },
+    {
+      "id": "osm-node-4249837879",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Kebo Iwa",
+      "coordinates": [
+        115.1853451,
+        -8.6364156
+      ],
+      "address": "Jalan Kebo Iwa, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4249837879",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1853451,
+        -8.6244156
+      ]
+    },
+    {
+      "id": "osm-node-4362250290",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Bangli",
+      "coordinates": [
+        115.3524859,
+        -8.4669679
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4362250290",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3524859,
+        -8.4549679
+      ]
+    },
+    {
+      "id": "osm-node-4368999206",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        115.0512955,
+        -8.2646029
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4368999206",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0512955,
+        -8.2526029
+      ]
+    },
+    {
+      "id": "osm-node-4420365789",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        114.8958367,
+        -8.3485679
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4420365789",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.8958367,
+        -8.3365679
+      ]
+    },
+    {
+      "id": "osm-node-4422250828",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sukawati",
+      "coordinates": [
+        115.2782915,
+        -8.6415338
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4422250828",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2782915,
+        -8.6295338
+      ]
+    },
+    {
+      "id": "osm-node-4426603389",
+      "name": "Pompa bensin",
+      "shortName": "Pompa bensin · Sukawati",
+      "coordinates": [
+        115.2360732,
+        -8.6060724
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4426603389",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2360732,
+        -8.5940724
+      ]
+    },
+    {
+      "id": "osm-node-4438497483",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Bypass Gatot Subroto",
+      "coordinates": [
+        115.2039161,
+        -8.6389264
+      ],
+      "address": "Jalan Bypass Gatot Subroto, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4438497483",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2039161,
+        -8.6269264
+      ]
+    },
+    {
+      "id": "osm-node-4446960858",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sukawati",
+      "coordinates": [
+        115.3247915,
+        -8.6018053
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4446960858",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3247915,
+        -8.5898053
+      ]
+    },
+    {
+      "id": "osm-node-4446961398",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Gianyar",
+      "coordinates": [
+        115.3526184,
+        -8.581006
+      ],
+      "address": "Near Gianyar",
+      "area": "Gianyar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4446961398",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3526184,
+        -8.569006
+      ]
+    },
+    {
+      "id": "osm-node-4467737446",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Ubud",
+      "coordinates": [
+        115.2515009,
+        -8.5538112
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4467737446",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2515009,
+        -8.5418112
+      ]
+    },
+    {
+      "id": "osm-node-4467738292",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Ubud",
+      "coordinates": [
+        115.2976035,
+        -8.4627372
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4467738292",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2976035,
+        -8.4507372
+      ]
+    },
+    {
+      "id": "osm-node-4467738625",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Pemuteran",
+      "coordinates": [
+        114.7500647,
+        -8.1772879
+      ],
+      "address": "Near Pemuteran",
+      "area": "Pemuteran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4467738625",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.7500647,
+        -8.1652879
+      ]
+    },
+    {
+      "id": "osm-node-4467739093",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Lovina",
+      "coordinates": [
+        114.8840471,
+        -8.2038795
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4467739093",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.8840471,
+        -8.1918795
+      ]
+    },
+    {
+      "id": "osm-node-4540413890",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Amed / Tulamben",
+      "coordinates": [
+        115.61914,
+        -8.32279
+      ],
+      "address": "Near Amed / Tulamben",
+      "area": "Amed / Tulamben",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4540413890",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.61914,
+        -8.31079
+      ]
+    },
+    {
+      "id": "osm-node-4591597595",
+      "name": "Small place",
+      "shortName": "Small place · Kintamani",
+      "coordinates": [
+        115.3793364,
+        -8.2785819
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4591597595",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3793364,
+        -8.2665819
+      ]
+    },
+    {
+      "id": "osm-node-4593501492",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sukawati",
+      "coordinates": [
+        115.2880082,
+        -8.5655166
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4593501492",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2880082,
+        -8.5535166
+      ]
+    },
+    {
+      "id": "osm-node-4593501496",
+      "name": "Pom bensin blahbatuh",
+      "shortName": "Pom bensin blahbatuh",
+      "coordinates": [
+        115.3049769,
+        -8.5662499
+      ],
+      "address": "Near Gianyar",
+      "area": "Gianyar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4593501496",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3049769,
+        -8.5542499
+      ]
+    },
+    {
+      "id": "osm-node-4593535189",
+      "name": "Pelumas Pertamina 54.805.09",
+      "shortName": "Pelumas Pertamina 54.805.09",
+      "coordinates": [
+        115.2717137,
+        -8.5287952
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4593535189",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2717137,
+        -8.5167952
+      ]
+    },
+    {
+      "id": "osm-node-4593932704",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sukawati",
+      "coordinates": [
+        115.3092889,
+        -8.6121569
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4593932704",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3092889,
+        -8.6001569
+      ]
+    },
+    {
+      "id": "osm-node-4593932705",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sukawati",
+      "coordinates": [
+        115.2872241,
+        -8.635779
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4593932705",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2872241,
+        -8.623779
+      ]
+    },
+    {
+      "id": "osm-node-4630425094",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Uluwatu / Ungasan",
+      "coordinates": [
+        115.1291518,
+        -8.7935202
+      ],
+      "address": "Near Uluwatu / Ungasan",
+      "area": "Uluwatu / Ungasan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4630425094",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1291518,
+        -8.7815202
+      ]
+    },
+    {
+      "id": "osm-node-4704509289",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Lovina",
+      "coordinates": [
+        114.9500563,
+        -8.1918108
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4704509289",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9500563,
+        -8.1798108
+      ]
+    },
+    {
+      "id": "osm-node-4706094090",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Nusa Penida",
+      "coordinates": [
+        115.5717814,
+        -8.6778872
+      ],
+      "address": "Near Nusa Penida",
+      "area": "Nusa Penida",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4706094090",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5717814,
+        -8.6658872
+      ]
+    },
+    {
+      "id": "osm-node-4707866590",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Ubud",
+      "coordinates": [
+        115.2448962,
+        -8.40877
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4707866590",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2448962,
+        -8.39677
+      ]
+    },
+    {
+      "id": "osm-node-4710004789",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Nusa Penida",
+      "coordinates": [
+        115.5327216,
+        -8.6770708
+      ],
+      "address": "Near Nusa Penida",
+      "area": "Nusa Penida",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4710004789",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5327216,
+        -8.6650708
+      ]
+    },
+    {
+      "id": "osm-node-4938684923",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan WR Supratman",
+      "coordinates": [
+        115.2517962,
+        -8.6413927
+      ],
+      "address": "Jalan WR Supratman, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4938684923",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2517962,
+        -8.6293927
+      ]
+    },
+    {
+      "id": "osm-node-4954534046",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Nusa Dua / Benoa",
+      "coordinates": [
+        115.1968257,
+        -8.7845777
+      ],
+      "address": "Near Nusa Dua / Benoa",
+      "area": "Nusa Dua / Benoa",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4954534046",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1968257,
+        -8.7725777
+      ]
+    },
+    {
+      "id": "osm-node-4954534052",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jimbaran",
+      "coordinates": [
+        115.1868238,
+        -8.783355
+      ],
+      "address": "Near Jimbaran",
+      "area": "Jimbaran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4954534052",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1868238,
+        -8.771355
+      ]
+    },
+    {
+      "id": "osm-node-4959546626",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Pulau Kawe",
+      "coordinates": [
+        115.2070972,
+        -8.6767582
+      ],
+      "address": "Jalan Pulau Kawe, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4959546626",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2070972,
+        -8.6647582
+      ]
+    },
+    {
+      "id": "osm-node-4965837975",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Pemuteran",
+      "coordinates": [
+        114.4387078,
+        -8.1824446
+      ],
+      "address": "Near Pemuteran",
+      "area": "Pemuteran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/4965837975",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.4387078,
+        -8.1704446
+      ]
+    },
+    {
+      "id": "osm-node-5015970023",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Canggu",
+      "coordinates": [
+        115.1769705,
+        -8.6372122
+      ],
+      "address": "Near Canggu",
+      "area": "Canggu",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5015970023",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1769705,
+        -8.6252122
+      ]
+    },
+    {
+      "id": "osm-node-5017453423",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Sukawati",
+      "coordinates": [
+        115.261646,
+        -8.563332
+      ],
+      "address": "Near Sukawati",
+      "area": "Sukawati",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5017453423",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.261646,
+        -8.551332
+      ]
+    },
+    {
+      "id": "osm-node-5052517732",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        115.0213127,
+        -8.1647348
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5052517732",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0213127,
+        -8.1527348
+      ]
+    },
+    {
+      "id": "osm-node-5103311413",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Bypass Gatot Subroto",
+      "coordinates": [
+        115.1947454,
+        -8.6365252
+      ],
+      "address": "Jalan Bypass Gatot Subroto, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5103311413",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1947454,
+        -8.6245252
+      ]
+    },
+    {
+      "id": "osm-node-5104508763",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Denpasar",
+      "coordinates": [
+        115.190962,
+        -8.6705534
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5104508763",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.190962,
+        -8.6585534
+      ]
+    },
+    {
+      "id": "osm-node-5126061305",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sanur",
+      "coordinates": [
+        115.2248385,
+        -8.7132748
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5126061305",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2248385,
+        -8.7012748
+      ]
+    },
+    {
+      "id": "osm-node-5257494824",
+      "name": "Bensin motorbike",
+      "shortName": "Bensin motorbike",
+      "coordinates": [
+        115.5928169,
+        -8.7660829
+      ],
+      "address": "Near Nusa Penida",
+      "area": "Nusa Penida",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5257494824",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5928169,
+        -8.7540829
+      ]
+    },
+    {
+      "id": "osm-node-5317781709",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Mengwi",
+      "coordinates": [
+        115.1867456,
+        -8.5941571
+      ],
+      "address": "Near Mengwi",
+      "area": "Mengwi",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5317781709",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1867456,
+        -8.5821571
+      ]
+    },
+    {
+      "id": "osm-node-5317781710",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Tabanan",
+      "coordinates": [
+        115.1391495,
+        -8.572125
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5317781710",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1391495,
+        -8.560125
+      ]
+    },
+    {
+      "id": "osm-node-5419297521",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        114.9768109,
+        -8.2859623
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5419297521",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9768109,
+        -8.2739623
+      ]
+    },
+    {
+      "id": "osm-node-5441794405",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kuta",
+      "coordinates": [
+        115.2022082,
+        -8.7177928
+      ],
+      "address": "Near Kuta",
+      "area": "Kuta",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5441794405",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2022082,
+        -8.7057928
+      ]
+    },
+    {
+      "id": "osm-node-5529682390",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sanur",
+      "coordinates": [
+        115.2590717,
+        -8.6953833
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5529682390",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2590717,
+        -8.6833833
+      ]
+    },
+    {
+      "id": "osm-node-5546845704",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Canggu",
+      "coordinates": [
+        115.1742066,
+        -8.6385964
+      ],
+      "address": "Near Canggu",
+      "area": "Canggu",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5546845704",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1742066,
+        -8.6265964
+      ]
+    },
+    {
+      "id": "osm-node-5575035954",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Teuku Umar Barat",
+      "coordinates": [
+        115.1913587,
+        -8.6821361
+      ],
+      "address": "Jalan Teuku Umar Barat, Denpasar",
+      "area": "Seminyak",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5575035954",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1913587,
+        -8.6701361
+      ]
+    },
+    {
+      "id": "osm-node-5624314821",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Nusa Lembongan",
+      "coordinates": [
+        115.4900787,
+        -8.678882
+      ],
+      "address": "Near Nusa Lembongan",
+      "area": "Nusa Lembongan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5624314821",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4900787,
+        -8.666882
+      ]
+    },
+    {
+      "id": "osm-node-5651550475",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Pemuteran",
+      "coordinates": [
+        114.8321428,
+        -8.2006978
+      ],
+      "address": "Near Pemuteran",
+      "area": "Pemuteran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5651550475",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.8321428,
+        -8.1886978
+      ]
+    },
+    {
+      "id": "osm-node-5753254022",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Nusa Penida",
+      "coordinates": [
+        115.5229503,
+        -8.7183405
+      ],
+      "address": "Near Nusa Penida",
+      "area": "Nusa Penida",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5753254022",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5229503,
+        -8.7063405
+      ]
+    },
+    {
+      "id": "osm-node-5755867921",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        115.0547153,
+        -8.2664614
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5755867921",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0547153,
+        -8.2544614
+      ]
+    },
+    {
+      "id": "osm-node-5833788586",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Ubud",
+      "coordinates": [
+        115.2394654,
+        -8.4483447
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/5833788586",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2394654,
+        -8.4363447
+      ]
+    },
+    {
+      "id": "osm-node-6040845285",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Karangasem",
+      "coordinates": [
+        115.6839471,
+        -8.4269234
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6040845285",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.6839471,
+        -8.4149234
+      ]
+    },
+    {
+      "id": "osm-node-6050520885",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Karangasem",
+      "coordinates": [
+        115.5788285,
+        -8.4437112
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6050520885",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5788285,
+        -8.4317112
+      ]
+    },
+    {
+      "id": "osm-node-6178072124",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Singaraja",
+      "coordinates": [
+        115.1117625,
+        -8.0952781
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6178072124",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1117625,
+        -8.0832781
+      ]
+    },
+    {
+      "id": "osm-node-6229193250",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Klungkung",
+      "coordinates": [
+        115.3746249,
+        -8.5684765
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6229193250",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3746249,
+        -8.5564765
+      ]
+    },
+    {
+      "id": "osm-node-6286590885",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Bangli",
+      "coordinates": [
+        115.3184907,
+        -8.451204
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6286590885",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3184907,
+        -8.439204
+      ]
+    },
+    {
+      "id": "osm-node-6316044085",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Uluwatu / Ungasan",
+      "coordinates": [
+        115.1152246,
+        -8.8079774
+      ],
+      "address": "Near Uluwatu / Ungasan",
+      "area": "Uluwatu / Ungasan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6316044085",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1152246,
+        -8.7959774
+      ]
+    },
+    {
+      "id": "osm-node-6332684386",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Nusa Lembongan",
+      "coordinates": [
+        115.4493191,
+        -8.6928105
+      ],
+      "address": "Near Nusa Lembongan",
+      "area": "Nusa Lembongan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6332684386",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4493191,
+        -8.6808105
+      ]
+    },
+    {
+      "id": "osm-node-6336822986",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Nusa Lembongan",
+      "coordinates": [
+        115.4377812,
+        -8.6882906
+      ],
+      "address": "Near Nusa Lembongan",
+      "area": "Nusa Lembongan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6336822986",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4377812,
+        -8.6762906
+      ]
+    },
+    {
+      "id": "osm-node-6355894185",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Ubud",
+      "coordinates": [
+        115.2805724,
+        -8.447857
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6355894185",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2805724,
+        -8.435857
+      ]
+    },
+    {
+      "id": "osm-node-6355907290",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Ubud",
+      "coordinates": [
+        115.279707,
+        -8.4523559
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6355907290",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.279707,
+        -8.4403559
+      ]
+    },
+    {
+      "id": "osm-node-6355913587",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Ubud",
+      "coordinates": [
+        115.279605,
+        -8.4533096
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6355913587",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.279605,
+        -8.4413096
+      ]
+    },
+    {
+      "id": "osm-node-6400253085",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Canggu",
+      "coordinates": [
+        115.1604306,
+        -8.6456055
+      ],
+      "address": "Near Canggu",
+      "area": "Canggu",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6400253085",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1604306,
+        -8.6336055
+      ]
+    },
+    {
+      "id": "osm-node-6460723863",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Jimbaran",
+      "coordinates": [
+        115.1718247,
+        -8.7691092
+      ],
+      "address": "Near Jimbaran",
+      "area": "Jimbaran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6460723863",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1718247,
+        -8.7571092
+      ]
+    },
+    {
+      "id": "osm-node-6611231166",
+      "name": "Pompa Bensin",
+      "shortName": "Pompa Bensin · Singaraja",
+      "coordinates": [
+        115.0792969,
+        -8.1272096
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6611231166",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0792969,
+        -8.1152096
+      ]
+    },
+    {
+      "id": "osm-node-6611231167",
+      "name": "Pompa Bensin",
+      "shortName": "Pompa Bensin · Singaraja",
+      "coordinates": [
+        115.082669,
+        -8.1131501
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6611231167",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.082669,
+        -8.1011501
+      ]
+    },
+    {
+      "id": "osm-node-6712210032",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Bangli",
+      "coordinates": [
+        115.3081128,
+        -8.4396411
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6712210032",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3081128,
+        -8.4276411
+      ]
+    },
+    {
+      "id": "osm-node-6712210047",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kintamani",
+      "coordinates": [
+        115.3467146,
+        -8.3181975
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6712210047",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3467146,
+        -8.3061975
+      ]
+    },
+    {
+      "id": "osm-node-6721922709",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Bangli",
+      "coordinates": [
+        115.3627892,
+        -8.4446637
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6721922709",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3627892,
+        -8.4326637
+      ]
+    },
+    {
+      "id": "osm-node-6721922710",
+      "name": "SPBU Bunutin",
+      "shortName": "SPBU Bunutin",
+      "coordinates": [
+        115.345469,
+        -8.5133706
+      ],
+      "address": "Near Gianyar",
+      "area": "Gianyar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6721922710",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.345469,
+        -8.5013706
+      ]
+    },
+    {
+      "id": "osm-node-6875260470",
+      "name": "Pertamina Buwit",
+      "shortName": "Pertamina Buwit",
+      "coordinates": [
+        115.1161502,
+        -8.6173884
+      ],
+      "address": "Near Pererenan",
+      "area": "Pererenan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/6875260470",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1161502,
+        -8.6053884
+      ]
+    },
+    {
+      "id": "osm-node-7105955685",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Singaraja",
+      "coordinates": [
+        115.1751487,
+        -8.0853331
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/7105955685",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1751487,
+        -8.0733331
+      ]
+    },
+    {
+      "id": "osm-node-7192803785",
+      "name": "pertamina",
+      "shortName": "pertamina · Bangli",
+      "coordinates": [
+        115.4233169,
+        -8.4283591
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/7192803785",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4233169,
+        -8.4163591
+      ]
+    },
+    {
+      "id": "osm-node-7622285885",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kintamani",
+      "coordinates": [
+        115.2226649,
+        -8.3270538
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/7622285885",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2226649,
+        -8.3150538
+      ]
+    },
+    {
+      "id": "osm-node-7660527085",
+      "name": "Small garage",
+      "shortName": "Small garage · Amed / Tulamben",
+      "coordinates": [
+        115.4799474,
+        -8.2887138
+      ],
+      "address": "Near Amed / Tulamben",
+      "area": "Amed / Tulamben",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/7660527085",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4799474,
+        -8.2767138
+      ]
+    },
+    {
+      "id": "osm-node-9274481126",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Bangli",
+      "coordinates": [
+        115.2807412,
+        -8.4154523
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/9274481126",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2807412,
+        -8.4034523
+      ]
+    },
+    {
+      "id": "osm-node-9464806554",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Bangli",
+      "coordinates": [
+        115.2983646,
+        -8.4185343
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/9464806554",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2983646,
+        -8.4065343
+      ]
+    },
+    {
+      "id": "osm-node-9498002342",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kintamani",
+      "coordinates": [
+        115.3256533,
+        -8.3294926
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/9498002342",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3256533,
+        -8.3174926
+      ]
+    },
+    {
+      "id": "osm-node-9768297246",
+      "name": "Pom Bensin 54.803.01",
+      "shortName": "Pom Bensin 54.803.01",
+      "coordinates": [
+        115.1924875,
+        -8.6121311
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/9768297246",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1924875,
+        -8.6001311
+      ]
+    },
+    {
+      "id": "osm-node-9969087618",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Canggu",
+      "coordinates": [
+        115.1533538,
+        -8.6640732
+      ],
+      "address": "Near Canggu",
+      "area": "Canggu",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/9969087618",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1533538,
+        -8.6520732
+      ]
+    },
+    {
+      "id": "osm-node-10779010555",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Negara / West Bali",
+      "coordinates": [
+        114.5785813,
+        -8.348416
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10779010555",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.5785813,
+        -8.336416
+      ]
+    },
+    {
+      "id": "osm-node-10779013748",
+      "name": "SPBU Pertamina 54.822.16",
+      "shortName": "SPBU Pertamina 54.822.16",
+      "coordinates": [
+        114.6245958,
+        -8.3575859
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10779013748",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.6245958,
+        -8.3455859
+      ]
+    },
+    {
+      "id": "osm-node-10779027615",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Negara / West Bali",
+      "coordinates": [
+        114.661583,
+        -8.366457
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10779027615",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.661583,
+        -8.354457
+      ]
+    },
+    {
+      "id": "osm-node-10779073221",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Negara / West Bali",
+      "coordinates": [
+        114.7790503,
+        -8.4013944
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10779073221",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.7790503,
+        -8.3893944
+      ]
+    },
+    {
+      "id": "osm-node-10779078991",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Negara / West Bali",
+      "coordinates": [
+        114.8711291,
+        -8.4417838
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10779078991",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.8711291,
+        -8.4297838
+      ]
+    },
+    {
+      "id": "osm-node-10779108513",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Tabanan",
+      "coordinates": [
+        115.0492298,
+        -8.495693
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10779108513",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0492298,
+        -8.483693
+      ]
+    },
+    {
+      "id": "osm-node-10779121218",
+      "name": "SPBU Pertamina 54.821.04",
+      "shortName": "SPBU Pertamina 54.821.04",
+      "coordinates": [
+        115.1231642,
+        -8.5495892
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10779121218",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1231642,
+        -8.5375892
+      ]
+    },
+    {
+      "id": "osm-node-10798201666",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Singaraja",
+      "coordinates": [
+        115.1385918,
+        -8.2370115
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10798201666",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1385918,
+        -8.2250115
+      ]
+    },
+    {
+      "id": "osm-node-10799072563",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Lovina",
+      "coordinates": [
+        115.0036354,
+        -8.1758946
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10799072563",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0036354,
+        -8.1638946
+      ]
+    },
+    {
+      "id": "osm-node-10800799512",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kintamani",
+      "coordinates": [
+        115.1719401,
+        -8.3292799
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10800799512",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1719401,
+        -8.3172799
+      ]
+    },
+    {
+      "id": "osm-node-10801074996",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Tabanan",
+      "coordinates": [
+        115.1372242,
+        -8.4690241
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10801074996",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1372242,
+        -8.4570241
+      ]
+    },
+    {
+      "id": "osm-node-10801074998",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Tabanan",
+      "coordinates": [
+        115.1385149,
+        -8.4544855
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10801074998",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1385149,
+        -8.4424855
+      ]
+    },
+    {
+      "id": "osm-node-10997051997",
+      "name": "SPBU Pertamina",
+      "shortName": "SPBU Pertamina",
+      "coordinates": [
+        115.1778051,
+        -8.6736455
+      ],
+      "address": "Jalan Raya Kerobokan, Kerobokan Kelod, North Kuta, Bali",
+      "area": "Seminyak",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/10997051997",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1778051,
+        -8.6616455
+      ]
+    },
+    {
+      "id": "osm-node-11002446836",
+      "name": "Pertamina SPBU",
+      "shortName": "Pertamina SPBU",
+      "coordinates": [
+        115.208976,
+        -8.6245512
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11002446836",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.208976,
+        -8.6125512
+      ]
+    },
+    {
+      "id": "osm-node-11002446837",
+      "name": "SPBU Pertamina",
+      "shortName": "SPBU Pertamina",
+      "coordinates": [
+        115.2204386,
+        -8.5624985
+      ],
+      "address": "Near Mengwi",
+      "area": "Mengwi",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11002446837",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2204386,
+        -8.5504985
+      ]
+    },
+    {
+      "id": "osm-node-11002450532",
+      "name": "SPBU Darmasaba",
+      "shortName": "SPBU Darmasaba",
+      "coordinates": [
+        115.2157029,
+        -8.589582
+      ],
+      "address": "Darmasaba",
+      "area": "Mengwi",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11002450532",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2157029,
+        -8.577582
+      ]
+    },
+    {
+      "id": "osm-node-11002518744",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Bangli",
+      "coordinates": [
+        115.3074894,
+        -8.3676426
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11002518744",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3074894,
+        -8.3556426
+      ]
+    },
+    {
+      "id": "osm-node-11012490777",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Kintamani",
+      "coordinates": [
+        115.3422879,
+        -8.2682332
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11012490777",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3422879,
+        -8.2562332
+      ]
+    },
+    {
+      "id": "osm-node-11012490778",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Singaraja",
+      "coordinates": [
+        115.2002801,
+        -8.1409354
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11012490778",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2002801,
+        -8.1289354
+      ]
+    },
+    {
+      "id": "osm-node-11012490782",
+      "name": "Petramini",
+      "shortName": "Petramini · Singaraja",
+      "coordinates": [
+        115.1877653,
+        -8.1744256
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11012490782",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1877653,
+        -8.1624256
+      ]
+    },
+    {
+      "id": "osm-node-11012490783",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Kintamani",
+      "coordinates": [
+        115.378028,
+        -8.2791538
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11012490783",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.378028,
+        -8.2671538
+      ]
+    },
+    {
+      "id": "osm-node-11012515469",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Kintamani",
+      "coordinates": [
+        115.4647162,
+        -8.1771244
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11012515469",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4647162,
+        -8.1651244
+      ]
+    },
+    {
+      "id": "osm-node-11012542529",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Singaraja",
+      "coordinates": [
+        115.1872771,
+        -8.1184926
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11012542529",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1872771,
+        -8.1064926
+      ]
+    },
+    {
+      "id": "osm-node-11012542530",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Singaraja",
+      "coordinates": [
+        115.2138198,
+        -8.1390142
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11012542530",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2138198,
+        -8.1270142
+      ]
+    },
+    {
+      "id": "osm-node-11033884332",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Kintamani",
+      "coordinates": [
+        115.3237738,
+        -8.2129688
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11033884332",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3237738,
+        -8.2009688
+      ]
+    },
+    {
+      "id": "osm-node-11033884333",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Singaraja",
+      "coordinates": [
+        115.2167509,
+        -8.1263869
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11033884333",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2167509,
+        -8.1143869
+      ]
+    },
+    {
+      "id": "osm-node-11033884335",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Kintamani",
+      "coordinates": [
+        115.3195361,
+        -8.2871827
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11033884335",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3195361,
+        -8.2751827
+      ]
+    },
+    {
+      "id": "osm-node-11033884336",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Ubud",
+      "coordinates": [
+        115.2462734,
+        -8.4239732
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11033884336",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2462734,
+        -8.4119732
+      ]
+    },
+    {
+      "id": "osm-node-11033884337",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Kintamani",
+      "coordinates": [
+        115.2906849,
+        -8.1945373
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11033884337",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2906849,
+        -8.1825373
+      ]
+    },
+    {
+      "id": "osm-node-11033915359",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Singaraja",
+      "coordinates": [
+        115.1758923,
+        -8.0917582
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11033915359",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1758923,
+        -8.0797582
+      ]
+    },
+    {
+      "id": "osm-node-11033915360",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Singaraja",
+      "coordinates": [
+        115.2103401,
+        -8.1312581
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11033915360",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2103401,
+        -8.1192581
+      ]
+    },
+    {
+      "id": "osm-node-11048153450",
+      "name": "PetraMINA",
+      "shortName": "PetraMINA · Lovina",
+      "coordinates": [
+        115.057153,
+        -8.1498823
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048153450",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.057153,
+        -8.1378823
+      ]
+    },
+    {
+      "id": "osm-node-11048165238",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Candidasa",
+      "coordinates": [
+        115.4793876,
+        -8.4377262
+      ],
+      "address": "Near Candidasa",
+      "area": "Candidasa",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048165238",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4793876,
+        -8.4257262
+      ]
+    },
+    {
+      "id": "osm-node-11048165239",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Karangasem",
+      "coordinates": [
+        115.5793071,
+        -8.4151857
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048165239",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5793071,
+        -8.4031857
+      ]
+    },
+    {
+      "id": "osm-node-11048165240",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Bangli",
+      "coordinates": [
+        115.4414954,
+        -8.4261734
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048165240",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4414954,
+        -8.4141734
+      ]
+    },
+    {
+      "id": "osm-node-11048165241",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Bangli",
+      "coordinates": [
+        115.4209625,
+        -8.4036763
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048165241",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4209625,
+        -8.3916763
+      ]
+    },
+    {
+      "id": "osm-node-11048180310",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Amed / Tulamben",
+      "coordinates": [
+        115.7000512,
+        -8.3675804
+      ],
+      "address": "Near Amed / Tulamben",
+      "area": "Amed / Tulamben",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048180310",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.7000512,
+        -8.3555804
+      ]
+    },
+    {
+      "id": "osm-node-11048180311",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Karangasem",
+      "coordinates": [
+        115.5974888,
+        -8.3906726
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048180311",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5974888,
+        -8.3786726
+      ]
+    },
+    {
+      "id": "osm-node-11048180312",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Karangasem",
+      "coordinates": [
+        115.6834293,
+        -8.4216715
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048180312",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.6834293,
+        -8.4096715
+      ]
+    },
+    {
+      "id": "osm-node-11048180313",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Amed / Tulamben",
+      "coordinates": [
+        115.6191112,
+        -8.3406285
+      ],
+      "address": "Near Amed / Tulamben",
+      "area": "Amed / Tulamben",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048180313",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.6191112,
+        -8.3286285
+      ]
+    },
+    {
+      "id": "osm-node-11048180314",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Amed / Tulamben",
+      "coordinates": [
+        115.7053647,
+        -8.3741615
+      ],
+      "address": "Near Amed / Tulamben",
+      "area": "Amed / Tulamben",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048180314",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.7053647,
+        -8.3621615
+      ]
+    },
+    {
+      "id": "osm-node-11048190871",
+      "name": "Pertashop",
+      "shortName": "Pertashop",
+      "coordinates": [
+        115.6258207,
+        -8.4626463
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048190871",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.6258207,
+        -8.4506463
+      ]
+    },
+    {
+      "id": "osm-node-11048190872",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Karangasem",
+      "coordinates": [
+        115.6519867,
+        -8.4529207
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048190872",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.6519867,
+        -8.4409207
+      ]
+    },
+    {
+      "id": "osm-node-11048190873",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Karangasem",
+      "coordinates": [
+        115.6809174,
+        -8.4264119
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048190873",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.6809174,
+        -8.4144119
+      ]
+    },
+    {
+      "id": "osm-node-11048192287",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Candidasa",
+      "coordinates": [
+        115.4959274,
+        -8.5314421
+      ],
+      "address": "Near Candidasa",
+      "area": "Candidasa",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048192287",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4959274,
+        -8.5194421
+      ]
+    },
+    {
+      "id": "osm-node-11048192289",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Klungkung",
+      "coordinates": [
+        115.4852266,
+        -8.5477323
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11048192289",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4852266,
+        -8.5357323
+      ]
+    },
+    {
+      "id": "osm-node-11203013135",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Klungkung",
+      "coordinates": [
+        115.3651598,
+        -8.522743
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11203013135",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3651598,
+        -8.510743
+      ]
+    },
+    {
+      "id": "osm-node-11674186496",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Singaraja",
+      "coordinates": [
+        115.2199185,
+        -8.0791108
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11674186496",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2199185,
+        -8.0671108
+      ]
+    },
+    {
+      "id": "osm-node-11707649769",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sanur",
+      "coordinates": [
+        115.2335044,
+        -8.7109197
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11707649769",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2335044,
+        -8.6989197
+      ]
+    },
+    {
+      "id": "osm-node-11909772240",
+      "name": "Pertamini",
+      "shortName": "Pertamini",
+      "coordinates": [
+        115.5890976,
+        -8.3519222
+      ],
+      "address": "Near Amed / Tulamben",
+      "area": "Amed / Tulamben",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11909772240",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.5890976,
+        -8.3399222
+      ]
+    },
+    {
+      "id": "osm-node-11909796444",
+      "name": "Pertamini",
+      "shortName": "Pertamini",
+      "coordinates": [
+        115.484262,
+        -8.4070469
+      ],
+      "address": "Near Candidasa",
+      "area": "Candidasa",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11909796444",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.484262,
+        -8.3950469
+      ]
+    },
+    {
+      "id": "osm-node-11918886642",
+      "name": "Pertamini",
+      "shortName": "Pertamini",
+      "coordinates": [
+        115.053696,
+        -8.2662257
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11918886642",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.053696,
+        -8.2542257
+      ]
+    },
+    {
+      "id": "osm-node-11954796697",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        115.0615534,
+        -8.2703177
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11954796697",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0615534,
+        -8.2583177
+      ]
+    },
+    {
+      "id": "osm-node-11954796698",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        115.0573748,
+        -8.2728105
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11954796698",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0573748,
+        -8.2608105
+      ]
+    },
+    {
+      "id": "osm-node-11957676499",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Nusa Lembongan",
+      "coordinates": [
+        115.4519263,
+        -8.6960923
+      ],
+      "address": "Near Nusa Lembongan",
+      "area": "Nusa Lembongan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/11957676499",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4519263,
+        -8.6840923
+      ]
+    },
+    {
+      "id": "osm-node-12252323023",
+      "name": "Cửa hàng Xăng dầu",
+      "shortName": "Cửa hàng Xăng dầu",
+      "coordinates": [
+        115.1350984,
+        -8.1140255
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12252323023",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1350984,
+        -8.1020255
+      ]
+    },
+    {
+      "id": "osm-node-12269097382",
+      "name": "PetraMini",
+      "shortName": "PetraMini · Singaraja",
+      "coordinates": [
+        115.0981351,
+        -8.1491167
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12269097382",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0981351,
+        -8.1371167
+      ]
+    },
+    {
+      "id": "osm-node-12277145587",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Bangli",
+      "coordinates": [
+        115.4060252,
+        -8.4631202
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12277145587",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4060252,
+        -8.4511202
+      ]
+    },
+    {
+      "id": "osm-node-12277145588",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Klungkung",
+      "coordinates": [
+        115.4020469,
+        -8.5107841
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12277145588",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4020469,
+        -8.4987841
+      ]
+    },
+    {
+      "id": "osm-node-12277185797",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Kintamani",
+      "coordinates": [
+        115.3968365,
+        -8.3092894
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12277185797",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3968365,
+        -8.2972894
+      ]
+    },
+    {
+      "id": "osm-node-12277189747",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Bangli",
+      "coordinates": [
+        115.4191175,
+        -8.3652741
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12277189747",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4191175,
+        -8.3532741
+      ]
+    },
+    {
+      "id": "osm-node-12277190271",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kintamani",
+      "coordinates": [
+        115.2472815,
+        -8.1465707
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12277190271",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2472815,
+        -8.1345707
+      ]
+    },
+    {
+      "id": "osm-node-12277198682",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Klungkung",
+      "coordinates": [
+        115.4011688,
+        -8.4858451
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12277198682",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4011688,
+        -8.4738451
+      ]
+    },
+    {
+      "id": "osm-node-12287905177",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Ubud",
+      "coordinates": [
+        115.210345,
+        -8.5048211
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12287905177",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.210345,
+        -8.4928211
+      ]
+    },
+    {
+      "id": "osm-node-12287921053",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Lovina",
+      "coordinates": [
+        115.0277035,
+        -8.2599613
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12287921053",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0277035,
+        -8.2479613
+      ]
+    },
+    {
+      "id": "osm-node-12287923856",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Mengwi",
+      "coordinates": [
+        115.2137882,
+        -8.5219765
+      ],
+      "address": "Near Mengwi",
+      "area": "Mengwi",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12287923856",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2137882,
+        -8.5099765
+      ]
+    },
+    {
+      "id": "osm-node-12287937936",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Kintamani",
+      "coordinates": [
+        115.1740283,
+        -8.2952994
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12287937936",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1740283,
+        -8.2832994
+      ]
+    },
+    {
+      "id": "osm-node-12290095501",
+      "name": "Cửa hàng Xăng dầu",
+      "shortName": "Cửa hàng Xăng dầu",
+      "coordinates": [
+        114.981214,
+        -8.2529113
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12290095501",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.981214,
+        -8.2409113
+      ]
+    },
+    {
+      "id": "osm-node-12291632313",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Lovina",
+      "coordinates": [
+        114.9708258,
+        -8.2766697
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12291632313",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9708258,
+        -8.2646697
+      ]
+    },
+    {
+      "id": "osm-node-12293396265",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Negara / West Bali",
+      "coordinates": [
+        114.6256044,
+        -8.3711837
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12293396265",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.6256044,
+        -8.3591837
+      ]
+    },
+    {
+      "id": "osm-node-12293398519",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Lovina",
+      "coordinates": [
+        114.9696464,
+        -8.2661384
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12293398519",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9696464,
+        -8.2541384
+      ]
+    },
+    {
+      "id": "osm-node-12293398520",
+      "name": "Cửa hàng Xăng dầu",
+      "shortName": "Cửa hàng Xăng dầu",
+      "coordinates": [
+        114.5070504,
+        -8.1665389
+      ],
+      "address": "Near Pemuteran",
+      "area": "Pemuteran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12293398520",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.5070504,
+        -8.1545389
+      ]
+    },
+    {
+      "id": "osm-node-12293406734",
+      "name": "Cửa hàng Xăng dầu",
+      "shortName": "Cửa hàng Xăng dầu",
+      "coordinates": [
+        114.5954745,
+        -8.1442322
+      ],
+      "address": "Near Pemuteran",
+      "area": "Pemuteran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12293406734",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.5954745,
+        -8.1322322
+      ]
+    },
+    {
+      "id": "osm-node-12293406735",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Negara / West Bali",
+      "coordinates": [
+        114.5975123,
+        -8.3824644
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12293406735",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.5975123,
+        -8.3704644
+      ]
+    },
+    {
+      "id": "osm-node-12293410046",
+      "name": "SPBU",
+      "shortName": "SPBU",
+      "coordinates": [
+        114.5160832,
+        -8.3024075
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12293410046",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.5160832,
+        -8.2904075
+      ]
+    },
+    {
+      "id": "osm-node-12293422755",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Negara / West Bali",
+      "coordinates": [
+        114.5718077,
+        -8.3608242
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12293422755",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.5718077,
+        -8.3488242
+      ]
+    },
+    {
+      "id": "osm-node-12313863793",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Tabanan",
+      "coordinates": [
+        115.0764661,
+        -8.552535
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12313863793",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0764661,
+        -8.540535
+      ]
+    },
+    {
+      "id": "osm-node-12313877251",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Tabanan",
+      "coordinates": [
+        114.9584518,
+        -8.492523
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12313877251",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9584518,
+        -8.480523
+      ]
+    },
+    {
+      "id": "osm-node-12313882736",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Tabanan",
+      "coordinates": [
+        115.0778761,
+        -8.5085467
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12313882736",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0778761,
+        -8.4965467
+      ]
+    },
+    {
+      "id": "osm-node-12313908583",
+      "name": "Fuel Station",
+      "shortName": "Fuel Station · Negara / West Bali",
+      "coordinates": [
+        114.8638291,
+        -8.4378104
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12313908583",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.8638291,
+        -8.4258104
+      ]
+    },
+    {
+      "id": "osm-node-12468698409",
+      "name": "Petramini",
+      "shortName": "Petramini · Lovina",
+      "coordinates": [
+        114.9588303,
+        -8.1915596
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12468698409",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9588303,
+        -8.1795596
+      ]
+    },
+    {
+      "id": "osm-node-12661989424",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Denpasar",
+      "coordinates": [
+        115.2090517,
+        -8.6504538
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/12661989424",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2090517,
+        -8.6384538
+      ]
+    },
+    {
+      "id": "osm-node-13122086601",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Jalan Toyaning II",
+      "coordinates": [
+        115.1510788,
+        -8.8257372
+      ],
+      "address": "Jalan Toyaning II",
+      "area": "Uluwatu / Ungasan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/13122086601",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1510788,
+        -8.8137372
+      ]
+    },
+    {
+      "id": "osm-node-13948488673",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Nusa Dua / Benoa",
+      "coordinates": [
+        115.2050547,
+        -8.8318606
+      ],
+      "address": "Near Nusa Dua / Benoa",
+      "area": "Nusa Dua / Benoa",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/13948488673",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2050547,
+        -8.8198606
+      ]
+    },
+    {
+      "id": "osm-node-14060362657",
+      "name": "Pertamini",
+      "shortName": "Pertamini",
+      "coordinates": [
+        115.2531206,
+        -8.7066005
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/14060362657",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2531206,
+        -8.6946005
+      ]
+    },
+    {
+      "id": "osm-node-14284211424",
+      "name": "Pertamina Gajah Mada",
+      "shortName": "Pertamina Gajah Mada",
+      "coordinates": [
+        115.0931161,
+        -8.1121023
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/node/14284211424",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0931161,
+        -8.1001023
+      ]
+    },
+    {
+      "id": "osm-way-209462178",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Karangasem",
+      "coordinates": [
+        115.6016304,
+        -8.4556416
+      ],
+      "address": "Near Karangasem",
+      "area": "Karangasem",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/209462178",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.6016304,
+        -8.4436416
+      ]
+    },
+    {
+      "id": "osm-way-225177250",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Ubud",
+      "coordinates": [
+        115.1962745,
+        -8.4375237
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/225177250",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1962745,
+        -8.4255237
+      ]
+    },
+    {
+      "id": "osm-way-311216627",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Uluwatu",
+      "coordinates": [
+        115.1612195,
+        -8.7978587
+      ],
+      "address": "Jalan Uluwatu, Ungasan",
+      "area": "Jimbaran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/311216627",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1612195,
+        -8.7858587
+      ]
+    },
+    {
+      "id": "osm-way-374650214",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Raya Sesetan",
+      "coordinates": [
+        115.2194621,
+        -8.6996475
+      ],
+      "address": "Jalan Raya Sesetan, Denpasar",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/374650214",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2194621,
+        -8.6876475
+      ]
+    },
+    {
+      "id": "osm-way-374650232",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sanur",
+      "coordinates": [
+        115.2210697,
+        -8.7091641
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/374650232",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2210697,
+        -8.6971641
+      ]
+    },
+    {
+      "id": "osm-way-375347728",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan H.O.S. Cokroaminoto",
+      "coordinates": [
+        115.209575,
+        -8.6447571
+      ],
+      "address": "Jalan H.O.S. Cokroaminoto, Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/375347728",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.209575,
+        -8.6327571
+      ]
+    },
+    {
+      "id": "osm-way-419467852",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kuta",
+      "coordinates": [
+        115.1798409,
+        -8.7389783
+      ],
+      "address": "Near Kuta",
+      "area": "Kuta",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/419467852",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1798409,
+        -8.7269783
+      ]
+    },
+    {
+      "id": "osm-way-475757306",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Singaraja",
+      "coordinates": [
+        115.1617255,
+        -8.2578546
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/475757306",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1617255,
+        -8.2458546
+      ]
+    },
+    {
+      "id": "osm-way-509984088",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kintamani",
+      "coordinates": [
+        115.2836325,
+        -8.1024654
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/509984088",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2836325,
+        -8.0904654
+      ]
+    },
+    {
+      "id": "osm-way-512355161",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Ubud",
+      "coordinates": [
+        115.2637147,
+        -8.5241915
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/512355161",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2637147,
+        -8.5121915
+      ]
+    },
+    {
+      "id": "osm-way-514001663",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Ubud",
+      "coordinates": [
+        115.2437777,
+        -8.5277397
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/514001663",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2437777,
+        -8.5157397
+      ]
+    },
+    {
+      "id": "osm-way-514011012",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Gianyar",
+      "coordinates": [
+        115.2950609,
+        -8.5262808
+      ],
+      "address": "Near Gianyar",
+      "area": "Gianyar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/514011012",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2950609,
+        -8.5142808
+      ]
+    },
+    {
+      "id": "osm-way-522920168",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Denpasar",
+      "coordinates": [
+        115.2116215,
+        -8.6777714
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/522920168",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2116215,
+        -8.6657714
+      ]
+    },
+    {
+      "id": "osm-way-541037284",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Klungkung",
+      "coordinates": [
+        115.4098836,
+        -8.5403657
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/541037284",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4098836,
+        -8.5283657
+      ]
+    },
+    {
+      "id": "osm-way-545825031",
+      "name": "Pertamina 54.805.20",
+      "shortName": "Pertamina 54.805.20",
+      "coordinates": [
+        115.2717004,
+        -8.5052246
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/545825031",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2717004,
+        -8.4932246
+      ]
+    },
+    {
+      "id": "osm-way-550979020",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Klungkung",
+      "coordinates": [
+        115.4165788,
+        -8.5646602
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/550979020",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.4165788,
+        -8.5526602
+      ]
+    },
+    {
+      "id": "osm-way-559976070",
+      "name": "SPBU",
+      "shortName": "SPBU",
+      "coordinates": [
+        114.9401671,
+        -8.2151865
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/559976070",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9401671,
+        -8.2031865
+      ]
+    },
+    {
+      "id": "osm-way-560893611",
+      "name": "SPBU",
+      "shortName": "SPBU",
+      "coordinates": [
+        114.9222581,
+        -8.1933082
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/560893611",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9222581,
+        -8.1813082
+      ]
+    },
+    {
+      "id": "osm-way-563856427",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Bangli",
+      "coordinates": [
+        115.2806455,
+        -8.4160766
+      ],
+      "address": "Near Bangli",
+      "area": "Bangli",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/563856427",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2806455,
+        -8.4040766
+      ]
+    },
+    {
+      "id": "osm-way-564399387",
+      "name": "Petrolimex",
+      "shortName": "Petrolimex · Pemuteran",
+      "coordinates": [
+        114.7492069,
+        -8.1771136
+      ],
+      "address": "Near Pemuteran",
+      "area": "Pemuteran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/564399387",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.7492069,
+        -8.1651136
+      ]
+    },
+    {
+      "id": "osm-way-577920894",
+      "name": "Gas Station Buluh Indah (54.801.31)",
+      "shortName": "Gas Station Buluh Indah (54.801.31)",
+      "coordinates": [
+        115.1962934,
+        -8.643363
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/577920894",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1962934,
+        -8.631363
+      ]
+    },
+    {
+      "id": "osm-way-597363262",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Ubud",
+      "coordinates": [
+        115.1899586,
+        -8.3621749
+      ],
+      "address": "Near Ubud",
+      "area": "Ubud",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/597363262",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1899586,
+        -8.3501749
+      ]
+    },
+    {
+      "id": "osm-way-600380264",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Tabanan",
+      "coordinates": [
+        115.0012811,
+        -8.528148
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/600380264",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0012811,
+        -8.516148
+      ]
+    },
+    {
+      "id": "osm-way-603585689",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Mengwi",
+      "coordinates": [
+        115.2004194,
+        -8.5235731
+      ],
+      "address": "Near Mengwi",
+      "area": "Mengwi",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/603585689",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2004194,
+        -8.5115731
+      ]
+    },
+    {
+      "id": "osm-way-603638421",
+      "name": "Padma Sari (P. Bayu)",
+      "shortName": "Padma Sari (P. Bayu)",
+      "coordinates": [
+        115.098058,
+        -8.4826317
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/603638421",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.098058,
+        -8.4706317
+      ]
+    },
+    {
+      "id": "osm-way-603638557",
+      "name": "PERTASHOP TIMPAG (CV Restu Mahitala)",
+      "shortName": "PERTASHOP TIMPAG (CV Restu Mahitala)",
+      "coordinates": [
+        115.0945631,
+        -8.4869695
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/603638557",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0945631,
+        -8.4749695
+      ]
+    },
+    {
+      "id": "osm-way-603638612",
+      "name": "PERTASHOP TIMPAG (CV Restu Mahitala)",
+      "shortName": "PERTASHOP TIMPAG (CV Restu Mahitala)",
+      "coordinates": [
+        115.0952209,
+        -8.486425
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/603638612",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0952209,
+        -8.474425
+      ]
+    },
+    {
+      "id": "osm-way-714724146",
+      "name": "SPBU Pertamina Sunset Road 54.803.34",
+      "shortName": "SPBU Pertamina Sunset Road 54.803.34",
+      "coordinates": [
+        115.1780504,
+        -8.6986899
+      ],
+      "address": "Sunset Road, Kuta, Kabupaten Badung, Bali, Indonesia",
+      "area": "Legian",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/714724146",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1780504,
+        -8.6866899
+      ]
+    },
+    {
+      "id": "osm-way-753245598",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Canggu",
+      "coordinates": [
+        115.1716363,
+        -8.6028465
+      ],
+      "address": "Near Canggu",
+      "area": "Canggu",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/753245598",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1716363,
+        -8.5908465
+      ]
+    },
+    {
+      "id": "osm-way-1072524309",
+      "name": "Distributor Minicon Bali (Penghemat BBM)",
+      "shortName": "Distributor Minicon Bali (Penghemat BBM)",
+      "coordinates": [
+        115.0932288,
+        -8.4883055
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1072524309",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.0932288,
+        -8.4763055
+      ]
+    },
+    {
+      "id": "osm-way-1087950699",
+      "name": "Pertashop Telagatawang",
+      "shortName": "Pertashop Telagatawang",
+      "coordinates": [
+        115.446903,
+        -8.479283
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1087950699",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.446903,
+        -8.467283
+      ]
+    },
+    {
+      "id": "osm-way-1087957090",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Gianyar",
+      "coordinates": [
+        115.3334269,
+        -8.5366361
+      ],
+      "address": "Near Gianyar",
+      "area": "Gianyar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1087957090",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3334269,
+        -8.5246361
+      ]
+    },
+    {
+      "id": "osm-way-1090641137",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Jalan Buana Raya",
+      "coordinates": [
+        115.1877229,
+        -8.6671225
+      ],
+      "address": "Jalan Buana Raya, 101, Padang Sambian, Denpasar, Bali, Indonesia",
+      "area": "Seminyak",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1090641137",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1877229,
+        -8.6551225
+      ]
+    },
+    {
+      "id": "osm-way-1109033923",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Klungkung",
+      "coordinates": [
+        115.3916306,
+        -8.5672355
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1109033923",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3916306,
+        -8.5552355
+      ]
+    },
+    {
+      "id": "osm-way-1111172220",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Klungkung",
+      "coordinates": [
+        115.375018,
+        -8.5501132
+      ],
+      "address": "Near Klungkung",
+      "area": "Klungkung",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1111172220",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.375018,
+        -8.5381132
+      ]
+    },
+    {
+      "id": "osm-way-1119410373",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Tabanan",
+      "coordinates": [
+        114.9326444,
+        -8.4747415
+      ],
+      "address": "Near Tabanan",
+      "area": "Tabanan",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1119410373",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9326444,
+        -8.4627415
+      ]
+    },
+    {
+      "id": "osm-way-1121908173",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Lovina",
+      "coordinates": [
+        114.9448347,
+        -8.22624
+      ],
+      "address": "Near Lovina",
+      "area": "Lovina",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1121908173",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.9448347,
+        -8.21424
+      ]
+    },
+    {
+      "id": "osm-way-1150185346",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Negara / West Bali",
+      "coordinates": [
+        114.4788746,
+        -8.2509341
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1150185346",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.4788746,
+        -8.2389341
+      ]
+    },
+    {
+      "id": "osm-way-1181397892",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Kintamani",
+      "coordinates": [
+        115.2543113,
+        -8.2235019
+      ],
+      "address": "Near Kintamani",
+      "area": "Kintamani",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1181397892",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2543113,
+        -8.2115019
+      ]
+    },
+    {
+      "id": "osm-way-1184213626",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Singaraja",
+      "coordinates": [
+        115.1013777,
+        -8.1352895
+      ],
+      "address": "Near Singaraja",
+      "area": "Singaraja",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1184213626",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1013777,
+        -8.1232895
+      ]
+    },
+    {
+      "id": "osm-way-1185103949",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Negara / West Bali",
+      "coordinates": [
+        114.8086824,
+        -8.4201946
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1185103949",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.8086824,
+        -8.4081946
+      ]
+    },
+    {
+      "id": "osm-way-1190145498",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Negara / West Bali",
+      "coordinates": [
+        114.630782,
+        -8.3568614
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1190145498",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.630782,
+        -8.3448614
+      ]
+    },
+    {
+      "id": "osm-way-1192654164",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Negara / West Bali",
+      "coordinates": [
+        114.8347783,
+        -8.4269492
+      ],
+      "address": "Near Negara / West Bali",
+      "area": "Negara / West Bali",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1192654164",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.8347783,
+        -8.4149492
+      ]
+    },
+    {
+      "id": "osm-way-1329030189",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Denpasar",
+      "coordinates": [
+        115.2363679,
+        -8.623218
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1329030189",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.2363679,
+        -8.611218
+      ]
+    },
+    {
+      "id": "osm-way-1447743524",
+      "name": "Fuel station",
+      "shortName": "Fuel station · Pemuteran",
+      "coordinates": [
+        114.6323875,
+        -8.1489524
+      ],
+      "address": "Near Pemuteran",
+      "area": "Pemuteran",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1447743524",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        114.6323875,
+        -8.1369524
+      ]
+    },
+    {
+      "id": "osm-way-1489545694",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Gianyar",
+      "coordinates": [
+        115.3084164,
+        -8.5483293
+      ],
+      "address": "Near Gianyar",
+      "area": "Gianyar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1489545694",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3084164,
+        -8.5363293
+      ]
+    },
+    {
+      "id": "osm-way-1532743149",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Gianyar",
+      "coordinates": [
+        115.3210918,
+        -8.5413513
+      ],
+      "address": "Near Gianyar",
+      "area": "Gianyar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1532743149",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.3210918,
+        -8.5293513
+      ]
+    },
+    {
+      "id": "osm-way-1547522483",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Denpasar",
+      "coordinates": [
+        115.1831218,
+        -8.6189193
+      ],
+      "address": "Near Denpasar",
+      "area": "Denpasar",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1547522483",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.1831218,
+        -8.6069193
+      ]
+    },
+    {
+      "id": "osm-way-1557359089",
+      "name": "Pertamina",
+      "shortName": "Pertamina · Sanur",
+      "coordinates": [
+        115.227932,
+        -8.6914637
+      ],
+      "address": "Near Sanur",
+      "area": "Sanur",
+      "placeId": null,
+      "source": "OpenStreetMap",
+      "sourceUrl": "https://www.openstreetmap.org/way/1557359089",
+      "operatingStatus": "unknown",
+      "operatingSource": "unknown",
+      "operatingCheckedAt": null,
+      "approachStart": [
+        115.227932,
+        -8.6794637
+      ]
+    }
+  ]
+}

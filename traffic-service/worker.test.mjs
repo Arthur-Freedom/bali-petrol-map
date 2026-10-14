@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createHandler,TrafficBudget,measure,metres,ORIGIN,OWNER,COOLDOWN,STATIONS} from './worker.mjs';
+import {createHandler,TrafficBudget,measure,metres,ORIGIN,OWNER,COOLDOWN,STATIONS,ALL_STATIONS} from './worker.mjs';
 import P from '../dist/core.js';
 const json=(x,status=200)=>new Response(JSON.stringify(x),{status});
 function encode(points){let lat=0,lng=0,out='';const number=n=>{let v=n<0?~(n<<1):n<<1,s='';while(v>=32){s+=String.fromCharCode((32|(v&31))+63);v>>=5;}return s+String.fromCharCode(v+63);};for(const p of points){const a=Math.round(p[1]*1e5),b=Math.round(p[0]*1e5);out+=number(a-lat)+number(b-lng);lat=a;lng=b;}return out;}
@@ -40,8 +40,20 @@ test('missing coverage, malformed intervals and endpoints far from station fail 
  const points=[[0,0],[.01,0]];for(const r of [route(points,[]),route(points,[{endPolylinePointIndex:5,speed:'NORMAL'}]),route(points,[{startPolylinePointIndex:1,endPolylinePointIndex:1,speed:'NORMAL'}])])assert.throws(()=>measure(r,points.at(-1)));
  assert.throws(()=>measure(traffic(points),[10,10]));
 });
-test('live traffic never renews old opening, stock or queue reports',()=>{
- const now=Date.now(),base={checkedAt:new Date(now-3600001).toISOString(),stock:{pertalite:'out',pertamax:'out'},operatingStatus:'closed',waitMinutes:[90,120]},reading={jamMetres:0,slowMetres:0,approachMetres:1000,checkedAt:new Date(now).toISOString()};
- const merged=P.mergeLive(base,reading,now);assert.equal(merged.operatingStatus,'unknown');assert.equal(merged.waitMinutes,null);assert.equal(P.status(merged).blocked,false);assert.equal(P.status(merged).wait,null);assert.equal(merged.stock.pertalite,'unknown');
- const recent=P.mergeLive({...base,checkedAt:reading.checkedAt},reading,now);assert.equal(P.status(recent).blocked,true);
+test('different catalogue groups can refresh while duplicate groups are blocked, including reordered IDs',async()=>{
+ const s=setup(),ids=ALL_STATIONS.slice(5,8).map(s=>s.id);
+ assert.equal((await s.request()).status,200);
+ assert.equal((await s.request({body:JSON.stringify({stationIds:ids})})).status,200);
+ assert.equal(s.calls.length,8);
+ assert.equal((await s.request({body:JSON.stringify({stationIds:[...ids].reverse()})})).status,429);
+ assert.equal(s.calls.length,8);
+});
+test('station selection rejects arbitrary coordinates, unknown IDs, duplicate IDs and more than five',async()=>{
+ for(const body of [{stationIds:['not-real']},{stationIds:[]},{stationIds:ALL_STATIONS.slice(0,6).map(s=>s.id)},{stationIds:[STATIONS[0].id,STATIONS[0].id]},{stationIds:[STATIONS[0].id],origin:[0,0]}]){
+  const s=setup();assert.equal((await s.request({body:JSON.stringify(body)})).status,400);assert.equal(s.calls.length,0);assert.equal(s.records.size,0);
+ }
+});
+test('worker catalogue matches the public locations exactly',async()=>{
+ const {readFile}=await import('node:fs/promises'),data=JSON.parse(await readFile(new URL('../dist/stations.json',import.meta.url)));
+ assert.deepEqual(ALL_STATIONS,data.stations.map(s=>({id:s.id,end:s.coordinates,start:s.approachStart})));
 });
