@@ -1,5 +1,6 @@
 import {VectorTile} from '@mapbox/vector-tile';
 import Pbf from 'pbf';
+import {measureApproaches} from './approach.mjs';
 
 export const PROVIDER='tomtom-orbis-v2', RADIUS=250, ZOOM=15;
 const N=2**ZOOM, EARTH=6371000, RAD=Math.PI/180;
@@ -30,7 +31,7 @@ export function decodeTile(bytes,x,y){
   const geometry=feature.toGeoJSON(x,y,ZOOM).geometry;
   for(const coordinates of geometry.type==='LineString'?[geometry.coordinates]:geometry.coordinates){
    if(!Array.isArray(coordinates)||coordinates.length<2||!coordinates.every(point))throw Error('Invalid traffic geometry');
-   lines.push({coordinates,relativeSpeed:relative,closed});
+   lines.push({coordinates,relativeSpeed:relative,closed,roadCategory:p.road_category});
   }
  }
  return {x,y,lines};
@@ -66,7 +67,7 @@ export function measureTiles(tiles,center){
    const nearT=Math.max(lo,Math.min(hi,-(a[0]*d[0]+a[1]*d[1])/aa));
    nearest=Math.min(nearest,Math.hypot(a[0]+nearT*d[0],a[1]+nearT*d[1]));
    total+=take;if(speed==='TRAFFIC_JAM')jam+=take;else if(speed==='SLOW')slow+=take;if(line.closed)closedMetres+=take;
-   segments.push({from,to,speed,relativeSpeed:relative,closed:!!line.closed});
+   segments.push({from,to,speed,relativeSpeed:relative,closed:!!line.closed,roadCategory:line.roadCategory});
    if(segments.length>3000||total>20000)throw Error('Excessive traffic geometry');
   }
  }
@@ -102,5 +103,8 @@ export function createSampler({fetch:send=globalThis.fetch,key,signal=AbortSigna
   }));
   return cache.get(id);
  }
- return async station=>measureTiles(await Promise.all(tilesFor(station.end).map(getTile)),station.end);
+ return async station=>{
+  const reading=measureTiles(await Promise.all(tilesFor(station.end).map(getTile)),station.end);
+  return {...reading,approach:measureApproaches(reading.segments,station.access,station.end)};
+ };
 }

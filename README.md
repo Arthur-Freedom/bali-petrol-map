@@ -21,11 +21,21 @@ Each allowlisted station uses at most four zoom-15 tiles covering a 250-metre ra
 - Green: 70–100%.
 - Dark: reported **road** closure, also counted in congested metres.
 
-Rankings compare the percentage of covered road-direction metres that are slow or congested, rounded to whole percentages, then the congested percentage. Equal scores show ties. Coverage varies; nearby through traffic and junctions affect the score. This does not identify forecourt entrances or distinguish motorcycles from cars.
+The main signal is now the **continuous slow road stretch reaching a mapped station access**, up to 200 m on each incoming approach. It is an experimental road signal, not a measured petrol queue or motorcycle waiting time. The initial catalogue has 49 locations with candidate mapped accesses (47 have a full 200 m on every mapped approach), out of 293 locations. The rest remain discoverable with nearby-road context and no approach ranking.
 
-Colours and rankings use the **same response**, updated together on refresh. After 15 minutes, readings leave current recommendations and the coloured overlay; details retain their original timestamp. Zero says “No slowdown detected”, not that a petrol queue is absent. Checked-at is query time, not a guaranteed observation time for every road signal.
+`scripts/import-access.cjs` finds OSM fuel geometry or a nearby matching fuel point, follows incoming service roads to a public-road connection, respects mapped one-way directions, and traces up to 200 m upstream. It rejects ambiguous station matches, private/prohibited roads and ambiguous continuations. Each published path retains its fuel source, driveway way IDs, road way IDs and direction. The blue A marker and dashed guide expose the selected station's inferred access/path for inspection. Map-derived access is **not field verified**; the importer does not resolve every turn restriction, divider, temporary closure or unmapped entrance.
 
-Live tests on 15 October 2026 returned different congestion levels at the original five stations, including congested sections near Bypass 54.803.27. This establishes functioning local coverage, not independently measured queue accuracy.
+`traffic-service/approach.mjs` samples that fixed path every 5 m. A sample requires a TomTom edge within 12 m pointing in the same direction (cosine at least 0.82). Service-road flow is excluded from matching the public-road approach. Feature endpoints allow 1 m quantisation tolerance. Conflicting near-equal matches stay unknown. These are engineering matching tolerances, not calibrated confidence scores; map misalignment and parallel roads can still cause errors. The same 250 m tile footprint and four-tile ceiling apply.
+
+Starting at the access, consecutive samples below 70% of free-flow speed are counted until faster traffic or an unknown sample. Missing coverage is never bridged. **200+ m** is a lower bound when congestion reaches the observation limit; an interrupted stretch says **At least ... m**. Upstream slow pockets separated from the access are reported separately. If several incoming paths exist, the main value is the longest observed connected slowdown, with every direction available in details.
+
+Only recent, successful readings covering **every full 200 m mapped approach** qualify for ranking. Shorter connected stretches rank first, then fewer congested metres, rounded to 10 m. Reported approach closures rank after passable approaches. Two readings capped at 200+ m tie because their actual lengths are unknown. Unmapped and partially covered stations never win with an assumed zero. Wider road percentages remain contextual only, avoiding the old denominator bias where an identical jam looked better because extra roads were covered nearby.
+
+Bold lines show matched incoming traffic; faint lines show wider context. Colours and numbers use the **same response**, updated together on refresh. After 15 minutes readings leave current recommendations and the coloured overlay. Checked-at is query time, not a guaranteed observation time for every road. Zero means no slowdown reaches the mapped access in the sampled road traffic, not no petrol queue.
+
+The browser compares consecutive fully covered readings only when the method, set of approaches and selected direction match, both requests succeeded, and queries are 14–45 minutes apart. Changes under 20 m are labelled similar. Two capped observations cannot establish growth. It retains only the current observation and a small comparison summary in memory; seeing traffic in both checks does not establish continuous congestion between checks. No motorcycle/car-specific wait, pump throughput, petrol availability or forecourt-queue estimate is produced.
+
+A live workerd probe on 15 October 2026 returned 195/200 m matched coverage at Bypass 54.803.27 with a coverage gap interrupting a congested stretch. It correctly produced a partial lower-bound result rather than a ranked zero. This verifies real provider decoding and matching behaviour, **not independently measured queue accuracy**.
 
 ## Access and spending protection
 
@@ -51,9 +61,9 @@ Optional repeats run every 15 minutes while visible and pause after scope change
 
 ## Privacy and history
 
-Traffic stays in request/browser memory. No raw tiles, traffic observations or derived history are archived to GitHub, browser storage or a database. The server stores only refresh counts/times. Long-term history needs storage rights confirmed for the selected TomTom plan. Your location is requested only by “Show stations near me” and stays in the browser; TomTom receives fixed station-area tile coordinates.
+Traffic stays in request/browser memory. No raw tiles, traffic observations or derived history are archived to GitHub, browser storage or a database. The current tab can hold a comparison summary of its last two eligible checks; reload/sign-out clears it. The server stores only refresh counts/times. Long-term history needs storage rights confirmed for the selected TomTom plan. Your location is requested only by “Show stations near me” and stays in the browser; TomTom receives fixed station-area tile coordinates.
 
-Traffic attribution: © TomTom. Basemap: OpenFreeMap/OpenStreetMap. Expanded stations: © OpenStreetMap contributors, ODbL. Original five listing observations came from Google Maps and keep their original timestamps.
+Traffic attribution: © TomTom. Basemap: OpenFreeMap/OpenStreetMap. Expanded stations and candidate access paths: © OpenStreetMap contributors, ODbL. Original five listing observations came from Google Maps and keep their original timestamps.
 
 ## Development and deployment
 
@@ -69,9 +79,9 @@ Pushes to `main` test and publish Pages. From `traffic-service/`, deploy using `
 
 ## Catalogue
 
-`dist/stations.json` contains public locations and overlapping area presets; `traffic-service/stations.mjs` is the matching server allowlist. Legacy approach-start coordinates are unused. Entries include smaller retailers; hours, stock and full SPBU service are not implied.
+`dist/stations.json` contains public locations and overlapping area presets; `traffic-service/stations.mjs` is the matching server allowlist. Legacy approach-start coordinates are unused; `access` contains the new traceable OSM-derived approach definitions. Entries include smaller retailers; hours, stock and full SPBU service are not implied.
 
-OSM `amenity=fuel` nodes/ways/relations are filtered to Bali province boundary 1615621, excluding disused, abandoned and private entries. Nearby duplicates within 65 m are consolidated. Every entry retains a source. To regenerate, obtain Overpass fuel data and Nominatim Bali **state** GeoJSON into ignored `.local/osm-fuel.json` and `.local/bali-boundary.json`, then run `node scripts/import-stations.cjs`. Deploy both Worker and Pages after catalogue changes. See [DATA-LICENSE.md](DATA-LICENSE.md).
+OSM `amenity=fuel` nodes/ways/relations are filtered to Bali province boundary 1615621, excluding disused, abandoned and private entries. Nearby duplicates within 65 m are consolidated. Every entry retains a source. To regenerate, obtain Overpass fuel data and Nominatim Bali **state** GeoJSON into ignored `.local/osm-fuel.json` and `.local/bali-boundary.json`, then run `node scripts/import-stations.cjs`. Deploy both Worker and Pages after catalogue changes. Then import access geometry with `node scripts/import-access.cjs .local/osm-access.json`. The access input is an Overpass JSON extract containing fuel nodes/ways plus road ways with node IDs, tags and `geometry` (`out geom`). A typical small-area query is `[out:json][timeout:60];(way[highway](south,west,north,east);nwr[amenity=fuel](south,west,north,east););out geom;`. Keep downloaded raw extracts in ignored `.local/`; commit the reproducible derived catalogue and server allowlist. The first import is geographically incomplete because several larger public queries timed out; absence of an imported access does not establish absence of an entrance in OSM or on the ground. See [DATA-LICENSE.md](DATA-LICENSE.md).
 
 ## References
 

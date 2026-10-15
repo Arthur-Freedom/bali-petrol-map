@@ -65,7 +65,7 @@ test('station selection rejects arbitrary coordinates, unknown IDs, duplicate ID
 });
 test('worker catalogue matches the public locations exactly',async()=>{
  const {readFile}=await import('node:fs/promises'),data=JSON.parse(await readFile(new URL('../dist/stations.json',import.meta.url)));
- assert.deepEqual(ALL_STATIONS,data.stations.map(s=>({id:s.id,end:s.coordinates,start:s.approachStart})));
+ assert.deepEqual(ALL_STATIONS,data.stations.map(s=>({id:s.id,end:s.coordinates,start:s.approachStart,access:s.access})));
 });
 
 test('15 distinct stations can be checked back-to-back at the same time',async()=>{

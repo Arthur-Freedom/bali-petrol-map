@@ -39,21 +39,23 @@
    finally{clearTimeout(timer);requests.delete(controller);}
  }
  function drawTraffic(){
-   if(!map?.isStyleLoaded())return;
+   if(!map||!mapReady)return;
    const visible=new Set(scopedStations().map(s=>s.id)),features=[];
    for(const data of live.readings.values()){
      if(!visible.has(data.id)||data.refreshFailed||!P.fresh(data.checkedAt))continue;
-     for(const segment of data.segments||[])features.push({type:'Feature',properties:{id:data.id,selected:data.id===selected,color:segment.closed?'#343f49':segment.speed==='TRAFFIC_JAM'?'#b74335':segment.speed==='SLOW'?'#df931c':'#43855c'},geometry:{type:'LineString',coordinates:[segment.from,segment.to]}});
+     const add=(segment,focus)=>features.push({type:'Feature',properties:{id:data.id,selected:data.id===selected,focus,color:segment.closed?'#343f49':segment.speed==='TRAFFIC_JAM'?'#b74335':segment.speed==='SLOW'?'#df931c':'#43855c'},geometry:{type:'LineString',coordinates:[segment.from,segment.to]}});
+     for(const segment of data.segments||[])add(segment,false);
+     for(const route of data.approach?.routes||[])for(const segment of route.segments)add(segment,true);
    }
    const data={type:'FeatureCollection',features};
    if(map.getSource('station-traffic'))map.getSource('station-traffic').setData(data);
    else{
      map.addSource('station-traffic',{type:'geojson',data,attribution:'Traffic © <a href="https://www.tomtom.com/" target="_blank" rel="noopener">TomTom</a>'});
-     map.addLayer({id:'traffic-outline',type:'line',source:'station-traffic',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#fff','line-width':['case',['get','selected'],9,6],'line-opacity':.9}});
-     map.addLayer({id:'traffic-colours',type:'line',source:'station-traffic',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['get','color'],'line-width':['case',['get','selected'],6,3],'line-opacity':.95}});
+     map.addLayer({id:'traffic-outline',type:'line',source:'station-traffic',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#fff','line-width':['case',['get','selected'],9,6],'line-opacity':['case',['get','focus'],.9,0]}});
+     map.addLayer({id:'traffic-colours',type:'line',source:'station-traffic',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['get','color'],'line-width':['case',['get','focus'],['case',['get','selected'],6,3],1.5],'line-opacity':['case',['get','focus'],.95,['case',['get','selected'],.5,.25]]}});
    }
  }
- function showTraffic(){live.active=true;$('road-legend').hidden=false;$('map-layer-title').textContent='NEARBY ROAD TRAFFIC';$('map-layer-note').textContent='250 m around checked stations · refresh updates colours and ranking';drawTraffic();}
+ function showTraffic(){live.active=true;$('road-legend').hidden=false;$('map-layer-title').textContent='TRAFFIC AT MAPPED ACCESSES';$('map-layer-note').textContent='Bold: incoming approaches · faint: nearby roads';drawTraffic();}
  async function connect(){
    if(!owner.get()){status(owner.error||'Only Arthur-Freedom can request live traffic.');controls();return;}
    const generation=++epoch;verified=false;controls();status('Verifying your GitHub account…');
@@ -74,7 +76,7 @@
        let data;try{data=await request('/api/refresh','POST',{stationIds:batch.map(s=>s.id)});}catch(error){if(generation===epoch&&verified)failedReadings(batch);throw error;}
        if(generation!==epoch)return;limits(data);
        const readings=Array.isArray(data.stations)?data.stations:[];let incomplete=readings.length!==batch.length;
-       for(const station of batch){const matches=readings.filter(r=>r?.id===station.id),reading=matches[0];if(matches.length===1&&P.validReading(reading,station.id,Date.now(),station.coordinates)){live.readings.set(reading.id,reading);success++;}else{if(matches.length!==1||typeof reading?.error!=='string'||!reading.error)incomplete=true;const previous=live.readings.get(station.id);live.readings.set(station.id,{...previous,id:station.id,refreshFailed:true,errorCode:reading?.errorCode||'provider_data'});}}
+       for(const station of batch){const matches=readings.filter(r=>r?.id===station.id),reading=matches[0];if(matches.length===1&&P.validReading(reading,station.id,Date.now(),station.coordinates)){live.readings.set(reading.id,P.withTrend(live.readings.get(reading.id),reading));success++;}else{if(matches.length!==1||typeof reading?.error!=='string'||!reading.error)incomplete=true;const previous=live.readings.get(station.id);live.readings.set(station.id,{...previous,id:station.id,refreshFailed:true,errorCode:reading?.errorCode||'provider_data'});}}
        progress.done+=batch.length;applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();
        const failedService=readings.find(r=>['provider_limit','provider_auth','provider_unavailable','provider_data'].includes(r?.errorCode));
        if(failedService||incomplete){stopAuto();throw Error(failedService?(failedService.errorCode==='provider_limit'?'TomTom’s request limit was reached.':failedService.error)+' Remaining checks stopped.':'The traffic service returned incomplete results. Remaining checks stopped.');}

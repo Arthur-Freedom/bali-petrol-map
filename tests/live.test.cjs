@@ -10,7 +10,7 @@ async function setup({onPost,onRequest,monthlyRemaining=900,provider='tomtom-orb
  let remainingChecks=50,stationNextAt={};
  const limits=()=>({remainingChecks,stationNextAt:{...stationNextAt},resetAt:Date.now()+86400000,monthlyLimit:900,remainingMonthlyChecks:monthlyRemaining,monthlyResetAt:Date.now()+86400000});
  class MapStub{panTo(){}setZoom(){}fitBounds(){}addListener(){}getZoom(){return 13}}
- const context={P,$,selected:null,stations:base,dataset:{stations:base},map:{resize(){},isStyleLoaded:()=>true,getSource:id=>sources.get(id),addSource(id,source){sources.set(id,{...source,setData(data){this.data=data;}});},addLayer(layer){layers.push(layer);}},scopeCenter:()=>[115,-8],scopedStations:()=>context.stations,
+ const context={P,$,selected:null,stations:base,dataset:{stations:base},mapReady:true,map:{resize(){},isStyleLoaded:()=>false,getSource:id=>sources.get(id),addSource(id,source){sources.set(id,{...source,setData(data){this.data=data;}});},addLayer(layer){layers.push(layer);}},scopeCenter:()=>[115,-8],scopedStations:()=>context.stations,
   updateMarker(){},renderList(){},renderDetail(){},updateSnapshot(){},selectStation(){},
   applyChecks(){context.stations=base.map(s=>P.mergeLive(s,context.PetrolLive.readings.get(s.id)));},
   Date,Map,Set,Promise,URLSearchParams,encodeURIComponent,Error,TypeError,AbortController,AbortSignal,
@@ -24,7 +24,7 @@ async function setup({onPost,onRequest,monthlyRemaining=900,provider='tomtom-orb
    const ids=JSON.parse(options.body).stationIds;posts.push(ids);
    if(onPost){const reply=await onPost({ids,posts,context});if(reply)return reply;}
    remainingChecks-=ids.length;monthlyRemaining-=ids.length;for(const id of ids)stationNextAt[id]=Date.now()+900000;
-   return new Response(JSON.stringify({...limits(),stations:ids.map(id=>({id,jamMetres:0,slowMetres:0,provider:'tomtom-orbis-v2',radiusMetres:250,coveredMetres:500,closedMetres:0,nearestRoadMetres:0,checkedAt:new Date().toISOString(),segments:[{from:base.find(s=>s.id===id).coordinates,to:[base.find(s=>s.id===id).coordinates[0]+.001,-8],speed:'NORMAL',relativeSpeed:1,closed:false}]}))}));
+   return new Response(JSON.stringify({...limits(),stations:ids.map(id=>({id,approach:{method:'entrance-road-v1',status:'unmapped',routes:[],selectedId:null},jamMetres:0,slowMetres:0,provider:'tomtom-orbis-v2',radiusMetres:250,coveredMetres:500,closedMetres:0,nearestRoadMetres:0,checkedAt:new Date().toISOString(),segments:[{from:base.find(s=>s.id===id).coordinates,to:[base.find(s=>s.id===id).coordinates[0]+.001,-8],speed:'NORMAL',relativeSpeed:1,closed:false}]}))}));
   }};
  context.window=context;vm.runInNewContext(source,context);await new Promise(setImmediate);
  return {context,elements,events,posts,sources,layers,timers,scripts,$,setHandle(value){handle=value;},resetCooldowns(){stationNextAt={};}};
