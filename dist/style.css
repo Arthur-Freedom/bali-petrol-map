@@ -39,3 +39,12 @@
 @media(min-width:761px) and (max-height:850px){.panel{overflow-y:auto}.brand{padding-block:12px}.eyebrow{margin-bottom:5px}.brand h1{font-size:23px}.brand p:last-child{font-size:11px}.controls{padding-top:12px}.area-controls{margin-block:6px}.search{margin-block:6px 8px}.search input{height:36px}.refresh-summary{font-size:10px;margin-block:4px}.owner-controls{padding-block:5px}.owner-controls p{margin-block:5px}.traffic-time{margin-block:6px}.recommendation{padding-block:10px}.recommendation p{font-size:10px;margin-block:4px}.list-section{padding-top:10px;flex:1 0 180px}}
 
 .last-reading{font-size:11px;line-height:1.6;background:#fff4d9;border:1px solid #dcc792;border-radius:6px;padding:10px;color:#655125}.last-reading strong{font-size:12px}.legend .earlier{height:0;width:14px;border-top:2px dashed #727d82;border-radius:0}.legend{flex-wrap:wrap}
+
+/* The rider's position stays distinct from numbered station and access pins. */
+.user-location{width:22px;height:22px;z-index:1100;pointer-events:none}
+.location-dot{display:block;width:22px;height:22px;border:3px solid #fff;border-radius:50%;background:#2374d5;box-shadow:0 0 0 5px #2374d52b,0 2px 7px #143b6c66}
+.location-label{position:absolute;top:32px;left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--paper);color:#174a8a;border:1px solid #b7cce8;border-radius:5px;padding:6px 9px;font-size:12px;font-weight:700;box-shadow:0 2px 6px #143b6c20}
+.location-status{font-size:11px;line-height:1.6;color:#174a8a;margin:-2px 0 12px}
+.location-status[data-state=error]{color:#7e622e}
+#locate[data-located=true]{color:#174a8a;border-color:#8aaed9;background:#edf4fd}
+@media(max-width:760px){.location-status{font-size:12px}}

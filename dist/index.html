@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
- <script src="owner-session.js?v=20261015-archive"></script>
+ <script src="owner-session.js?v=20261015-location"></script>
  <meta name="theme-color" content="#17483e"><meta name="description" content="Find petrol stations across Bali and compare recent road congestion with protected TomTom traffic refreshes.">
  <title>Bali Petrol Map</title><link rel="icon" type="image/svg+xml" href="icon.svg">
  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;650;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css"><link rel="stylesheet" href="style.css?v=20261015-archive">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css"><link rel="stylesheet" href="style.css?v=20261015-location">
  <script defer src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
- <script defer src="core.js?v=20261015-archive"></script><script defer src="app.js?v=20261015-archive"></script><script defer src="live.js?v=20261015-archive"></script>
+ <script defer src="core.js?v=20261015-location"></script><script defer src="app.js?v=20261015-location"></script><script defer src="live.js?v=20261015-location"></script>
 </head>
 <body>
  <a class="skip" href="#stations">Skip to stations</a>
@@ -17,7 +17,8 @@
   <aside class="panel" aria-label="Station finder">
    <header class="brand"><div><p class="eyebrow">BALI · PETROL</p><h1>Bali petrol map</h1><p>Compare traffic approaching petrol stations.</p></div><button class="icon-button" id="help-toggle" aria-expanded="false" aria-controls="help" aria-label="Settings and help">☰</button></header>
    <section class="controls" aria-label="Find and compare stations">
-    <label class="small-label" for="area">EXPLORE AN AREA</label><div class="area-controls"><select id="area"><option value="nusa-dua">Nusa Dua / Benoa</option></select><button id="locate" title="Show stations near me" aria-label="Show stations near me">◎</button></div>
+    <label class="small-label" for="area">EXPLORE AN AREA</label><div class="area-controls"><select id="area"><option value="nusa-dua">Nusa Dua / Benoa</option></select><button id="locate" title="Show stations near me" aria-label="Show stations near me" disabled>◎</button></div>
+    <p id="location-status" class="location-status" role="status" hidden></p>
     <p id="area-count" class="area-count">Loading station count…</p>
     <p id="access-count" class="access-count"></p>
     <label class="sr-only" for="search">Search stations in this area</label><div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="Search this area…" autocomplete="off"></div>

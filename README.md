@@ -10,6 +10,8 @@ Choose an area and refresh all due stations, the five oldest checks (unchecked f
 
 Ordinary scrolling zooms the map. A selected pin has a blue outline and name caption. On phones, selecting a list row scrolls to the map; details appear immediately below it. Google Maps links open the place without directions or the user's location. Listed opening hours remain unverified and never exclude a station from comparison.
 
+“Near me” requests a fresh, high-accuracy location fix and focuses on a labelled blue position dot with the browser's accuracy circle. Estimates wider than 250 m are labelled “Approximate location”. The sidebar confirms accuracy and fix time; tap the button again to update. On phones it brings the map into view. The station list still covers 8 km, and “Fit this area” shows those stations plus the position. Location stays in page memory and is never added to the URL or traffic archive. Permission failures preserve an existing fix with an explicit warning.
+
 ## Measurement
 
 The Worker uses **TomTom Orbis v2 vector flow tiles**, decoded with pinned `@mapbox/vector-tile` and `pbf`. Google Routes returned all-NORMAL intervals despite visible congestion and is no longer called. No paid Google basemap is loaded.

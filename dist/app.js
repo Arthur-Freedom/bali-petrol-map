@@ -2,7 +2,7 @@
 const $=id=>document.getElementById(id),P=window.Petrol;
 const colours={neutral:'#617687',medium:'#af771a',long:'#a54135',unknown:'#727d82',unavailable:'#535d64'};
 const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let dataset,stations=[],selected=null,map=null,markers=[],accessMarkers=[],origin=null,mapReady=false,toastTimer;
+let dataset,stations=[],selected=null,map=null,markers=[],accessMarkers=[],origin=null,locationFix=null,locationMarker=null,mapReady=false,toastTimer;
 function notify(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4500);}
 function ageLabel(date){if(!date)return 'Not checked';const minutes=Math.max(0,Math.floor((Date.now()-Date.parse(date))/60000));return minutes<1?'Just now':minutes<60?`${minutes} min ago`:minutes<1440?`${Math.floor(minutes/60)} hr ago`:`${Math.floor(minutes/1440)} days ago`;}
 function dateLabel(date){return new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Makassar'}).format(new Date(date))+' WITA';}
@@ -51,17 +51,58 @@ function renderDetail(){
 function selectStation(id,fly=true,scroll=false){
  const s=stations.find(s=>s.id===id);if(!s)return;selected=id;history.replaceState(null,'',location.pathname+location.search+'#'+id);renderList();renderDetail();
  if(fly&&map)map.flyTo({center:s.coordinates,zoom:16,offset:[matchMedia('(min-width:761px)').matches?Math.min(160,$('map').clientWidth*.18):0,0],duration:matchMedia('(prefers-reduced-motion:reduce)').matches?0:500});
- if(scroll&&matchMedia('(max-width:760px)').matches){const region=document.querySelector('.map-wrap');region.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'});region.focus({preventScroll:true});}
+ if(scroll)revealMap();
 }
-function fitAll(){if(!map)return;const list=scopedStations();if(!list.length)return;const bounds=new maplibregl.LngLatBounds();list.forEach(s=>bounds.extend(s.coordinates));map.fitBounds(bounds,{padding:{top:110,bottom:65,left:55,right:70},maxZoom:14,duration:0});}
+function revealMap(){if(matchMedia('(max-width:760px)').matches){const region=document.querySelector('.map-wrap');region.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'});region.focus({preventScroll:true});}}
+function locationDistance(metres){return metres>=1000?(metres/1000).toFixed(1)+' km':Math.max(1,Math.round(metres))+' m';}
+function locationTime(){return new Date(locationFix.timestamp).toLocaleTimeString('en-GB',{timeZone:'Asia/Makassar',hour:'2-digit',minute:'2-digit',hour12:false})+' WITA';}
+function locationRing(radius){
+ const rad=Math.PI/180,lat=origin[1]*rad,lng=origin[0]*rad,angle=radius/6371000,points=[];
+ for(let i=0;i<=64;i++){const bearing=i/64*Math.PI*2,y=Math.asin(Math.sin(lat)*Math.cos(angle)+Math.cos(lat)*Math.sin(angle)*Math.cos(bearing)),x=lng+Math.atan2(Math.sin(bearing)*Math.sin(angle)*Math.cos(lat),Math.cos(angle)-Math.sin(lat)*Math.sin(y));points.push([x/rad,y/rad]);}
+ points[points.length-1]=points[0];return points;
+}
+function renderLocation(){
+ if(!map||!mapReady||!locationFix)return;
+ const label=locationFix.accuracy>250?'Approximate location':'You are here';
+ if(!locationMarker){const el=document.createElement('div');el.className='user-location';el.setAttribute('role','img');el.innerHTML='<span class="location-dot" aria-hidden="true"></span><span class="location-label"></span>';locationMarker=new maplibregl.Marker({element:el}).setLngLat(origin).addTo(map);}
+ locationMarker.setLngLat(origin);const el=locationMarker.getElement();el.querySelector('.location-label').textContent=label;el.setAttribute('aria-label',label+' · accuracy about '+locationDistance(locationFix.accuracy)+' · located '+locationTime());
+ const data={type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[locationRing(locationFix.accuracy)]}};
+ if(map.getSource('location-accuracy'))map.getSource('location-accuracy').setData(data);else{
+  map.addSource('location-accuracy',{type:'geojson',data});
+  const before=map.getLayer('access-path-guide')?'access-path-guide':undefined;
+  map.addLayer({id:'location-accuracy-fill',type:'fill',source:'location-accuracy',paint:{'fill-color':'#2374d5','fill-opacity':.12}},before);
+  map.addLayer({id:'location-accuracy-outline',type:'line',source:'location-accuracy',paint:{'line-color':'#2374d5','line-opacity':.55,'line-width':1}},before);
+ }
+}
+function focusLocation(){
+ if(!map||!mapReady||!locationFix)return;
+ renderLocation();const bounds=new maplibregl.LngLatBounds();locationRing(Math.max(120,locationFix.accuracy)).forEach(p=>bounds.extend(p));
+ map.fitBounds(bounds,{padding:{top:125,bottom:65,left:55,right:55},maxZoom:16,duration:matchMedia('(prefers-reduced-motion:reduce)').matches?0:500});
+}
+function locate(){
+ const button=$('locate'),status=$('location-status');status.hidden=false;
+ const fail=code=>{button.disabled=false;button.removeAttribute('aria-busy');button.textContent='◎';status.dataset.state='error';const message=code===1?'Location access blocked. Allow location for this site, then try again.':code===3?'Location timed out. Try again, or choose an area.':'Location unavailable. Try again, or choose an area.';status.textContent=message+(locationFix?' Still showing your last fix from '+locationTime()+'.':'');};
+ if(!navigator.geolocation){fail(2);return;}
+ button.disabled=true;button.setAttribute('aria-busy','true');button.textContent='…';status.dataset.state='finding';status.textContent='Finding your location…';
+ navigator.geolocation.getCurrentPosition(pos=>{
+  const {longitude,latitude,accuracy}=pos.coords;
+  if(!Number.isFinite(longitude)||!Number.isFinite(latitude)||!Number.isFinite(accuracy)||Math.abs(longitude)>180||Math.abs(latitude)>90||accuracy<0||accuracy>20000000){fail(2);return;}
+  origin=[longitude,latitude];locationFix={accuracy,timestamp:Number.isFinite(pos.timestamp)?pos.timestamp:Date.now()};
+  if(!$('area').querySelector('[value="nearby"]'))$('area').insertAdjacentHTML('afterbegin','<option value="nearby">Near me · 8 km</option>');
+  $('area').value='nearby';$('search').value='';button.disabled=false;button.removeAttribute('aria-busy');button.dataset.located='true';button.textContent='◎';
+  status.dataset.state='found';status.textContent=(accuracy>250?'Approximate location':'Location found')+' · accuracy about '+locationDistance(accuracy)+' · '+locationTime()+'. Tap ◎ to locate again.';
+  changeScope();revealMap();
+ },error=>fail(error.code),{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+function fitAll(){if(!map)return;const list=scopedStations();if(!list.length){if($('area').value==='nearby')focusLocation();return;}const bounds=new maplibregl.LngLatBounds();list.forEach(s=>bounds.extend(s.coordinates));if($('area').value==='nearby'&&origin)bounds.extend(origin);map.fitBounds(bounds,{padding:{top:110,bottom:65,left:55,right:70},maxZoom:14,duration:0});}
 function initMap(){
- mapReady=false;
+ mapReady=false;locationMarker?.remove();locationMarker=null;
  if(!window.maplibregl){$('map-error').hidden=false;return;}
  try{
   map=new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/positron',center:[115.201,-8.787],zoom:12,minZoom:7,maxZoom:18,attributionControl:false,cooperativeGestures:false,scrollZoom:true});
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');map.addControl(new maplibregl.AttributionControl({compact:false}),'bottom-right');
   markers=stations.map(s=>{const element=document.createElement('button');element.className='map-pin';element.innerHTML=`<span class="pin-number">${s.number}</span><span class="pin-caption"></span>`;element.dataset.side=s.id==='bypass-27'?'left':'right';element.addEventListener('click',()=>selectStation(s.id,true,true));return {id:s.id,element,marker:new maplibregl.Marker({element}).setLngLat(s.coordinates).addTo(map)};});
-  map.on('load',()=>{mapReady=true;$('map-error').hidden=true;fitAll();renderList();});map.on('zoomend',()=>renderList());
+  map.on('load',()=>{mapReady=true;$('map-error').hidden=true;renderLocation();if($('area').value==='nearby'&&locationFix)focusLocation();else fitAll();renderList();});map.on('zoomend',()=>renderList());
   setTimeout(()=>{if(!mapReady&&!window.PetrolLive?.active)$('map-error').hidden=false;},12000);renderList();
  }catch{$('map-error').hidden=false;}
 }
@@ -70,13 +111,13 @@ async function loadData(){
  $('area').innerHTML='<option value="all">All Bali</option>'+dataset.areas.map(a=>`<option value="${a.id}">${e(a.name)}</option>`).join('');
  const wanted=new URL(location.href).searchParams.get('area');$('area').value=dataset.areas.some(a=>a.id===wanted)||wanted==='all'?wanted:'nusa-dua';
  const hash=location.hash.slice(1);if(stations.some(s=>s.id===hash)){selected=hash;if(!scopedStations().some(s=>s.id===hash))$('area').value='all';}
- renderList();renderDetail();initMap();
+ renderList();renderDetail();initMap();$('locate').disabled=false;
  }catch{$('stations').innerHTML='<li class="empty">Station locations could not load. Reload the page to retry.</li>';}
 }
-function changeScope(){selected=null;const url=new URL(location.href);url.hash='';url.searchParams.set('area',$('area').value);history.replaceState(null,'',url);window.PetrolLive?.scopeChanged();renderList();renderDetail();fitAll();}
+function changeScope(){selected=null;const url=new URL(location.href);url.hash='';url.searchParams.set('area',$('area').value);history.replaceState(null,'',url);window.PetrolLive?.scopeChanged();renderList();renderDetail();if($('area').value==='nearby'&&locationFix)focusLocation();else fitAll();}
 $('area').addEventListener('change',()=>{$('search').value='';changeScope();});$('search').addEventListener('input',()=>{window.PetrolLive?.scopeChanged();renderList();});
 $('show-all').addEventListener('click',fitAll);
-$('locate').addEventListener('click',()=>{if(!navigator.geolocation){notify('Location is unavailable. Choose an area.');return;}$('locate').disabled=true;navigator.geolocation.getCurrentPosition(pos=>{origin=[pos.coords.longitude,pos.coords.latitude];if(!$('area').querySelector('[value="nearby"]'))$('area').insertAdjacentHTML('afterbegin','<option value="nearby">Near me · 8 km</option>');$('area').value='nearby';$('search').value='';$('locate').disabled=false;changeScope();},()=>{$('locate').disabled=false;notify('Location unavailable. Choose an area instead.');},{timeout:12000,maximumAge:60000});});
+$('locate').addEventListener('click',locate);
 $('retry-map').addEventListener('click',()=>{map?.remove();map=null;markers=[];initMap();});
 function openHelp(){$('help').hidden=false;$('help-toggle').setAttribute('aria-expanded','true');$('help-close').focus();}
 function closeHelp(){$('help').hidden=true;$('help-toggle').setAttribute('aria-expanded','false');$('help-toggle').focus();}
