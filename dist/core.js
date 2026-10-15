@@ -38,7 +38,7 @@
    for(let i=0;i<targets.length;i+=5)batches.push(targets.slice(i,i+5));
    return {targets,batches,total:list.length,eligible:wanted.length,cooling:cooling.length,nextAt:cooling.length?Math.min(...cooling.map(s=>stationNextAt[s.id])):0,limited:targets.length<wanted.length,remainingChecks:available};
  }
- function mergeLive(base,reading){const data={...base,refreshFailed:!!reading?.refreshFailed,live:!!reading?.checkedAt};for(const key of ['jamMetres','slowMetres','closedMetres','coveredMetres','radiusMetres','nearestRoadMetres','provider','checkedAt'])data[key]=reading?.[key]??null;return data;}
+ function mergeLive(base,reading){const data={...base,refreshFailed:!!reading?.refreshFailed,live:!!reading?.checkedAt};for(const key of ['jamMetres','slowMetres','closedMetres','coveredMetres','radiusMetres','nearestRoadMetres','provider','checkedAt','errorCode'])data[key]=reading?.[key]??null;return data;}
  function validReading(reading,id,now=Date.now(),center){
    if(!reading||reading.id!==id||reading.error)return false;
    const {jamMetres:jam,slowMetres:slow,closedMetres:closed,coveredMetres:length,nearestRoadMetres:near,segments,checkedAt}=reading,time=Date.parse(checkedAt);

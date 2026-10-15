@@ -152,3 +152,14 @@ test('owner session returns provider metadata but no API credentials',async()=>{
 test('missing TomTom secret fails before reserving a check',async()=>{
  const s=setup();delete s.env.TOMTOM_API_KEY;assert.equal((await s.request()).status,503);assert.equal(s.calls.length,0);assert.equal(s.records.size,0);
 });
+
+test('runtime incident restores only recorded broken-deployment admissions, exactly once',async()=>{
+ const s=setup(),oldId=STATIONS[0].id,failedIds=STATIONS.slice(1,3).map(s=>s.id),oldAt=Date.parse('2026-10-15T03:00:00Z')+COOLDOWN,failedAt=Date.parse('2026-10-15T03:09:00Z')+COOLDOWN;
+ s.advance(11.5*3600000);
+ s.records.set('budget',{day:'2026-10-15',used:46,month:'2026-10',monthlyUsed:46,groups:{[oldId]:oldAt,[failedIds.join(',')]:failedAt},stationNextAt:{[oldId]:oldAt,...Object.fromEntries(failedIds.map(id=>[id,failedAt]))}});
+ const session=()=>s.request({method:'GET',path:'/api/session'}).then(r=>r.json());
+ const data=await session();assert.equal(data.remainingChecks,6);assert.equal(data.remainingMonthlyChecks,856);assert.equal(data.stationNextAt[oldId],oldAt);assert.equal(data.stationNextAt[failedIds[0]],undefined);
+ assert.equal((await session()).remainingChecks,6);assert.equal(s.records.get('budget').recoveredChecks,2);
+ assert.equal((await s.request({body:JSON.stringify({stationIds:failedIds})})).status,200);
+ assert.equal((await session()).remainingChecks,4);assert.equal((await session()).remainingMonthlyChecks,854);
+});

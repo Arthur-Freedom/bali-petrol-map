@@ -5,7 +5,7 @@
  const requests=new Set();
  function stopRequests(){for(const controller of requests)controller.abort();requests.clear();}
  function stopAuto(){auto=false;$('auto-refresh').checked=false;}
- function failedReadings(batch){for(const {id} of batch){const previous=live.readings.get(id);live.readings.set(id,{...previous,id,refreshFailed:true});}applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();}
+ function failedReadings(batch){for(const {id} of batch){const previous=live.readings.get(id);live.readings.set(id,{...previous,id,refreshFailed:true,errorCode:'provider_unavailable'});}applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();}
  const live={active:false,readings:new Map(),controls,refreshStation(id){auto=false;$('auto-refresh').checked=false;return refresh(id);},scopeChanged(){scopeVersion++;auto=false;$('auto-refresh').checked=false;if(!pending&&verified)status('Ready to compare this area.');controls();},updateMarkers(){drawTraffic();},clear(){live.readings.clear();live.active=false;drawTraffic();$('road-legend').hidden=true;$('map-layer-title').textContent='PETROL LOCATIONS';$('map-layer-note').textContent='Sign in to compare nearby road traffic.';if(dataset){applyChecks();renderList();renderDetail();}updateSnapshot();}};
  window.PetrolLive=live;
  function status(message){$('owner-status').textContent=message;}
@@ -74,9 +74,10 @@
        let data;try{data=await request('/api/refresh','POST',{stationIds:batch.map(s=>s.id)});}catch(error){if(generation===epoch&&verified)failedReadings(batch);throw error;}
        if(generation!==epoch)return;limits(data);
        const readings=Array.isArray(data.stations)?data.stations:[];let incomplete=readings.length!==batch.length;
-       for(const station of batch){const matches=readings.filter(r=>r?.id===station.id),reading=matches[0];if(matches.length===1&&P.validReading(reading,station.id,Date.now(),station.coordinates)){live.readings.set(reading.id,reading);success++;}else{if(matches.length!==1||typeof reading?.error!=='string'||!reading.error)incomplete=true;const previous=live.readings.get(station.id);live.readings.set(station.id,{...previous,id:station.id,refreshFailed:true});}}
+       for(const station of batch){const matches=readings.filter(r=>r?.id===station.id),reading=matches[0];if(matches.length===1&&P.validReading(reading,station.id,Date.now(),station.coordinates)){live.readings.set(reading.id,reading);success++;}else{if(matches.length!==1||typeof reading?.error!=='string'||!reading.error)incomplete=true;const previous=live.readings.get(station.id);live.readings.set(station.id,{...previous,id:station.id,refreshFailed:true,errorCode:reading?.errorCode||'provider_data'});}}
        progress.done+=batch.length;applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();
-       if(readings.some(r=>r?.errorCode==='provider_limit')||incomplete){stopAuto();throw Error(readings.some(r=>r?.errorCode==='provider_limit')?'TomTom’s request limit was reached. Remaining checks stopped.':'The traffic service returned incomplete results. Remaining checks stopped.');}
+       const failedService=readings.find(r=>['provider_limit','provider_auth','provider_unavailable','provider_data'].includes(r?.errorCode));
+       if(failedService||incomplete){stopAuto();throw Error(failedService?(failedService.errorCode==='provider_limit'?'TomTom’s request limit was reached.':failedService.error)+' Remaining checks stopped.':'The traffic service returned incomplete results. Remaining checks stopped.');}
      }
      if(generation===epoch)status(`${success} of ${progress.done} stations updated.${progress.done>success?' Unavailable readings keep their original times.':''}${scope!==scopeVersion?' Area changed; remaining checks stopped.':''}`);
    }catch(error){if(generation===epoch){stopAuto();status(error.message);}}finally{pending=false;progress=null;autoNextAt=Date.now()+15*60000;controls();}

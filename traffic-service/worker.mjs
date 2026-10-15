@@ -2,6 +2,9 @@ export const ORIGIN='https://arthur-freedom.github.io';
 export const OWNER='18115558';
 export const COOLDOWN=15*60*1000, DAILY_LIMIT=50, MONTHLY_LIMIT=900;
 const AUTH='https://bali-cinema-owner-refresh.honeymooninbali.workers.dev';
+// Version 82b0f03f rejected redirect:error before any provider call. Recover
+// only recorded admissions after its deployment, once, without raising limits.
+const BROKEN_TOMTOM_START=Date.parse('2026-10-15T03:06:00.080Z');
 import CATALOGUE from './stations.mjs';
 import {createSampler,PROVIDER,RADIUS} from './traffic.mjs';
 export const ALL_STATIONS=CATALOGUE;
@@ -44,6 +47,21 @@ export class TrafficBudget {
   async admit(request){
     const now=this.now(),day=new Date(now+8*3600000).toISOString().slice(0,10),month=day.slice(0,7);
     const saved=await this.storage.get('budget')||{day,used:0};
+    if(!saved.tomtomRuntimeFix){
+      const groups={...saved.groups},stationNextAt={...saved.stationNextAt};let credit=0;
+      if(day==='2026-10-15'&&saved.day===day){
+        for(const [group,nextAt] of Object.entries(groups)){
+          const ids=group.split(','),admitted=nextAt-COOLDOWN;
+          if(Number.isFinite(nextAt)&&admitted>=BROKEN_TOMTOM_START&&admitted<=now&&ids.length<=5&&new Set(ids).size===ids.length&&ids.every(id=>CATALOGUE.some(s=>s.id===id))){
+            credit+=ids.length;delete groups[group];
+            for(const id of ids)if(stationNextAt[id]===nextAt)delete stationNextAt[id];
+          }
+        }
+      }
+      if(credit&&(!Number.isInteger(saved.used)||saved.used<credit||saved.month!==month||!Number.isInteger(saved.monthlyUsed)||saved.monthlyUsed<credit))throw Error('Unverifiable recovery');
+      await this.storage.put('budget',{...saved,...(credit?{used:saved.used-credit,monthlyUsed:saved.monthlyUsed-credit,groups,stationNextAt}:{}),tomtomRuntimeFix:true,recoveredChecks:credit});
+      return this.admit(request);
+    }
     // Conservatively charge each old five-station attempt as five checks.
     const legacySpent=saved.used??(saved.count||0)*5,used=saved.day===day?legacySpent:0;
     // Rollout is on the app's first usage day; preserve its existing charges.
@@ -58,7 +76,7 @@ export class TrafficBudget {
     for(const [group,time] of Object.entries(groups))for(const id of group.split(','))stationNextAt[id]=Math.max(stationNextAt[id]||0,time);
     const limits=(spent=used,monthSpent=monthlyUsed)=>({groups,stationNextAt,resetAt:midnight,dailyNextAt:spent>=DAILY_LIMIT?midnight:0,remainingChecks:Math.max(0,DAILY_LIMIT-spent),remaining:Math.max(0,Math.floor(Math.min(DAILY_LIMIT-spent,MONTHLY_LIMIT-monthSpent)/5)),monthlyLimit:MONTHLY_LIMIT,monthlyUsed:monthSpent,remainingMonthlyChecks:Math.max(0,MONTHLY_LIMIT-monthSpent),monthlyResetAt});
     if(request.method==='GET'){
-      if(!saved.month)await this.storage.put('budget',{day,used,month,monthlyUsed,groups,stationNextAt});
+      if(!saved.month)await this.storage.put('budget',{day,used,month,monthlyUsed,groups,stationNextAt,tomtomRuntimeFix:true,recoveredChecks:saved.recoveredChecks||0});
       return json(limits());
     }
     const group=(await request.json()).group;
@@ -70,7 +88,7 @@ export class TrafficBudget {
     if(ids.some(id=>now<(stationNextAt[id]||0)))return json({...limits(),error:'A station in this request was checked recently. Other stations can be checked now.'},429);
     groups[group]=now+COOLDOWN;
     for(const id of ids)stationNextAt[id]=now+COOLDOWN;
-    await this.storage.put('budget',{day,used:used+ids.length,month,monthlyUsed:monthlyUsed+ids.length,groups,stationNextAt});
+    await this.storage.put('budget',{day,used:used+ids.length,month,monthlyUsed:monthlyUsed+ids.length,groups,stationNextAt,tomtomRuntimeFix:true,recoveredChecks:saved.recoveredChecks||0});
     return json(limits(used+ids.length,monthlyUsed+ids.length));
   }
 }
@@ -107,7 +125,7 @@ export function createHandler({fetch:send=globalThis.fetch,now=Date.now,samplerF
                 try{
                   const measured=await sample(station);
                   return {id:station.id,...measured,checkedAt:new Date(now()).toISOString()};
-                }catch(error){return error.code==='provider_limit'?{id:station.id,error:'TomTom request limit reached.',errorCode:'provider_limit'}:{id:station.id,error:'Insufficient traffic coverage near this station.'};}
+                }catch(error){const messages={provider_limit:'TomTom request limit reached.',provider_auth:'TomTom access could not be verified. No coverage conclusion is available.',provider_unavailable:'The traffic service could not reach TomTom.',provider_data:'The traffic response could not be read.',no_coverage:'Insufficient traffic coverage near this station.'};const errorCode=Object.hasOwn(messages,error.code)?error.code:'provider_unavailable';return {id:station.id,error:messages[errorCode],errorCode};}
               }));
               response=json({stations,...limits});
             }

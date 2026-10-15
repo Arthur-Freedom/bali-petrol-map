@@ -104,6 +104,14 @@ test('provider exhaustion stops remaining batches and automatic repeats',async()
  assert.match(s.$('owner-status').textContent,/TomTom’s request limit.*Remaining checks stopped/);
 });
 
+test('systemic provider failures stop after the first batch instead of spending an entire area budget',async()=>{
+ for(const errorCode of ['provider_auth','provider_unavailable','provider_data']){
+  const s=await setup({onPost:({ids})=>new Response(JSON.stringify({stations:ids.map(id=>({id,error:'Traffic service failed.',errorCode}))}))});
+  s.$('auto-refresh').checked=true;await s.events.get('auto-refresh:change')();await new Promise(setImmediate);
+  assert.equal(s.posts.length,1);assert.equal(s.$('auto-refresh').checked,false);assert.match(s.$('owner-status').textContent,/Traffic service failed.*Remaining checks stopped/);
+ }
+});
+
 test('a hanging request times out, unlocks controls and is never retried automatically',async()=>{
  let hang=false;
  const s=await setup({onRequest:({options})=>hang?new Promise((resolve,reject)=>options.signal.addEventListener('abort',()=>reject(new Error('aborted')))):undefined});

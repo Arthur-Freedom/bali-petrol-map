@@ -61,6 +61,10 @@ Static source is `dist/`; no build is required. Install dependencies with `npm c
 
 Tests cover auth, concurrent budgets, rollovers, preserved charges, cooldowns, geographic clipping, tile seams, direction counting, MVT decoding, missing coverage, provider failures, call bounds, single/area/oldest refresh, expiry and session races. Test fixtures are synthetic, not retained provider data.
 
+The complete refresh handler also runs under Cloudflare's workerd runtime in CI. This catches runtime differences that Node-only tests miss: workerd rejects `redirect: 'error'`, so provider requests use `manual` and reject non-success statuses without following redirects or forwarding the secret. Systemic provider failures stop further area batches and are distinguished from genuine missing coverage.
+
+The first TomTom deployment on 15 October 2026 failed before any provider request because of that redirect option. A one-time budget migration credits only recorded admissions during that broken deployment and clears their cooldowns. Earlier spending, successful later checks and the 50/day, 900/month limits remain unchanged.
+
 Pushes to `main` test and publish Pages. From `traffic-service/`, deploy using `npx wrangler@4 deploy`. Supply `TOMTOM_API_KEY` through Wrangler secret stdin, never command arguments or plaintext files. Keep the `OWNER_AUTH` binding, budget object and migration IDs unchanged. Deploy client and Worker together for schema changes; legacy clients fail closed because no Google display key is returned.
 
 ## Catalogue

@@ -51,7 +51,7 @@ test('sampler shares tiles inside a batch, uses a header secret, bounds concurre
  let calls=0,inFlight=0,peak=0;const urls=[];
  const sample=createSampler({key:'private-test-key',fetch:async(url,options)=>{
   calls++;urls.push(url);peak=Math.max(peak,++inFlight);await new Promise(resolve=>setTimeout(resolve,2));inFlight--;
-  assert.equal(options.headers['TomTom-Api-Key'],'private-test-key');assert.equal(options.redirect,'error');assert.ok(!url.includes('private-test-key'));
+  assert.equal(options.headers['TomTom-Api-Key'],'private-test-key');assert.equal(options.redirect,'manual');assert.ok(!url.includes('private-test-key'));
   return new Response(vectorBytes());
  }});
  const stations=STATIONS.slice(0,5),expected=new Set(stations.flatMap(s=>tilesFor(s.end).map(t=>t.x+','+t.y))).size;

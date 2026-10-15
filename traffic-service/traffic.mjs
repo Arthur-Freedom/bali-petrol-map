@@ -4,6 +4,7 @@ import Pbf from 'pbf';
 export const PROVIDER='tomtom-orbis-v2', RADIUS=250, ZOOM=15;
 const N=2**ZOOM, EARTH=6371000, RAD=Math.PI/180;
 const MAX_BYTES=1024*1024;
+const failure=(code,message)=>Object.assign(Error(message),{code});
 const point=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)&&Math.abs(p[0])<=180&&Math.abs(p[1])<85;
 const tileXY=p=>[(p[0]+180)/360*N,(1-Math.asinh(Math.tan(p[1]*RAD))/Math.PI)/2*N];
 const tileLL=(x,y)=>[x/N*360-180,Math.atan(Math.sinh(Math.PI*(1-2*y/N)))/RAD];
@@ -69,7 +70,7 @@ export function measureTiles(tiles,center){
    if(segments.length>3000||total>20000)throw Error('Excessive traffic geometry');
   }
  }
- if(total<150||nearest>100)throw Error('Insufficient nearby road coverage');
+ if(total<150||nearest>100)throw failure('no_coverage','Insufficient nearby road coverage');
  return {provider:PROVIDER,radiusMetres:RADIUS,coveredMetres:Math.round(total),jamMetres:Math.round(jam),slowMetres:Math.round(slow),closedMetres:Math.round(closedMetres),nearestRoadMetres:Math.round(nearest),segments};
 }
 async function readBytes(response){
@@ -81,19 +82,23 @@ async function readBytes(response){
 }
 export function createSampler({fetch:send=globalThis.fetch,key,signal=AbortSignal.timeout(20000)}={}){
  // Request-local sharing only: no retained provider content or calls on page views.
- const cache=new Map(),queue=[];let active=0,limited=false;
+ const cache=new Map(),queue=[];let active=0,stoppedCode=null;
  async function limitedFetch(job){
   if(active>=4)await new Promise(resolve=>queue.push(resolve));else active++;
-  try{if(limited||signal.aborted)throw Object.assign(Error('Traffic unavailable'),{code:limited?'provider_limit':undefined});return await job();}
+  try{if(stoppedCode||signal.aborted)throw failure(stoppedCode||'provider_unavailable','Traffic unavailable');return await job();}
   finally{const next=queue.shift();if(next)next();else active--;}
  }
  function getTile({x,y}){
   const id=x+','+y;
   if(!cache.has(id))cache.set(id,limitedFetch(async()=>{
-   const result=await send(`https://api.tomtom.com/maps/orbis/traffic/flow/vector/tile/${ZOOM}/${x}/${y}?apiVersion=2`,{headers:{'TomTom-Api-Key':key,Accept:'application/vnd.mapbox-vector-tile'},redirect:'error',signal});
-   if(result.status===429){limited=true;throw Object.assign(Error('Provider limit'),{code:'provider_limit'});}
-   if(!result.ok)throw Error('Traffic unavailable');
-   return decodeTile(await readBytes(result),x,y);
+   let result;
+   // workerd supports manual/follow, not redirect:error. Reject 3xx below;
+   // never forward the secret to a redirected host.
+   try{result=await send(`https://api.tomtom.com/maps/orbis/traffic/flow/vector/tile/${ZOOM}/${x}/${y}?apiVersion=2`,{headers:{'TomTom-Api-Key':key,Accept:'application/vnd.mapbox-vector-tile'},redirect:'manual',signal});}
+   catch{stoppedCode='provider_unavailable';throw failure(stoppedCode,'Traffic request failed');}
+   if(!result.ok){stoppedCode=result.status===429?'provider_limit':[401,403].includes(result.status)?'provider_auth':'provider_unavailable';throw failure(stoppedCode,'Traffic provider rejected the request');}
+   try{return decodeTile(await readBytes(result),x,y);}
+   catch{stoppedCode='provider_data';throw failure(stoppedCode,'Traffic response could not be decoded');}
   }));
   return cache.get(id);
  }
