@@ -1,9 +1,9 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),P=require('../dist/core.js');
 const source=fs.readFileSync('dist/live.js','utf8');
 
-async function setup({onPost,onRequest,monthlyRemaining=900,dailyRemaining=50,provider='tomtom-orbis-v2'}={}){
+async function setup({onPost,onRequest,monthlyRemaining=900,dailyRemaining=50,provider='tomtom-orbis-v2',savedReadings=[],initialHandle='remembered.'+'a'.repeat(43)}={}){
  const elements=new Map(),events=new Map(),posts=[],sources=new Map(),layers=[],timers=new Map(),scripts=[];
- let handle='remembered.'+'a'.repeat(43),timerId=0;
+ let handle=initialHandle,timerId=0;
  const element=id=>({id,hidden:false,disabled:false,checked:false,value:id==='refresh-mode'?'area':'',dataset:{},style:{},remove(){this.removed=true;},addEventListener:(name,fn)=>events.set(id+':'+name,fn),querySelector:()=>({textContent:''})});
  const $=id=>id==='refresh-station'&&!elements.has(id)?null:(elements.has(id)?elements.get(id):(elements.set(id,element(id)),elements.get(id)));
  const base=Array.from({length:15},(_,i)=>({id:'s'+i,coordinates:[115+i*.001,-8],shortName:'Station '+i,checkedAt:null}));
@@ -19,6 +19,7 @@ async function setup({onPost,onRequest,monthlyRemaining=900,dailyRemaining=50,pr
   document:{hidden:false,createElement:()=>element('pin'),addEventListener(){},head:{appendChild(script){scripts.push(script);}}},addEventListener:(name,fn)=>events.set('window:'+name,fn),setInterval(){},setTimeout(fn,ms){timers.set(++timerId,{fn,ms});return timerId;},clearTimeout(id){timers.delete(id);},location:{},
   fetch:async(url,options)=>{
    if(onRequest){const reply=await onRequest({url,options,context});if(reply)return reply;}
+   if(url.includes('/api/saved'))return new Response(JSON.stringify({schemaVersion:1,stations:savedReadings,next:null,archive:{pendingChecks:0,lastArchivedAt:null}}));
    if(url.endsWith('/api/logout'))return new Response('{}');
    if(options.method!=='POST')return new Response(JSON.stringify({...limits(),ownerId:'18115558',provider}));
    const ids=JSON.parse(options.body).stationIds;posts.push(ids);
@@ -66,7 +67,7 @@ test('using the last daily check retains the measurement and blocks all further 
  const s=await setup({dailyRemaining:1});await s.context.PetrolLive.refreshStation('s3');
  const reading=s.context.PetrolLive.readings.get('s3'),time=reading.checkedAt;
  assert.equal(s.$('traffic-refresh').textContent,'Daily budget used');assert.equal(s.$('traffic-refresh').disabled,true);
- assert.match(s.$('refresh-summary').textContent,/Last measurements remain visible with their original times/);
+ assert.match(s.$('refresh-summary').textContent,/Saved measurements remain visible with their original times/);
  await s.context.PetrolLive.refreshStation('s3');await s.events.get('traffic-refresh:click')();
  assert.equal(s.posts.length,1);assert.equal(s.context.PetrolLive.readings.get('s3').checkedAt,time);assert.equal(s.sources.get('station-traffic').data.features.length,1);
 });
@@ -84,7 +85,7 @@ test('outdated approach dashes follow continuous geometry without joining gaps o
 test('zero budget on a new tab explains missing history without inventing or fetching readings',async()=>{
  const s=await setup({dailyRemaining:0});
  assert.equal(s.posts.length,0);assert.equal(s.context.PetrolLive.readings.size,0);
- assert.match(s.$('refresh-summary').textContent,/not archived.*cannot be restored after a reload/);
+ assert.match(s.$('refresh-summary').textContent,/before archiving was enabled cannot be recovered/);
 });
 
 test('a transient reconnect failure preserves the last result, but a revoked session still clears it',async()=>{
@@ -179,4 +180,35 @@ test('sign-out cancels further refresh batches and stale responses do not restor
 
 test('provider version mismatch keeps refresh locked and asks for a reload',async()=>{
  const s=await setup({provider:'old-version'});assert.equal(s.$('traffic-refresh').hidden,true);assert.equal(s.$('owner-login').hidden,false);assert.equal(s.posts.length,0);assert.match(s.$('owner-status').textContent,/Reload this page/);
+});
+
+
+test('reload restores yesterday’s measurement and its overlay at zero daily budget without any refresh POST',async()=>{
+ const first=await setup();await first.context.PetrolLive.refreshStation('s3');
+ const saved={...first.context.PetrolLive.readings.get('s3'),checkedAt:new Date(Date.now()-86400000).toISOString()};
+ const reloaded=await setup({dailyRemaining:0,savedReadings:[saved]});
+ assert.equal(reloaded.posts.length,0);assert.equal(reloaded.context.PetrolLive.readings.get('s3').checkedAt,saved.checkedAt);
+ assert.equal(reloaded.sources.get('station-traffic').data.features.length,1);assert.equal(reloaded.sources.get('station-traffic').data.features[0].properties.stale,true);
+ assert.equal(P.status(reloaded.context.stations.find(s=>s.id==='s3')).rankable,false);assert.match(reloaded.$('owner-status').textContent,/Loaded 1 saved measurement\./);
+ assert.match(reloaded.$('refresh-summary').textContent,/including after a reload/);
+});
+
+test('an archive save failure retains current values but stops remaining paid batches and repeats',async()=>{
+ let base;const first=await setup();await first.context.PetrolLive.refreshStation('s0');base=first.context.PetrolLive.readings.get('s0');
+ const s=await setup({onPost:({ids})=>new Response(JSON.stringify({stations:ids.map(id=>({...base,id,segments:[{...base.segments[0],from:[115+Number(id.slice(1))*.001,-8],to:[115+Number(id.slice(1))*.001+.001,-8]}]})),archive:{saved:false,error:'Measurements could not be saved. Further checks stopped; keep this tab open.'}}))});
+ s.$('auto-refresh').checked=true;await s.events.get('auto-refresh:change')();await new Promise(setImmediate);
+ assert.equal(s.posts.length,1);assert.equal(s.context.PetrolLive.readings.size,5);assert.equal(s.$('auto-refresh').checked,false);assert.match(s.$('owner-status').textContent,/could not be saved/);
+});
+
+
+test('signed-out visitors load the public GitHub backup without calling the Worker or TomTom',async()=>{
+ const first=await setup();await first.context.PetrolLive.refreshStation('s3');
+ const saved={...first.context.PetrolLive.readings.get('s3'),checkedAt:new Date(Date.now()-3600000).toISOString()},urls=[];
+ const s=await setup({initialHandle:'',onRequest:({url})=>{
+   urls.push(url);assert.ok(url.startsWith('https://raw.githubusercontent.com/Arthur-Freedom/bali-petrol-map/refs/heads/traffic-history/'));
+   return new Response(JSON.stringify(url.includes('index.json')?{schemaVersion:1,updatedAt:saved.checkedAt,stations:{s3:{checkedAt:saved.checkedAt,lastAttemptStatus:'success'}}}:saved));
+ }});
+ assert.equal(urls.length,2);assert.equal(s.posts.length,0);assert.equal(s.context.PetrolLive.readings.get('s3').checkedAt,saved.checkedAt);
+ assert.equal(s.$('traffic-refresh').hidden,true);assert.equal(s.$('archive-status').hidden,false);assert.match(s.$('archive-status').textContent,/GitHub backup/);
+ assert.equal(s.sources.get('station-traffic').data.features[0].properties.stale,true);
 });

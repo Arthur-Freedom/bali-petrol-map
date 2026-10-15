@@ -1,0 +1,33 @@
+name: Archive traffic measurements
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: petrol-traffic-archive
+  cancel-in-progress: false
+jobs:
+  archive:
+    if: github.event_name == 'schedule' || github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: source
+          persist-credentials: false
+      - uses: actions/checkout@v6
+        with:
+          ref: traffic-history
+          path: archive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Save dated results and acknowledge only after a confirmed push
+        env:
+          ARCHIVE_EXPORT_KEY: ${{ secrets.ARCHIVE_EXPORT_KEY }}
+        run: python source/scripts/archive_traffic.py --archive-dir archive

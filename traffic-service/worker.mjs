@@ -7,6 +7,7 @@ const AUTH='https://bali-cinema-owner-refresh.honeymooninbali.workers.dev';
 const BROKEN_TOMTOM_START=Date.parse('2026-10-15T03:06:00.080Z');
 import CATALOGUE from './stations.mjs';
 import {createSampler,PROVIDER,RADIUS} from './traffic.mjs';
+import {TrafficArchive,exportAuthorized} from './archive.mjs';
 export const ALL_STATIONS=CATALOGUE;
 export const STATIONS=CATALOGUE.filter(s=>['nusa-dua','bypass-30x','bypass-27','dharmawangsa','jimbaran-02'].includes(s.id));
 export function requestStations(text){
@@ -18,12 +19,12 @@ export function requestStations(text){
  }catch{return null;}
 }
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});
-async function boundedBody(request){
+async function boundedBody(request,maxBytes=2048){
  const declared=Number(request.headers.get('Content-Length'));
- if(declared>2048)return null;
+ if(declared>maxBytes)return null;
  const reader=request.body?.getReader();if(!reader)return '';
  let size=0,text='';const decoder=new TextDecoder();
- try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>2048){await reader.cancel();return null;}text+=decoder.decode(value,{stream:true});}return text+decoder.decode();}finally{reader.releaseLock();}
+ try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>maxBytes){await reader.cancel();return null;}text+=decoder.decode(value,{stream:true});}return text+decoder.decode();}finally{reader.releaseLock();}
 }
 export function metres(a,b){const r=Math.PI/180,dlat=(b[1]-a[1])*r,dlon=(b[0]-a[0])*r,h=Math.sin(dlat/2)**2+Math.cos(a[1]*r)*Math.cos(b[1]*r)*Math.sin(dlon/2)**2;return 6371000*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));}
 export function decodePolyline(value){let i=0,lat=0,lng=0,points=[];const next=()=>{let shift=0,result=0,b;do{if(i>=value.length||shift>30)throw Error('Invalid polyline');b=value.charCodeAt(i++)-63;result|=(b&31)<<shift;shift+=5;}while(b>=32);return result&1?~(result>>1):result>>1;};while(i<value.length){lat+=next();lng+=next();points.push([lng/1e5,lat/1e5]);}return points;}
@@ -40,10 +41,10 @@ export function measure(route,end){
 }
 
 // One globally named object. Admission serializes the shared daily budget and
-// per-station cooldown across tabs. Provider content is never persisted.
+// per-station cooldown across tabs, with durable result storage before reply.
 export class TrafficBudget {
-  constructor(state,env,{now=Date.now}={}){this.storage=state.storage;this.now=now;this.pending=Promise.resolve();}
-  fetch(request){const run=this.pending.then(()=>this.admit(request));this.pending=run.catch(()=>{});return run;}
+  constructor(state,env,{now=Date.now}={}){this.storage=state.storage;this.now=now;this.archive=new TrafficArchive(state.storage,now);this.pending=Promise.resolve();}
+  fetch(request){const run=this.pending.then(()=>new URL(request.url).pathname==='/'?this.admit(request):this.archive.route(request));this.pending=run.catch(()=>{});return run;}
   async admit(request){
     const now=this.now(),day=new Date(now+8*3600000).toISOString().slice(0,10),month=day.slice(0,7);
     const saved=await this.storage.get('budget')||{day,used:0};
@@ -77,7 +78,7 @@ export class TrafficBudget {
     const limits=(spent=used,monthSpent=monthlyUsed)=>({groups,stationNextAt,resetAt:midnight,dailyNextAt:spent>=DAILY_LIMIT?midnight:0,remainingChecks:Math.max(0,DAILY_LIMIT-spent),remaining:Math.max(0,Math.floor(Math.min(DAILY_LIMIT-spent,MONTHLY_LIMIT-monthSpent)/5)),monthlyLimit:MONTHLY_LIMIT,monthlyUsed:monthSpent,remainingMonthlyChecks:Math.max(0,MONTHLY_LIMIT-monthSpent),monthlyResetAt});
     if(request.method==='GET'){
       if(!saved.month)await this.storage.put('budget',{day,used,month,monthlyUsed,groups,stationNextAt,tomtomRuntimeFix:true,recoveredChecks:saved.recoveredChecks||0});
-      return json(limits());
+      return json({...limits(),archive:await this.archive.status()});
     }
     const group=(await request.json()).group;
     if(typeof group!=='string'||group.length>700)return json({error:'Invalid group.'},400);
@@ -88,19 +89,28 @@ export class TrafficBudget {
     if(ids.some(id=>now<(stationNextAt[id]||0)))return json({...limits(),error:'A station in this request was checked recently. Other stations can be checked now.'},429);
     groups[group]=now+COOLDOWN;
     for(const id of ids)stationNextAt[id]=now+COOLDOWN;
-    await this.storage.put('budget',{day,used:used+ids.length,month,monthlyUsed:monthlyUsed+ids.length,groups,stationNextAt,tomtomRuntimeFix:true,recoveredChecks:saved.recoveredChecks||0});
-    return json(limits(used+ids.length,monthlyUsed+ids.length));
+    const reservation=await this.archive.reserve(ids,now);
+    await this.storage.put({...reservation.entries,budget:{day,used:used+ids.length,month,monthlyUsed:monthlyUsed+ids.length,groups,stationNextAt,tomtomRuntimeFix:true,recoveredChecks:saved.recoveredChecks||0}});
+    return json({...limits(used+ids.length,monthlyUsed+ids.length),reservations:reservation.reservations});
   }
 }
 export function createHandler({fetch:send=globalThis.fetch,now=Date.now,samplerFactory=createSampler}={}){
- return async(request,env)=>{
+ return async(request,env,ctx)=>{
   let response;
   try{
     const path=new URL(request.url).pathname;let requestedStations;
-    if(request.headers.get('Origin')!==ORIGIN)response=json({error:'Owner website access required.'},403);
+    if(path.startsWith('/internal/archive/')){
+      if(!await exportAuthorized(request,env.ARCHIVE_EXPORT_KEY))response=json({error:'Archive access denied.'},401);
+      else if(!((path==='/internal/archive/export'&&request.method==='GET')||(path==='/internal/archive/ack'&&request.method==='POST')))response=json({error:'Not found.'},404);
+      else{const body=request.method==='POST'?await boundedBody(request,8192):null;
+        if(request.method==='POST'&&body===null)response=json({error:'Invalid acknowledgement.'},400);
+        else response=await env.TRAFFIC_BUDGET.get(env.TRAFFIC_BUDGET.idFromName('owner-global')).fetch(new Request('https://budget'+path.replace('/internal',''),{method:request.method,...(body!==null?{body}:{})}));
+      }
+    }
+    else if(request.headers.get('Origin')!==ORIGIN)response=json({error:'Owner website access required.'},403);
     else if(request.method==='OPTIONS')response=new Response(null,{status:204});
-    else if(!((path==='/api/session'&&request.method==='GET')||(path==='/api/refresh'&&request.method==='POST')))response=json({error:'Not found.'},404);
-    else if(env.PAID_FEATURES_ENABLED!=='true')response=json({error:'Paid map features are paused by the owner.'},503);
+    else if(!((['/api/session','/api/saved'].includes(path)&&request.method==='GET')||(path==='/api/refresh'&&request.method==='POST')))response=json({error:'Not found.'},404);
+    else if(path==='/api/refresh'&&env.PAID_FEATURES_ENABLED!=='true')response=json({error:'Paid map features are paused by the owner. Saved readings remain available.'},503);
     else if(request.method==='POST'&&(request.headers.get('Content-Type')!=='application/json'||!(requestedStations=requestStations((await boundedBody(request))??'invalid'))))response=json({error:'Invalid refresh request.'},400);
     else{
       const authorization=request.headers.get('Authorization')||'';
@@ -113,21 +123,28 @@ export function createHandler({fetch:send=globalThis.fetch,now=Date.now,samplerF
           const budget=env.TRAFFIC_BUDGET.get(env.TRAFFIC_BUDGET.idFromName('owner-global'));
           if(path==='/api/session'){
             const allowance=await budget.fetch(new Request('https://budget/',{method:'GET'}));
-            response=allowance.ok?json({ownerId:OWNER,login:'Arthur-Freedom',provider:PROVIDER,radiusMetres:RADIUS,...await allowance.json()}):json({error:'Spending protection is temporarily unavailable.'},503);
+            response=allowance.ok?json({ownerId:OWNER,login:'Arthur-Freedom',provider:PROVIDER,radiusMetres:RADIUS,refreshEnabled:env.PAID_FEATURES_ENABLED==='true',...await allowance.json()}):json({error:'Spending protection is temporarily unavailable.'},503);
           }
+          else if(path==='/api/saved')response=await budget.fetch(new Request('https://budget/saved'+new URL(request.url).search));
           else if(!env.TOMTOM_API_KEY)response=json({error:'Traffic service is not configured.'},503);
+          else if(!env.ARCHIVE_EXPORT_KEY||env.ARCHIVE_EXPORT_KEY.length<43)response=json({error:'Traffic archiving is not configured. Refreshes are paused to avoid losing results.'},503);
           else{
             const allowance=await budget.fetch(new Request('https://budget/',{method:'POST',body:JSON.stringify({group:requestedStations.map(s=>s.id).sort().join(',')})})),limits=await allowance.json();
             if(!allowance.ok)response=json(limits,allowance.status);
             else{
+              const work=(async()=>{
               const sample=samplerFactory({fetch:send,key:env.TOMTOM_API_KEY});
-              const stations=await Promise.all(requestedStations.map(async station=>{
+              const stations=await Promise.all([...requestedStations].sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0).map(async station=>{
                 try{
                   const measured=await sample(station);
                   return {id:station.id,...measured,checkedAt:new Date(now()).toISOString()};
                 }catch(error){const messages={provider_limit:'TomTom request limit reached.',provider_auth:'TomTom access could not be verified. No coverage conclusion is available.',provider_unavailable:'The traffic service could not reach TomTom.',provider_data:'The traffic response could not be read.',no_coverage:'Insufficient traffic coverage near this station.'};const errorCode=Object.hasOwn(messages,error.code)?error.code:'provider_unavailable';return {id:station.id,error:messages[errorCode],errorCode};}
               }));
-              response=json({stations,...limits});
+              const {reservations,...publicLimits}=limits;
+              try{const stored=await budget.fetch(new Request('https://budget/archive/finish',{method:'POST',body:JSON.stringify({reservations,stations})}));if(!stored.ok)throw Error('Save failed');return json({...await stored.json(),...publicLimits});}
+              catch{return json({stations,...publicLimits,archive:{saved:false,error:'Measurements could not be saved. Further checks stopped; keep this tab open.'}});}
+              })();
+              ctx?.waitUntil(work.then(()=>{},()=>{}));response=await work;
             }
           }
         }

@@ -24,5 +24,6 @@ class_name = "TrafficBudget"
 tag = "traffic-budget-v1"
 new_sqlite_classes = ["TrafficBudget"]
 
-# Workers Free only. Secret: TOMTOM_API_KEY. Legacy Google secrets are unused.
-# Budget storage contains counts/times only, never provider traffic content.
+# Secrets: TOMTOM_API_KEY and ARCHIVE_EXPORT_KEY (export/ack only; no refresh access).
+# Durable storage retains latest readings and pending GitHub archive records.
+# Owner confirmed archive permission on 15 October 2026. No new paid plan.

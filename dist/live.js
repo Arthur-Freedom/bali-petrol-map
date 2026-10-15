@@ -1,31 +1,37 @@
 'use strict';
 (()=>{
  const service='https://bali-petrol-traffic.honeymooninbali.workers.dev',auth='https://bali-cinema-owner-refresh.honeymooninbali.workers.dev',owner=window.PetrolOwner;
- let verified=false,pending=false,budget={remainingChecks:50,stationNextAt:{},monthlyLimit:900,remainingMonthlyChecks:900},progress=null,scopeVersion=0,auto=false,autoNextAt=0,epoch=0;
+ const archiveRoot='https://raw.githubusercontent.com/Arthur-Freedom/bali-petrol-map/refs/heads/traffic-history/';
+ let publicIndex=null,publicLoading=false;const publicLoaded=new Set();
+ let verified=false,pending=false,budget={remainingChecks:50,stationNextAt:{},monthlyLimit:900,remainingMonthlyChecks:900},archive=null,progress=null,scopeVersion=0,auto=false,autoNextAt=0,epoch=0;
  const requests=new Set();
  function stopRequests(){for(const controller of requests)controller.abort();requests.clear();}
  function stopAuto(){auto=false;$('auto-refresh').checked=false;}
  function failedReadings(batch){for(const {id} of batch){const previous=live.readings.get(id);live.readings.set(id,{...previous,id,refreshFailed:true,errorCode:'provider_unavailable'});}applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();}
- const live={active:false,readings:new Map(),controls,refreshStation(id){auto=false;$('auto-refresh').checked=false;return refresh(id);},scopeChanged(){scopeVersion++;auto=false;$('auto-refresh').checked=false;if(!pending&&verified)status('Ready to compare this area.');controls();},updateMarkers(){drawTraffic();},clear(){live.readings.clear();live.active=false;drawTraffic();$('road-legend').hidden=true;$('map-layer-title').textContent='PETROL LOCATIONS';$('map-layer-note').textContent='Sign in to compare nearby road traffic.';if(dataset){applyChecks();renderList();renderDetail();}updateSnapshot();}};
+ const live={active:false,readings:new Map(),controls,refreshStation(id){auto=false;$('auto-refresh').checked=false;return refresh(id);},scopeChanged(){scopeVersion++;auto=false;$('auto-refresh').checked=false;if(!pending&&verified)status('Ready to compare this area.');if(!owner.get())loadPublicSaved();controls();},updateMarkers(){drawTraffic();},clear(){live.readings.clear();publicLoaded.clear();live.active=false;drawTraffic();$('road-legend').hidden=true;$('map-layer-title').textContent='PETROL LOCATIONS';$('map-layer-note').textContent='Sign in to compare nearby road traffic.';if(dataset){applyChecks();renderList();renderDetail();}updateSnapshot();}};
  window.PetrolLive=live;
  function status(message){$('owner-status').textContent=message;}
  function mode(){return $('refresh-mode').value;}
  function plan(id){return P.refreshPlan(id?stations.filter(s=>s.id===id):scopedStations(),scopeCenter(),budget,id?'area':mode());}
- function limits(data){if(data.stationNextAt)budget.stationNextAt=data.stationNextAt;if(Number.isFinite(data.resetAt))budget.resetAt=data.resetAt;if(Number.isFinite(data.remainingChecks))budget.remainingChecks=data.remainingChecks;for(const key of ['monthlyLimit','monthlyUsed','remainingMonthlyChecks','monthlyResetAt'])if(Number.isFinite(data[key]))budget[key]=data[key];}
+ function limits(data){if(data.archive)archive=data.archive;if(typeof data.refreshEnabled==='boolean')budget.refreshEnabled=data.refreshEnabled;if(data.stationNextAt)budget.stationNextAt=data.stationNextAt;if(Number.isFinite(data.resetAt))budget.resetAt=data.resetAt;if(Number.isFinite(data.remainingChecks))budget.remainingChecks=data.remainingChecks;for(const key of ['monthlyLimit','monthlyUsed','remainingMonthlyChecks','monthlyResetAt'])if(Number.isFinite(data[key]))budget[key]=data[key];}
  function waitLabel(p){return `Recheck in ${Math.max(1,Math.ceil((p.nextAt-Date.now())/60000))} min`;}
- function retainedMessage(){return scopedStations().some(s=>s.checkedAt)?'Last measurements remain visible with their original times.':'No measurement is retained in this tab. Earlier checks were not archived and cannot be restored after a reload.';}
+ function retainedMessage(){return scopedStations().some(s=>s.checkedAt)?'Saved measurements remain visible with their original times, including after a reload.':'No saved measurement for this area yet. Checks made before archiving was enabled cannot be recovered.';}
  function controls(){
    if(budget.resetAt&&Date.now()>=budget.resetAt)budget={...budget,remainingChecks:50,stationNextAt:{},resetAt:0};
    if(budget.monthlyResetAt&&Date.now()>=budget.monthlyResetAt)budget={...budget,remainingMonthlyChecks:budget.monthlyLimit,monthlyResetAt:0};
    $('owner-login').hidden=verified;$('traffic-refresh').hidden=!verified;$('owner-logout').hidden=!owner.get();$('auto-wrap').hidden=!verified;
    $('owner-login').textContent=owner.get()?'Retry connection':'Sign in with GitHub';
    const p=plan(),count=p.targets.length;
-   $('traffic-refresh').disabled=pending||!verified||!count;
+   $('traffic-refresh').disabled=pending||!verified||!count||budget.refreshEnabled===false;
    $('traffic-refresh').textContent=pending?(progress?`Checking ${progress.done}/${progress.total}…`:'Preparing checks…'):!p.total?'No stations here':p.remainingChecks===0?(budget.remainingMonthlyChecks===0?'Monthly safety limit':'Daily budget used'):!count?waitLabel(p):mode()==='oldest'?`Refresh oldest ${count}`:p.limited?`Refresh next ${count}`:p.cooling?`Refresh remaining ${count}`:`Refresh area · ${count}`;
    $('refresh-summary').textContent=!verified?`Sign in to refresh all ${p.total} stations here, or choose the oldest checks.`:p.remainingChecks===0?(budget.remainingMonthlyChecks===0?'Monthly safety limit reached. More checks next month. ':'More checks after midnight in Bali. ')+retainedMessage():!p.total?'Choose another area or search.':!count?'These stations were checked recently. Other areas can be checked now.':mode()==='oldest'?'Unchecked stations first, then the oldest readings.':p.limited?`The remaining budget allows ${count} of ${p.eligible} due stations now.`:p.cooling?`${p.cooling} checked recently; ${count} can be checked now.`:`One click checks all ${count} stations. No wait between stations.`;
    $('check-budget').hidden=!verified;$('check-budget').textContent=`${budget.remainingChecks} station checks left today · ${50-budget.remainingChecks}/50 used · ${budget.remainingMonthlyChecks}/${budget.monthlyLimit} left this month`;
+   if(verified&&budget.refreshEnabled===false){$('traffic-refresh').textContent='Refreshes paused';$('refresh-summary').textContent='New traffic checks are paused. Saved measurements remain available.';}
+   const archiveTime=time=>new Date(time).toLocaleString('en-GB',{timeZone:'Asia/Makassar',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' WITA';
+   $('archive-status').hidden=!verified&&!publicIndex?.updatedAt;$('archive-status').textContent=!verified&&publicIndex?.updatedAt?'Showing GitHub backup · '+archiveTime(publicIndex.updatedAt):archive?.saved===false?'Saving failed · keep this tab open':archive?(archive.pendingChecks||archive.lastArchivedAt?`Saved on server · ${archive.pendingChecks||0} check${archive.pendingChecks===1?'':'s'} waiting for GitHub backup${archive.lastArchivedAt?' · last backup '+archiveTime(archive.lastArchivedAt):''}`:'Archive ready · new checks will be saved'):'Saved readings load without using traffic checks.';
    const button=$('refresh-station');if(button){const one=plan(button.dataset.id);button.hidden=!verified;button.disabled=pending||!one.targets.length;button.textContent=pending?'Checking traffic…':one.remainingChecks===0?(budget.remainingMonthlyChecks===0?'Monthly safety limit':'Daily budget used'):one.targets.length?'Refresh this station':waitLabel(one);}
-   const empty=$('empty-reading-note');if(empty&&verified&&p.remainingChecks===0)empty.textContent='No retained measurement for this station. Refreshes are paused by the spending limit; previous tabs were not archived.';
+   if(button&&budget.refreshEnabled===false){button.disabled=true;button.textContent='Refreshes paused';}
+   const empty=$('empty-reading-note');if(empty&&verified&&p.remainingChecks===0)empty.textContent='No saved measurement for this station yet. Refreshes resume when the spending limit resets.';
  }
  async function request(path,method='GET',body={}){
    const generation=epoch,handle=owner.get(),controller=new AbortController();requests.add(controller);
@@ -73,14 +79,55 @@
    if(live.active){$('map-layer-title').textContent=earlier?'LAST TRAFFIC MEASUREMENTS':'TRAFFIC AT MAPPED ACCESSES';$('map-layer-note').textContent=earlier?'Dashed colours: outdated · select a station for its time':'Bold: incoming approaches · faint: nearby roads';}
  }
  function showTraffic(){live.active=true;$('road-legend').hidden=false;$('map-layer-title').textContent='TRAFFIC AT MAPPED ACCESSES';$('map-layer-note').textContent='Bold: incoming approaches · faint: nearby roads';drawTraffic();}
+ async function loadPublicSaved(){
+   if(publicLoading||owner.get())return;publicLoading=true;const generation=epoch,scope=scopeVersion;
+   try{
+     await window.petrolReady;if(!dataset)return;
+     if(!publicIndex){const response=await fetch(archiveRoot+'index.json',{cache:'no-store',signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error();const value=await response.json();if(value?.schemaVersion!==1||!value.stations||Array.isArray(value.stations)||typeof value.stations!=='object')throw Error();publicIndex=value;}
+     const pending=scopedStations().filter(s=>!publicLoaded.has(s.id)&&publicIndex.stations[s.id]?.checkedAt);
+     let position=0;
+     await Promise.all(Array.from({length:Math.min(4,pending.length)},async()=>{
+       while(position<pending.length&&generation===epoch&&!owner.get()){
+         const station=pending[position++],meta=publicIndex.stations[station.id];
+         try{const response=await fetch(archiveRoot+'latest/'+encodeURIComponent(station.id)+'.json?v='+encodeURIComponent(meta.checkedAt),{cache:'no-store',signal:AbortSignal.timeout(15000)});if(!response.ok)continue;const row=await response.json();
+           if(generation!==epoch||owner.get())return;
+           if(row.checkedAt!==meta.checkedAt||!P.validSavedReading(row,station.id,Date.now(),station.coordinates))continue;
+           if(meta.lastAttemptStatus==='failed'&&Date.parse(meta.lastAttemptAt)>=Date.parse(row.checkedAt)){row.refreshFailed=true;row.errorCode=meta.errorCode;}
+           live.readings.set(row.id,row);publicLoaded.add(row.id);
+         }catch{/* A missing backup is not a zero-traffic reading. */}
+       }
+     }));
+     if(generation===epoch&&!owner.get()){applyChecks();if(live.readings.size)showTraffic();renderList();renderDetail();updateSnapshot();controls();}
+   }catch{/* The station finder remains usable when GitHub is unavailable. */}
+   finally{publicLoading=false;if(generation===epoch&&scope!==scopeVersion&&!owner.get())loadPublicSaved();}
+ }
+ async function loadSaved(generation){
+   let cursor='',count=0;const seen=new Set();
+   do{
+     const data=await request('/api/saved'+(cursor?'?after='+encodeURIComponent(cursor):''));if(generation!==epoch)return count;
+     if(data.schemaVersion!==1||!Array.isArray(data.stations)||data.stations.length>20)throw Error('Saved measurements could not be read. Retry connection; no traffic check was used.');
+     for(const row of data.stations){
+       const station=stations.find(s=>s.id===row?.id);if(!station||seen.has(row.id))throw Error('Invalid saved measurements.');seen.add(row.id);
+       const previous=live.readings.get(row.id);
+       if(P.validSavedReading(row,row.id,Date.now(),station.coordinates)){
+         if(!previous?.checkedAt||Date.parse(row.checkedAt)>=Date.parse(previous.checkedAt))live.readings.set(row.id,row);count++;
+       }else if(!row.checkedAt&&row.refreshFailed&&!previous?.checkedAt)live.readings.set(row.id,{id:row.id,refreshFailed:true,errorCode:row.errorCode});
+       else throw Error('Invalid saved measurement. No traffic check was used.');
+     }
+     limits(data);const next=data.next;
+     if(next!==null&&(typeof next!=='string'||next===cursor||!seen.has(next)))throw Error('Invalid saved-reading cursor.');
+     cursor=next;
+   }while(cursor);
+   applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();return count;
+ }
  async function connect(){
-   if(!owner.get()){status(owner.error||'Only Arthur-Freedom can request live traffic.');controls();return;}
+   if(!owner.get()){status(owner.error||'Saved traffic is public. Only Arthur-Freedom can request new checks.');controls();loadPublicSaved();return;}
    const generation=++epoch;verified=false;controls();status('Verifying your GitHub account…');
-   try{const data=await request('/api/session');if(generation!==epoch)return;if(data.ownerId!=='18115558'||data.provider!=='tomtom-orbis-v2')throw Error('Traffic version changed. Reload this page and reconnect.');limits(data);await window.petrolReady;if(generation!==epoch)return;if(!dataset)throw Error('Station locations could not load. Reload the page to retry.');showTraffic();verified=true;status('Signed in as Arthur-Freedom.');}
+   try{const data=await request('/api/session');if(generation!==epoch)return;if(data.ownerId!=='18115558'||data.provider!=='tomtom-orbis-v2')throw Error('Traffic version changed. Reload this page and reconnect.');limits(data);await window.petrolReady;if(generation!==epoch)return;if(!dataset)throw Error('Station locations could not load. Reload the page to retry.');status('Loading saved measurements…');const loaded=await loadSaved(generation);if(generation!==epoch)return;showTraffic();verified=true;status(`Signed in as Arthur-Freedom.${loaded?' Loaded '+loaded+' saved measurement'+(loaded===1?'':'s')+'.':''}`);}
    catch(error){if(generation===epoch){verified=false;status(error.message+(live.readings.size?' Last measurements remain visible.':''));}}finally{controls();}
  }
  async function refresh(id){
-   if(!verified||pending||!plan(id).targets.length)return;
+   if(!verified||pending||budget.refreshEnabled===false||!plan(id).targets.length)return;
    pending=true;progress=null;autoNextAt=Date.now()+15*60000;controls();status('Checking the available refresh budget…');const generation=epoch,scope=scopeVersion;
    try{
      // Synchronize limits across devices before making any paid calls.
@@ -93,8 +140,9 @@
        let data;try{data=await request('/api/refresh','POST',{stationIds:batch.map(s=>s.id)});}catch(error){if(generation===epoch&&verified)failedReadings(batch);throw error;}
        if(generation!==epoch)return;limits(data);
        const readings=Array.isArray(data.stations)?data.stations:[];let incomplete=readings.length!==batch.length;
-       for(const station of batch){const matches=readings.filter(r=>r?.id===station.id),reading=matches[0];if(matches.length===1&&P.validReading(reading,station.id,Date.now(),station.coordinates)){live.readings.set(reading.id,P.withTrend(live.readings.get(reading.id),reading));success++;}else{if(matches.length!==1||typeof reading?.error!=='string'||!reading.error)incomplete=true;const previous=live.readings.get(station.id);live.readings.set(station.id,{...previous,id:station.id,refreshFailed:true,errorCode:reading?.errorCode||'provider_data'});}}
+       for(const station of batch){const matches=readings.filter(r=>r?.id===station.id),reading=matches[0];if(matches.length===1&&P.validReading(reading,station.id,Date.now(),station.coordinates)){live.readings.set(reading.id,reading.trend?reading:P.withTrend(live.readings.get(reading.id),reading));success++;}else{if(matches.length!==1||typeof reading?.error!=='string'||!reading.error)incomplete=true;const previous=live.readings.get(station.id);live.readings.set(station.id,{...previous,id:station.id,refreshFailed:true,errorCode:reading?.errorCode||'provider_data'});}}
        progress.done+=batch.length;applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();
+       if(data.archive?.saved===false){stopAuto();throw Error(data.archive.error||'Measurements could not be saved. Further checks stopped; keep this tab open.');}
        const failedService=readings.find(r=>['provider_limit','provider_auth','provider_unavailable','provider_data'].includes(r?.errorCode));
        if(failedService||incomplete){stopAuto();throw Error(failedService?(failedService.errorCode==='provider_limit'?'TomTom’s request limit was reached.':failedService.error)+' Remaining checks stopped.':'The traffic service returned incomplete results. Remaining checks stopped.');}
      }
@@ -108,6 +156,7 @@
  $('owner-logout').addEventListener('click',async()=>{
    const handle=owner.get(),generation=++epoch;verified=false;stopAuto();stopRequests();owner.clear();live.clear();controls();status('Signing out…');
    try{const r=await fetch(auth+'/api/logout',{method:'POST',signal:AbortSignal.timeout(15000),headers:{Authorization:'Bearer '+handle,'Content-Type':'application/json'},body:'{}'});if(!r.ok)throw Error();if(generation===epoch)status('Signed out. Live traffic is locked.');}catch{if(generation===epoch)status('Signed out on this device. Server revocation could not be confirmed; retry signing in and out when connected.');}
+   if(generation===epoch)loadPublicSaved();
  });
  addEventListener('owner-session-change',()=>{++epoch;verified=false;stopAuto();stopRequests();live.clear();connect();});
  setInterval(()=>{controls();if(auto&&verified&&!document.hidden&&Date.now()>=autoNextAt&&plan().targets.length)refresh();},15000);

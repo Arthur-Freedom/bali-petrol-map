@@ -2,20 +2,21 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHandler,TrafficBudget,measure,metres,ORIGIN,OWNER,COOLDOWN,STATIONS,ALL_STATIONS} from './worker.mjs';
 import P from '../dist/core.js';
+import {memoryStorage} from './test-storage.mjs';
 const json=(x,status=200)=>new Response(JSON.stringify(x),{status});
 function encode(points){let lat=0,lng=0,out='';const number=n=>{let v=n<0?~(n<<1):n<<1,s='';while(v>=32){s+=String.fromCharCode((32|(v&31))+63);v>>=5;}return s+String.fromCharCode(v+63);};for(const p of points){const a=Math.round(p[1]*1e5),b=Math.round(p[0]*1e5);out+=number(a-lat)+number(b-lng);lat=a;lng=b;}return out;}
 const route=(points,intervals)=>({polyline:{encodedPolyline:encode(points)},travelAdvisory:{speedReadingIntervals:intervals}});
 const traffic=points=>route(points,[{endPolylinePointIndex:points.length-1,speed:'NORMAL'}]);
 function setup({owner=OWNER,authStatus=200,upstream}={}){
  let time=Date.parse('2026-10-15T00:00:00+08:00'),calls=[],authCalls=0;
- const records=new Map(),budget=new TrafficBudget({storage:{get:async k=>records.get(k),put:async(k,v)=>records.set(k,v)}},{},{now:()=>time});
- const env={PAID_FEATURES_ENABLED:'true',TOMTOM_API_KEY:'secret-key',OWNER_AUTH:{fetch:async()=>{authCalls++;return json({ownerId:owner},authStatus)}},TRAFFIC_BUDGET:{idFromName:s=>s,get:()=>budget}};
+ const records=new Map(),budget=new TrafficBudget({storage:memoryStorage(records)},{},{now:()=>time});
+ const env={PAID_FEATURES_ENABLED:'true',TOMTOM_API_KEY:'secret-key',ARCHIVE_EXPORT_KEY:'x'.repeat(43),OWNER_AUTH:{fetch:async()=>{authCalls++;return json({ownerId:owner},authStatus)}},TRAFFIC_BUDGET:{idFromName:s=>s,get:()=>budget}};
  const handler=createHandler({now:()=>time,samplerFactory:({key})=>async station=>{
   calls.push({station,key});
   if(upstream){const response=upstream();if(!response.ok)throw Object.assign(Error('Upstream failed'),{code:response.status===429?'provider_limit':undefined});}
-  return {provider:'tomtom-orbis-v2',radiusMetres:250,coveredMetres:500,jamMetres:0,slowMetres:0,closedMetres:0,nearestRoadMetres:0,segments:[{from:station.end,to:[station.end[0]+.001,station.end[1]],relativeSpeed:1,closed:false,speed:'NORMAL'}]};
+  return {approach:{method:'entrance-road-v1',status:'unmapped',routes:[],selectedId:null},provider:'tomtom-orbis-v2',radiusMetres:250,coveredMetres:500,jamMetres:0,slowMetres:0,closedMetres:0,nearestRoadMetres:0,segments:[{from:station.end,to:[station.end[0]+.001,station.end[1]],relativeSpeed:1,closed:false,speed:'NORMAL'}]};
  }});
- const request=({token='remembered.'+'a'.repeat(43),origin=ORIGIN,body='{}',method='POST',path='/api/refresh'}={})=>handler(new Request('https://test'+path,{method,headers:{Origin:origin,Authorization:'Bearer '+token,'Content-Type':'application/json'},...(method==='POST'?{body}:{})}),env);
+ const request=({token='remembered.'+'a'.repeat(43),origin=ORIGIN,body='{}',method='POST',path='/api/refresh'}={})=>handler(new Request('https://test'+path,{method,headers:{...(origin===null?{}:{Origin:origin}),Authorization:'Bearer '+token,'Content-Type':'application/json'},...(method==='POST'?{body}:{})}),env);
  return {request,calls,records,budget,env,authCalls:()=>authCalls,advance:n=>time+=n};
 }
 test('unauthenticated, wrong identity, spoofed origin and arbitrary body make zero billable calls',async()=>{
@@ -26,8 +27,8 @@ test('concurrent owner refreshes admit only five fixed station checks and never 
  const s=setup(),responses=await Promise.all([s.request(),s.request()]);assert.deepEqual(responses.map(x=>x.status).sort(),[200,429]);assert.equal(s.calls.length,5);assert.equal(s.authCalls(),2);
  const response=responses.find(r=>r.ok),text=await response.text();assert.ok(!text.includes('secret-key'));assert.equal(response.headers.get('Cache-Control'),'no-store');
  const data=JSON.parse(text);assert.equal(data.stations.length,5);assert.ok(data.stations.every(x=>x.jamMetres===0&&x.checkedAt));assert.equal(data.remaining,9);
- for(let i=0;i<5;i++){assert.deepEqual(s.calls[i].station,STATIONS[i]);assert.equal(s.calls[i].key,'secret-key');}
- assert.deepEqual([...s.records.keys()],['budget']);assert.ok(!JSON.stringify([...s.records]).includes('segments'));
+ for(let i=0;i<5;i++){assert.deepEqual(s.calls[i].station,[...STATIONS].sort((a,b)=>a.id<b.id?-1:1)[i]);assert.equal(s.calls[i].key,'secret-key');}
+ assert.equal(data.archive.saved,true);assert.equal(data.archive.pendingChecks,5);assert.equal([...s.records.keys()].filter(k=>k.startsWith('latest:')).length,5);assert.ok(!JSON.stringify([...s.records]).includes('secret-key'));
 });
 test('daily budget survives cooldowns and resets at Bali midnight',async()=>{
  const s=setup();for(let i=0;i<10;i++){assert.equal((await s.request()).status,200);s.advance(COOLDOWN);}
@@ -122,7 +123,7 @@ test('migrating the first usage day preserves charges even if first reconnect is
 });
 
 test('disabled or missing kill-switch configuration exposes no key and makes no paid calls',async()=>{
- for(const enabled of ['false',undefined])for(const options of [{},{method:'GET',path:'/api/session'}]){
+ for(const enabled of ['false',undefined])for(const options of [{}]){
   const s=setup();s.env.PAID_FEATURES_ENABLED=enabled;const response=await s.request(options);assert.equal(response.status,503);assert.ok(!(await response.text()).includes('map-key'));assert.equal(s.calls.length,0);assert.equal(s.authCalls(),0);
  }
 });
@@ -162,4 +163,51 @@ test('runtime incident restores only recorded broken-deployment admissions, exac
  assert.equal((await session()).remainingChecks,6);assert.equal(s.records.get('budget').recoveredChecks,2);
  assert.equal((await s.request({body:JSON.stringify({stationIds:failedIds})})).status,200);
  assert.equal((await session()).remainingChecks,4);assert.equal((await session()).remainingMonthlyChecks,854);
+});
+
+
+test('saved results survive a new object, exhausted budget and a paused provider',async()=>{
+ const s=setup(),id=STATIONS[0].id;
+ const data=await(await s.request({body:JSON.stringify({stationIds:[id]})})).json(),checkedAt=data.stations[0].checkedAt;
+ const counters=s.records.get('budget');s.records.set('budget',{...counters,used:50,monthlyUsed:900});
+ s.advance(3600000);s.env.PAID_FEATURES_ENABLED='false';
+ const restarted=new TrafficBudget({storage:memoryStorage(s.records)});
+ s.env.TRAFFIC_BUDGET.get=()=>restarted;
+ const saved=await(await s.request({method:'GET',path:'/api/saved'})).json();
+ assert.equal(saved.stations[0].checkedAt,checkedAt);assert.equal(saved.archive.pendingChecks,1);assert.equal(s.calls.length,1);
+ assert.equal((await s.request({method:'GET',path:'/api/session'})).status,200);
+ assert.equal((await s.request()).status,503);assert.equal(s.calls.length,1);
+});
+
+test('failed and interrupted checks are dated events and do not replace previous successful readings',async()=>{
+ let failing=false;const s=setup({upstream:()=>json({},failing?500:200)}),id=STATIONS[0].id;
+ const first=await(await s.request({body:JSON.stringify({stationIds:[id]})})).json();
+ failing=true;s.advance(COOLDOWN);await s.request({body:JSON.stringify({stationIds:[id]})});
+ const saved=await(await s.request({method:'GET',path:'/api/saved'})).json();
+ assert.equal(saved.stations[0].checkedAt,first.stations[0].checkedAt);assert.equal(saved.stations[0].refreshFailed,true);
+ const admission=await(await s.budget.fetch(new Request('https://budget/',{method:'POST',body:JSON.stringify({group:STATIONS[1].id})}))).json();assert.equal(admission.reservations.length,1);
+ s.advance(300001);
+ const exported=await(await s.request({method:'GET',path:'/internal/archive/export',token:'x'.repeat(43),origin:null})).json();
+ const events=exported.records.map(r=>JSON.parse(r.payload));assert.deepEqual(events.map(r=>r.status),['success','failed','failed']);
+ assert.equal(events[0].requestedAtWita,'2026-10-15T00:00:00.000+08:00');assert.equal(events[2].errorCode,'interrupted');assert.equal(events[1].reading,undefined);
+});
+
+test('archive credential can export and acknowledge, but cannot read owner session or spend traffic',async()=>{
+ const s=setup();await s.request({body:JSON.stringify({stationIds:[STATIONS[0].id]})});
+ for(const options of [{token:'bad',origin:null},{token:'x'.repeat(43),origin:ORIGIN},{token:'remembered.'+'a'.repeat(43),origin:null}])assert.equal((await s.request({method:'GET',path:'/internal/archive/export',...options})).status,401);
+ assert.equal((await s.request({token:'x'.repeat(43)})).status,401);
+ assert.equal((await s.request({token:'x'.repeat(43),method:'GET',path:'/api/session'})).status,401);
+ const invoke=(path,method='GET',body='{}')=>s.request({path:'/internal/archive/'+path,method,body,token:'x'.repeat(43),origin:null});
+ const page=await(await invoke('export')).json();assert.equal(page.records.length,1);const {id,sha256}=page.records[0];
+ assert.equal((await invoke('ack','POST',JSON.stringify({commit:'a'.repeat(40),records:[{id,sha256:'0'.repeat(64)}]}))).status,409);
+ assert.equal((await(await invoke('export')).json()).records.length,1);
+ const body=JSON.stringify({commit:'a'.repeat(40),records:[{id,sha256}]});assert.equal((await invoke('ack','POST',body)).status,200);assert.equal((await invoke('ack','POST',body)).status,200);
+ assert.equal((await(await invoke('export')).json()).records.length,0);assert.equal(s.calls.length,1);
+ assert.equal((await(await s.request({method:'GET',path:'/api/saved'})).json()).stations.length,1);
+});
+
+test('missing archive configuration and full backlog stop paid calls before spending',async()=>{
+ const s=setup();delete s.env.ARCHIVE_EXPORT_KEY;assert.equal((await s.request()).status,503);assert.equal(s.calls.length,0);
+ s.env.ARCHIVE_EXPORT_KEY='x'.repeat(43);s.records.set('archive-meta',{pending:Object.fromEntries(Array.from({length:200},(_,i)=>['event-'+i,{bytes:100,complete:true}]))});
+ assert.equal((await s.request()).status,503);assert.equal(s.calls.length,0);assert.equal(s.records.get('budget').used,0);
 });
