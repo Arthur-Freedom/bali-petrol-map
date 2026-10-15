@@ -189,7 +189,11 @@ test('failed and interrupted checks are dated events and do not replace previous
  s.advance(300001);
  const exported=await(await s.request({method:'GET',path:'/internal/archive/export',token:'x'.repeat(43),origin:null})).json();
  const events=exported.records.map(r=>JSON.parse(r.payload));assert.deepEqual(events.map(r=>r.status),['success','failed','failed']);
- assert.equal(events[0].requestedAtWita,'2026-10-15T00:00:00.000+08:00');assert.equal(events[2].errorCode,'interrupted');assert.equal(events[1].reading,undefined);
+ assert.equal(events[0].requestedAtWita,'2026-10-15T00:00:00.000+08:00');
+ // The two failed checks share a timestamp; UUID order is deliberately arbitrary.
+ assert.equal(events.find(event=>event.id===admission.reservations[0]).errorCode,'interrupted');
+ assert.equal(events.find(event=>event.stationId===id&&event.status==='failed').errorCode,'provider_unavailable');
+ for(const event of events.filter(event=>event.status==='failed'))assert.equal(event.reading,undefined);
 });
 
 test('archive credential can export and acknowledge, but cannot read owner session or spend traffic',async()=>{
