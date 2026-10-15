@@ -13,6 +13,7 @@
  function plan(id){return P.refreshPlan(id?stations.filter(s=>s.id===id):scopedStations(),scopeCenter(),budget,id?'area':mode());}
  function limits(data){if(data.stationNextAt)budget.stationNextAt=data.stationNextAt;if(Number.isFinite(data.resetAt))budget.resetAt=data.resetAt;if(Number.isFinite(data.remainingChecks))budget.remainingChecks=data.remainingChecks;for(const key of ['monthlyLimit','monthlyUsed','remainingMonthlyChecks','monthlyResetAt'])if(Number.isFinite(data[key]))budget[key]=data[key];}
  function waitLabel(p){return `Recheck in ${Math.max(1,Math.ceil((p.nextAt-Date.now())/60000))} min`;}
+ function retainedMessage(){return scopedStations().some(s=>s.checkedAt)?'Last measurements remain visible with their original times.':'No measurement is retained in this tab. Earlier checks were not archived and cannot be restored after a reload.';}
  function controls(){
    if(budget.resetAt&&Date.now()>=budget.resetAt)budget={...budget,remainingChecks:50,stationNextAt:{},resetAt:0};
    if(budget.monthlyResetAt&&Date.now()>=budget.monthlyResetAt)budget={...budget,remainingMonthlyChecks:budget.monthlyLimit,monthlyResetAt:0};
@@ -21,9 +22,10 @@
    const p=plan(),count=p.targets.length;
    $('traffic-refresh').disabled=pending||!verified||!count;
    $('traffic-refresh').textContent=pending?(progress?`Checking ${progress.done}/${progress.total}…`:'Preparing checks…'):!p.total?'No stations here':p.remainingChecks===0?(budget.remainingMonthlyChecks===0?'Monthly safety limit':'Daily budget used'):!count?waitLabel(p):mode()==='oldest'?`Refresh oldest ${count}`:p.limited?`Refresh next ${count}`:p.cooling?`Refresh remaining ${count}`:`Refresh area · ${count}`;
-   $('refresh-summary').textContent=!verified?`Sign in to refresh all ${p.total} stations here, or choose the oldest checks.`:p.remainingChecks===0?(budget.remainingMonthlyChecks===0?'Monthly safety limit reached. More checks next month.':'More checks after midnight in Bali.'):!p.total?'Choose another area or search.':!count?'These stations were checked recently. Other areas can be checked now.':mode()==='oldest'?'Unchecked stations first, then the oldest readings.':p.limited?`The remaining budget allows ${count} of ${p.eligible} due stations now.`:p.cooling?`${p.cooling} checked recently; ${count} can be checked now.`:`One click checks all ${count} stations. No wait between stations.`;
+   $('refresh-summary').textContent=!verified?`Sign in to refresh all ${p.total} stations here, or choose the oldest checks.`:p.remainingChecks===0?(budget.remainingMonthlyChecks===0?'Monthly safety limit reached. More checks next month. ':'More checks after midnight in Bali. ')+retainedMessage():!p.total?'Choose another area or search.':!count?'These stations were checked recently. Other areas can be checked now.':mode()==='oldest'?'Unchecked stations first, then the oldest readings.':p.limited?`The remaining budget allows ${count} of ${p.eligible} due stations now.`:p.cooling?`${p.cooling} checked recently; ${count} can be checked now.`:`One click checks all ${count} stations. No wait between stations.`;
    $('check-budget').hidden=!verified;$('check-budget').textContent=`${budget.remainingChecks} station checks left today · ${50-budget.remainingChecks}/50 used · ${budget.remainingMonthlyChecks}/${budget.monthlyLimit} left this month`;
    const button=$('refresh-station');if(button){const one=plan(button.dataset.id);button.hidden=!verified;button.disabled=pending||!one.targets.length;button.textContent=pending?'Checking traffic…':one.remainingChecks===0?(budget.remainingMonthlyChecks===0?'Monthly safety limit':'Daily budget used'):one.targets.length?'Refresh this station':waitLabel(one);}
+   const empty=$('empty-reading-note');if(empty&&verified&&p.remainingChecks===0)empty.textContent='No retained measurement for this station. Refreshes are paused by the spending limit; previous tabs were not archived.';
  }
  async function request(path,method='GET',body={}){
    const generation=epoch,handle=owner.get(),controller=new AbortController();requests.add(controller);
@@ -42,25 +44,40 @@
    if(!map||!mapReady)return;
    const visible=new Set(scopedStations().map(s=>s.id)),features=[];
    for(const data of live.readings.values()){
-     if(!visible.has(data.id)||data.refreshFailed||!P.fresh(data.checkedAt))continue;
-     const add=(segment,focus)=>features.push({type:'Feature',properties:{id:data.id,selected:data.id===selected,focus,color:segment.closed?'#343f49':segment.speed==='TRAFFIC_JAM'?'#b74335':segment.speed==='SLOW'?'#df931c':'#43855c'},geometry:{type:'LineString',coordinates:[segment.from,segment.to]}});
-     for(const segment of data.segments||[])add(segment,false);
-     for(const route of data.approach?.routes||[])for(const segment of route.segments)add(segment,true);
+     if(!visible.has(data.id)||!data.checkedAt)continue;
+     const stale=data.refreshFailed||!P.fresh(data.checkedAt);
+     const addSegments=(segments,focus)=>{
+       let previous;const same=(a,b)=>a.every((n,i)=>Math.abs(n-b[i])<1e-10);
+       for(const segment of segments){
+         const color=segment.closed?'#343f49':segment.speed==='TRAFFIC_JAM'?'#b74335':segment.speed==='SLOW'?'#df931c':'#43855c',points=previous?.geometry.coordinates;
+         // Keep continuous equal-colour geometry together so dashes do not
+         // restart on every five-metre sample. Never join across a gap.
+         if(previous?.properties.color===color&&same(points.at(-1),segment.from)){points.push(segment.to);continue;}
+         if(previous?.properties.color===color&&same(points[0],segment.to)){points.unshift(segment.from);continue;}
+         previous={type:'Feature',properties:{id:data.id,selected:data.id===selected,focus,stale:!!stale,color},geometry:{type:'LineString',coordinates:[segment.from,segment.to]}};features.push(previous);
+       }
+     };
+     addSegments(data.segments||[],false);
+     for(const route of data.approach?.routes||[])addSegments(route.segments,true);
    }
    const data={type:'FeatureCollection',features};
    if(map.getSource('station-traffic'))map.getSource('station-traffic').setData(data);
    else{
      map.addSource('station-traffic',{type:'geojson',data,attribution:'Traffic © <a href="https://www.tomtom.com/" target="_blank" rel="noopener">TomTom</a>'});
-     map.addLayer({id:'traffic-outline',type:'line',source:'station-traffic',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#fff','line-width':['case',['get','selected'],9,6],'line-opacity':['case',['get','focus'],.9,0]}});
-     map.addLayer({id:'traffic-colours',type:'line',source:'station-traffic',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['get','color'],'line-width':['case',['get','focus'],['case',['get','selected'],6,3],1.5],'line-opacity':['case',['get','focus'],.95,['case',['get','selected'],.5,.25]]}});
+     map.addLayer({id:'traffic-outline',type:'line',source:'station-traffic',filter:['==',['get','stale'],false],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#fff','line-width':['case',['get','selected'],9,6],'line-opacity':['case',['get','focus'],.9,0]}});
+     map.addLayer({id:'traffic-colours',type:'line',source:'station-traffic',filter:['==',['get','stale'],false],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['get','color'],'line-width':['case',['get','focus'],['case',['get','selected'],6,3],1.5],'line-opacity':['case',['get','focus'],.95,['case',['get','selected'],.5,.25]]}});
+     map.addLayer({id:'traffic-earlier-outline',type:'line',source:'station-traffic',filter:['==',['get','stale'],true],paint:{'line-color':'#fff','line-width':['case',['get','selected'],9,6],'line-dasharray':[2,2],'line-opacity':['case',['get','focus'],.7,0]}});
+     map.addLayer({id:'traffic-earlier-colours',type:'line',source:'station-traffic',filter:['==',['get','stale'],true],paint:{'line-color':['get','color'],'line-width':['case',['get','focus'],['case',['get','selected'],6,3],1.5],'line-dasharray':[2,2],'line-opacity':['case',['get','focus'],.65,['case',['get','selected'],.4,.2]]}});
    }
+   const earlier=features.some(f=>f.properties.stale);$('earlier-legend').hidden=!earlier;
+   if(live.active){$('map-layer-title').textContent=earlier?'LAST TRAFFIC MEASUREMENTS':'TRAFFIC AT MAPPED ACCESSES';$('map-layer-note').textContent=earlier?'Dashed colours: outdated · select a station for its time':'Bold: incoming approaches · faint: nearby roads';}
  }
  function showTraffic(){live.active=true;$('road-legend').hidden=false;$('map-layer-title').textContent='TRAFFIC AT MAPPED ACCESSES';$('map-layer-note').textContent='Bold: incoming approaches · faint: nearby roads';drawTraffic();}
  async function connect(){
    if(!owner.get()){status(owner.error||'Only Arthur-Freedom can request live traffic.');controls();return;}
    const generation=++epoch;verified=false;controls();status('Verifying your GitHub account…');
    try{const data=await request('/api/session');if(generation!==epoch)return;if(data.ownerId!=='18115558'||data.provider!=='tomtom-orbis-v2')throw Error('Traffic version changed. Reload this page and reconnect.');limits(data);await window.petrolReady;if(generation!==epoch)return;if(!dataset)throw Error('Station locations could not load. Reload the page to retry.');showTraffic();verified=true;status('Signed in as Arthur-Freedom.');}
-   catch(error){if(generation===epoch){verified=false;live.clear();status(error.message);}}finally{controls();}
+   catch(error){if(generation===epoch){verified=false;status(error.message+(live.readings.size?' Last measurements remain visible.':''));}}finally{controls();}
  }
  async function refresh(id){
    if(!verified||pending||!plan(id).targets.length)return;

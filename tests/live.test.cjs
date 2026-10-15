@@ -1,13 +1,13 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),P=require('../dist/core.js');
 const source=fs.readFileSync('dist/live.js','utf8');
 
-async function setup({onPost,onRequest,monthlyRemaining=900,provider='tomtom-orbis-v2'}={}){
+async function setup({onPost,onRequest,monthlyRemaining=900,dailyRemaining=50,provider='tomtom-orbis-v2'}={}){
  const elements=new Map(),events=new Map(),posts=[],sources=new Map(),layers=[],timers=new Map(),scripts=[];
  let handle='remembered.'+'a'.repeat(43),timerId=0;
  const element=id=>({id,hidden:false,disabled:false,checked:false,value:id==='refresh-mode'?'area':'',dataset:{},style:{},remove(){this.removed=true;},addEventListener:(name,fn)=>events.set(id+':'+name,fn),querySelector:()=>({textContent:''})});
  const $=id=>id==='refresh-station'&&!elements.has(id)?null:(elements.has(id)?elements.get(id):(elements.set(id,element(id)),elements.get(id)));
  const base=Array.from({length:15},(_,i)=>({id:'s'+i,coordinates:[115+i*.001,-8],shortName:'Station '+i,checkedAt:null}));
- let remainingChecks=50,stationNextAt={};
+ let remainingChecks=dailyRemaining,stationNextAt={};
  const limits=()=>({remainingChecks,stationNextAt:{...stationNextAt},resetAt:Date.now()+86400000,monthlyLimit:900,remainingMonthlyChecks:monthlyRemaining,monthlyResetAt:Date.now()+86400000});
  class MapStub{panTo(){}setZoom(){}fitBounds(){}addListener(){}getZoom(){return 13}}
  const context={P,$,selected:null,stations:base,dataset:{stations:base},mapReady:true,map:{resize(){},isStyleLoaded:()=>false,getSource:id=>sources.get(id),addSource(id,source){sources.set(id,{...source,setData(data){this.data=data;}});},addLayer(layer){layers.push(layer);}},scopeCenter:()=>[115,-8],scopedStations:()=>context.stations,
@@ -51,13 +51,50 @@ test('changing areas stops further paid batches after the in-flight batch finish
 });
 
 test('map colours use exactly the validated readings, with selection emphasis and no provider calls on map movement',async()=>{
- const s=await setup();assert.equal(s.posts.length,0);assert.equal(s.layers.length,2);
+ const s=await setup();assert.equal(s.posts.length,0);assert.equal(s.layers.length,4);
  await s.context.PetrolLive.refreshStation('s3');
  let features=s.sources.get('station-traffic').data.features;
  assert.equal(features.length,1);assert.equal(features[0].properties.color,'#43855c');assert.equal(features[0].properties.selected,false);
  s.context.selected='s3';s.context.PetrolLive.updateMarkers();features=s.sources.get('station-traffic').data.features;assert.equal(features[0].properties.selected,true);assert.equal(s.posts.length,1);
- s.context.PetrolLive.readings.get('s3').checkedAt=new Date(Date.now()-900001).toISOString();s.context.PetrolLive.updateMarkers();assert.equal(s.sources.get('station-traffic').data.features.length,0);
+ s.context.PetrolLive.readings.get('s3').checkedAt=new Date(Date.now()-900001).toISOString();s.context.PetrolLive.updateMarkers();
+ features=s.sources.get('station-traffic').data.features;assert.equal(features.length,1);assert.equal(features[0].properties.stale,true);assert.equal(features[0].properties.color,'#43855c');assert.equal(s.$('earlier-legend').hidden,false);assert.match(s.$('map-layer-note').textContent,/outdated/);
+ assert.deepEqual(Array.from(s.layers.find(l=>l.id==='traffic-earlier-colours').paint['line-dasharray']),[2,2]);
  s.context.PetrolLive.clear();assert.equal(s.sources.get('station-traffic').data.features.length,0);assert.equal(s.$('road-legend').hidden,true);
+});
+
+test('using the last daily check retains the measurement and blocks all further paid requests',async()=>{
+ const s=await setup({dailyRemaining:1});await s.context.PetrolLive.refreshStation('s3');
+ const reading=s.context.PetrolLive.readings.get('s3'),time=reading.checkedAt;
+ assert.equal(s.$('traffic-refresh').textContent,'Daily budget used');assert.equal(s.$('traffic-refresh').disabled,true);
+ assert.match(s.$('refresh-summary').textContent,/Last measurements remain visible with their original times/);
+ await s.context.PetrolLive.refreshStation('s3');await s.events.get('traffic-refresh:click')();
+ assert.equal(s.posts.length,1);assert.equal(s.context.PetrolLive.readings.get('s3').checkedAt,time);assert.equal(s.sources.get('station-traffic').data.features.length,1);
+});
+
+test('outdated approach dashes follow continuous geometry without joining gaps or colour changes',async()=>{
+ const s=await setup();await s.context.PetrolLive.refreshStation('s3');const reading=s.context.PetrolLive.readings.get('s3');
+ reading.checkedAt=new Date(Date.now()-3600000).toISOString();
+ const point=n=>[115.003+n*.00001,-8],edge=(a,b,speed='SLOW')=>({from:point(a),to:point(b),speed,closed:false});
+ reading.approach.routes=[{segments:[edge(1,0),edge(2,1),edge(4,3),edge(5,4,'TRAFFIC_JAM')]}];
+ s.context.PetrolLive.updateMarkers();const approach=s.sources.get('station-traffic').data.features.filter(f=>f.properties.focus);
+ assert.equal(approach.length,3);assert.deepEqual(JSON.parse(JSON.stringify(approach[0].geometry.coordinates)),[point(2),point(1),point(0)]);
+ assert.ok(approach.every(f=>f.properties.stale));assert.notEqual(approach[1].properties.color,approach[2].properties.color);
+});
+
+test('zero budget on a new tab explains missing history without inventing or fetching readings',async()=>{
+ const s=await setup({dailyRemaining:0});
+ assert.equal(s.posts.length,0);assert.equal(s.context.PetrolLive.readings.size,0);
+ assert.match(s.$('refresh-summary').textContent,/not archived.*cannot be restored after a reload/);
+});
+
+test('a transient reconnect failure preserves the last result, but a revoked session still clears it',async()=>{
+ let state='ok';
+ const s=await setup({onRequest:()=>{if(state==='offline')throw new TypeError('fetch failed');if(state==='revoked')return new Response(JSON.stringify({error:'Session expired'}),{status:401});}});
+ await s.context.PetrolLive.refreshStation('s3');const time=s.context.PetrolLive.readings.get('s3').checkedAt;
+ state='offline';await s.events.get('owner-login:click')();
+ assert.equal(s.context.PetrolLive.readings.get('s3').checkedAt,time);assert.equal(s.sources.get('station-traffic').data.features.length,1);
+ assert.match(s.$('owner-status').textContent,/Last measurements remain visible/);assert.equal(s.$('traffic-refresh').hidden,true);
+ state='revoked';await s.events.get('owner-login:click')();assert.equal(s.context.PetrolLive.readings.size,0);assert.equal(s.posts.length,1);
 });
 
 test('an area refresh stops at the monthly balance and explains the monthly stop',async()=>{
