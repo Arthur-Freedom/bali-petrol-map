@@ -1,7 +1,7 @@
 import P from '../dist/core.js';
 import CATALOGUE from './stations.mjs';
 
-const MAX_PENDING=200, MAX_PENDING_BYTES=64*1024*1024, MAX_RECORD_BYTES=900000, PAGE_BYTES=1500000;
+export const MAX_PENDING=2000, MAX_PENDING_BYTES=256*1024*1024, MAX_RECORD_BYTES=900000, PAGE_BYTES=1500000;
 const errors=new Set(['provider_limit','provider_auth','provider_unavailable','provider_data','no_coverage','interrupted']);
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json'}});
 const stamp=time=>new Date(time).toISOString();

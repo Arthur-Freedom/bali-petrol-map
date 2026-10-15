@@ -1,6 +1,9 @@
 export const ORIGIN='https://arthur-freedom.github.io';
 export const OWNER='18115558';
-export const COOLDOWN=15*60*1000, DAILY_LIMIT=50, MONTHLY_LIMIT=900;
+// At most four tiles/check: 4,000/day and 80,000/month. This leaves headroom
+// below the published 200,000 monthly traffic vector tiles (15 Oct 2026).
+// These are app safety caps; provider/account limits still apply.
+export const COOLDOWN=15*60*1000, DAILY_LIMIT=1000, MONTHLY_LIMIT=20000;
 const AUTH='https://bali-cinema-owner-refresh.honeymooninbali.workers.dev';
 // Version 82b0f03f rejected redirect:error before any provider call. Recover
 // only recorded admissions after its deployment, once, without raising limits.
@@ -75,7 +78,7 @@ export class TrafficBudget {
     if(saved.day===day&&saved.nextAt&&!saved.groups)groups[STATIONS.map(s=>s.id).sort().join(',')]=saved.nextAt;
     const stationNextAt=saved.day===day?{...saved.stationNextAt}:{};
     for(const [group,time] of Object.entries(groups))for(const id of group.split(','))stationNextAt[id]=Math.max(stationNextAt[id]||0,time);
-    const limits=(spent=used,monthSpent=monthlyUsed)=>({groups,stationNextAt,resetAt:midnight,dailyNextAt:spent>=DAILY_LIMIT?midnight:0,remainingChecks:Math.max(0,DAILY_LIMIT-spent),remaining:Math.max(0,Math.floor(Math.min(DAILY_LIMIT-spent,MONTHLY_LIMIT-monthSpent)/5)),monthlyLimit:MONTHLY_LIMIT,monthlyUsed:monthSpent,remainingMonthlyChecks:Math.max(0,MONTHLY_LIMIT-monthSpent),monthlyResetAt});
+    const limits=(spent=used,monthSpent=monthlyUsed)=>({dailyLimit:DAILY_LIMIT,dailyUsed:spent,groups,stationNextAt,resetAt:midnight,dailyNextAt:spent>=DAILY_LIMIT?midnight:0,remainingChecks:Math.max(0,DAILY_LIMIT-spent),remaining:Math.max(0,Math.floor(Math.min(DAILY_LIMIT-spent,MONTHLY_LIMIT-monthSpent)/5)),monthlyLimit:MONTHLY_LIMIT,monthlyUsed:monthSpent,remainingMonthlyChecks:Math.max(0,MONTHLY_LIMIT-monthSpent),monthlyResetAt});
     if(request.method==='GET'){
       if(!saved.month)await this.storage.put('budget',{day,used,month,monthlyUsed,groups,stationNextAt,tomtomRuntimeFix:true,recoveredChecks:saved.recoveredChecks||0});
       return json({...limits(),archive:await this.archive.status()});
@@ -85,7 +88,7 @@ export class TrafficBudget {
     const ids=group.split(',');
     if(ids.length>5||new Set(ids).size!==ids.length||!ids.every(id=>CATALOGUE.some(s=>s.id===id)))return json({error:'Invalid stations.'},400);
     if(monthlyUsed+ids.length>MONTHLY_LIMIT)return json({...limits(),error:'Monthly safety limit reached. Traffic checks resume next month.'},429);
-    if(used+ids.length>DAILY_LIMIT)return json({...limits(),error:'Daily station-check budget reached. More checks after midnight in Bali.'},429);
+    if(used+ids.length>DAILY_LIMIT)return json({...limits(),error:'This app’s daily refresh limit is reached. Saved readings remain available; new checks resume after midnight in Bali.'},429);
     if(ids.some(id=>now<(stationNextAt[id]||0)))return json({...limits(),error:'A station in this request was checked recently. Other stations can be checked now.'},429);
     groups[group]=now+COOLDOWN;
     for(const id of ids)stationNextAt[id]=now+COOLDOWN;

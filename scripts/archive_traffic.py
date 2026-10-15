@@ -97,7 +97,7 @@ def save_page(repo, entries, catalogue):
     index['updatedAt'] = max(index.get('updatedAt') or '', *(json.loads(e['payload'])['completedAt'] for e in entries))
     index_path.write_text(json.dumps(index, indent=2, sort_keys=True) + '\n', encoding='utf-8')
     for day in affected:
-        # Rebuild a bounded daily CSV from immutable snapshots (max 50 checks/day).
+        # Rebuild a bounded daily CSV from immutable snapshots (max 1,000 checks/day).
         rows = []
         for path in sorted((repo / 'history' / day).glob('*.json')):
             event = json.loads(path.read_text(encoding='utf-8'))
@@ -120,7 +120,7 @@ def run(repo, catalogue, send=api):
     if git(repo, 'branch', '--show-current') != 'traffic-history' or git(repo, 'status', '--porcelain'):
         raise RuntimeError('A clean traffic-history checkout is required.')
     archived = 0
-    for _ in range(20):
+    for _ in range(100):
         page = send('export')
         if page.get('schemaVersion') != 1 or not isinstance(page.get('records'), list) or len(page['records']) > 20:
             raise ValueError('Invalid export response.')

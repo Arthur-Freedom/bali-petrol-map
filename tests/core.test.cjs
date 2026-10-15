@@ -115,3 +115,10 @@ test('bounded and uncertain lengths are labelled honestly, and capped readings t
  assert.equal(P.approachLabel({...r,extent:'gap',continuousSlowMetres:80}),'At least 80 m');assert.equal(P.approachLabel({...r,continuousSlowMetres:null}),'Unknown');
  const orange=station('orange',0,{slowMetres:200});assert.equal(P.compareTraffic(limit,orange),0);
 });
+
+
+test('daily rollover uses the server ceiling rather than restoring the old 50-check cap',()=>{
+ const list=Array.from({length:75},(_,i)=>station('s'+i,null));
+ const plan=P.refreshPlan(list,[115,-8],{dailyLimit:1000,remainingChecks:0,resetAt:now-1,monthlyLimit:20000,remainingMonthlyChecks:500},'area',now);
+ assert.equal(plan.targets.length,75);assert.equal(plan.batches.length,15);assert.equal(plan.remainingChecks,500);
+});

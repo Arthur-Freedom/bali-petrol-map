@@ -1,14 +1,14 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),P=require('../dist/core.js');
 const source=fs.readFileSync('dist/live.js','utf8');
 
-async function setup({onPost,onRequest,monthlyRemaining=900,dailyRemaining=50,provider='tomtom-orbis-v2',savedReadings=[],initialHandle='remembered.'+'a'.repeat(43)}={}){
+async function setup({onPost,onRequest,monthlyRemaining=900,dailyRemaining=50,dailyLimit=50,monthlyLimit=900,provider='tomtom-orbis-v2',savedReadings=[],initialHandle='remembered.'+'a'.repeat(43)}={}){
  const elements=new Map(),events=new Map(),posts=[],sources=new Map(),layers=[],timers=new Map(),scripts=[];
  let handle=initialHandle,timerId=0;
  const element=id=>({id,hidden:false,disabled:false,checked:false,value:id==='refresh-mode'?'area':'',dataset:{},style:{},remove(){this.removed=true;},addEventListener:(name,fn)=>events.set(id+':'+name,fn),querySelector:()=>({textContent:''})});
  const $=id=>id==='refresh-station'&&!elements.has(id)?null:(elements.has(id)?elements.get(id):(elements.set(id,element(id)),elements.get(id)));
  const base=Array.from({length:15},(_,i)=>({id:'s'+i,coordinates:[115+i*.001,-8],shortName:'Station '+i,checkedAt:null}));
  let remainingChecks=dailyRemaining,stationNextAt={};
- const limits=()=>({remainingChecks,stationNextAt:{...stationNextAt},resetAt:Date.now()+86400000,monthlyLimit:900,remainingMonthlyChecks:monthlyRemaining,monthlyResetAt:Date.now()+86400000});
+ const limits=()=>({dailyLimit,dailyUsed:dailyLimit-remainingChecks,remainingChecks,stationNextAt:{...stationNextAt},resetAt:Date.now()+86400000,monthlyLimit,remainingMonthlyChecks:monthlyRemaining,monthlyResetAt:Date.now()+86400000});
  class MapStub{panTo(){}setZoom(){}fitBounds(){}addListener(){}getZoom(){return 13}}
  const context={P,$,selected:null,stations:base,dataset:{stations:base},mapReady:true,map:{resize(){},isStyleLoaded:()=>false,getSource:id=>sources.get(id),addSource(id,source){sources.set(id,{...source,setData(data){this.data=data;}});},addLayer(layer){layers.push(layer);}},scopeCenter:()=>[115,-8],scopedStations:()=>context.stations,
   updateMarker(){},renderList(){},renderDetail(){},updateSnapshot(){},selectStation(){},
@@ -66,7 +66,7 @@ test('map colours use exactly the validated readings, with selection emphasis an
 test('using the last daily check retains the measurement and blocks all further paid requests',async()=>{
  const s=await setup({dailyRemaining:1});await s.context.PetrolLive.refreshStation('s3');
  const reading=s.context.PetrolLive.readings.get('s3'),time=reading.checkedAt;
- assert.equal(s.$('traffic-refresh').textContent,'Daily budget used');assert.equal(s.$('traffic-refresh').disabled,true);
+ assert.equal(s.$('traffic-refresh').textContent,'Daily refresh limit');assert.equal(s.$('traffic-refresh').disabled,true);
  assert.match(s.$('refresh-summary').textContent,/Saved measurements remain visible with their original times/);
  await s.context.PetrolLive.refreshStation('s3');await s.events.get('traffic-refresh:click')();
  assert.equal(s.posts.length,1);assert.equal(s.context.PetrolLive.readings.get('s3').checkedAt,time);assert.equal(s.sources.get('station-traffic').data.features.length,1);
@@ -211,4 +211,14 @@ test('signed-out visitors load the public GitHub backup without calling the Work
  assert.equal(urls.length,2);assert.equal(s.posts.length,0);assert.equal(s.context.PetrolLive.readings.get('s3').checkedAt,saved.checkedAt);
  assert.equal(s.$('traffic-refresh').hidden,true);assert.equal(s.$('archive-status').hidden,false);assert.match(s.$('archive-status').textContent,/GitHub backup/);
  assert.equal(s.sources.get('station-traffic').data.features[0].properties.stale,true);
+});
+
+
+test('server allowance replaces the old 50-check cap and shows accurate usage',async()=>{
+ const s=await setup({dailyRemaining:950,dailyLimit:1000,monthlyRemaining:19100,monthlyLimit:20000});
+ assert.equal(s.$('traffic-refresh').disabled,false);
+ assert.match(s.$('check-budget').textContent,/950 station checks left today.*50\/1000 used.*19100\/20000/);
+ await s.events.get('traffic-refresh:click')();
+ assert.equal(s.posts.flat().length,15);assert.equal(s.context.PetrolLive.readings.size,15);
+ assert.match(s.$('check-budget').textContent,/935 station checks left today.*65\/1000 used/);
 });

@@ -24,7 +24,7 @@ test('complete refresh executes in workerd with its native fetch, real budget ob
   const invoke=(authorization=token)=>mf.dispatchFetch('https://test/api/refresh',{method:'POST',headers:{Origin:origin,Authorization:authorization,'Content-Type':'application/json'},body:JSON.stringify({stationIds:['bypass-27']})});
   assert.equal((await invoke('Bearer fake')).status,401);assert.equal(calls,0);
   const response=await invoke(),data=await response.json();assert.equal(response.status,200);
-  assert.equal(data.stations[0].provider,'tomtom-orbis-v2',JSON.stringify(data.stations));assert.ok(data.stations[0].jamMetres>=199);assert.equal(data.remainingChecks,49);assert.equal(calls,2);
+  assert.equal(data.stations[0].provider,'tomtom-orbis-v2',JSON.stringify(data.stations));assert.ok(data.stations[0].jamMetres>=199);assert.equal(data.dailyLimit,1000);assert.equal(data.dailyUsed,1);assert.equal(data.remainingChecks,999);assert.equal(calls,2);
   assert.equal(data.stations[0].approach.status,'matched');assert.equal(data.stations[0].approach.routes[0].continuousSlowMetres,200);assert.equal(P.validReading(data.stations[0],station.id,Date.now(),station.end),true);
   assert.equal((await invoke()).status,429);assert.equal(calls,2);
   assert.equal(data.archive.saved,true);

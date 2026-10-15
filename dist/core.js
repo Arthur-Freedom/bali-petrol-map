@@ -58,7 +58,7 @@
    const cooling=list.filter(s=>(stationNextAt[s.id]||0)>now);
    const ready=list.filter(s=>(stationNextAt[s.id]||0)<=now);
    const wanted=mode==='oldest'?ready.slice(0,5):ready;
-   const daily=budget.resetAt&&now>=budget.resetAt?50:Math.max(0,budget.remainingChecks??50);
+   const daily=budget.resetAt&&now>=budget.resetAt?(budget.dailyLimit??50):Math.max(0,budget.remainingChecks??50);
    const monthly=budget.monthlyResetAt&&now>=budget.monthlyResetAt?(budget.monthlyLimit??900):Math.max(0,budget.remainingMonthlyChecks??900);
    const available=Math.min(daily,monthly);
    const targets=wanted.slice(0,available),batches=[];

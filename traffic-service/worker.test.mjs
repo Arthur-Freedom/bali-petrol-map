@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createHandler,TrafficBudget,measure,metres,ORIGIN,OWNER,COOLDOWN,STATIONS,ALL_STATIONS} from './worker.mjs';
+import {createHandler,TrafficBudget,measure,metres,ORIGIN,OWNER,COOLDOWN,DAILY_LIMIT,MONTHLY_LIMIT,STATIONS,ALL_STATIONS} from './worker.mjs';
 import P from '../dist/core.js';
+import {MAX_PENDING,MAX_PENDING_BYTES} from './archive.mjs';
 import {memoryStorage} from './test-storage.mjs';
 const json=(x,status=200)=>new Response(JSON.stringify(x),{status});
 function encode(points){let lat=0,lng=0,out='';const number=n=>{let v=n<0?~(n<<1):n<<1,s='';while(v>=32){s+=String.fromCharCode((32|(v&31))+63);v>>=5;}return s+String.fromCharCode(v+63);};for(const p of points){const a=Math.round(p[1]*1e5),b=Math.round(p[0]*1e5);out+=number(a-lat)+number(b-lng);lat=a;lng=b;}return out;}
@@ -26,21 +27,22 @@ test('unauthenticated, wrong identity, spoofed origin and arbitrary body make ze
 test('concurrent owner refreshes admit only five fixed station checks and never return the key',async()=>{
  const s=setup(),responses=await Promise.all([s.request(),s.request()]);assert.deepEqual(responses.map(x=>x.status).sort(),[200,429]);assert.equal(s.calls.length,5);assert.equal(s.authCalls(),2);
  const response=responses.find(r=>r.ok),text=await response.text();assert.ok(!text.includes('secret-key'));assert.equal(response.headers.get('Cache-Control'),'no-store');
- const data=JSON.parse(text);assert.equal(data.stations.length,5);assert.ok(data.stations.every(x=>x.jamMetres===0&&x.checkedAt));assert.equal(data.remaining,9);
+ const data=JSON.parse(text);assert.equal(data.stations.length,5);assert.ok(data.stations.every(x=>x.jamMetres===0&&x.checkedAt));assert.equal(data.remaining,Math.floor((DAILY_LIMIT-5)/5));
  for(let i=0;i<5;i++){assert.deepEqual(s.calls[i].station,[...STATIONS].sort((a,b)=>a.id<b.id?-1:1)[i]);assert.equal(s.calls[i].key,'secret-key');}
  assert.equal(data.archive.saved,true);assert.equal(data.archive.pendingChecks,5);assert.equal([...s.records.keys()].filter(k=>k.startsWith('latest:')).length,5);assert.ok(!JSON.stringify([...s.records]).includes('secret-key'));
 });
 test('daily budget survives cooldowns and resets at Bali midnight',async()=>{
- const s=setup();for(let i=0;i<10;i++){assert.equal((await s.request()).status,200);s.advance(COOLDOWN);}
- assert.equal((await s.request()).status,429);assert.equal(s.calls.length,50);s.advance(86400000);assert.equal((await s.request()).status,200);
+ const s=setup();s.records.set('budget',{day:'2026-10-15',used:DAILY_LIMIT-10,month:'2026-10',monthlyUsed:DAILY_LIMIT-10,tomtomRuntimeFix:true});
+ for(let i=0;i<2;i++){assert.equal((await s.request()).status,200);s.advance(COOLDOWN);}
+ assert.equal((await s.request()).status,429);assert.equal(s.calls.length,10);s.advance(86400000);assert.equal((await s.request()).status,200);
 });
 test('partial upstream failure does not invent clear roads or a fresh timestamp',async()=>{
- const s=setup({upstream:()=>json({error:{message:'secret-key internal'}},403)}),r=await s.request(),data=await r.json();assert.ok(data.stations.every(s=>s.error&&!s.checkedAt&&s.jamMetres===undefined));assert.ok(!JSON.stringify(data).includes('secret-key'));assert.equal(data.remaining,9);
+ const s=setup({upstream:()=>json({error:{message:'secret-key internal'}},403)}),r=await s.request(),data=await r.json();assert.ok(data.stations.every(s=>s.error&&!s.checkedAt&&s.jamMetres===undefined));assert.ok(!JSON.stringify(data).includes('secret-key'));assert.equal(data.remaining,Math.floor((DAILY_LIMIT-5)/5));
 });
 
 test('TomTom quota errors are distinguishable so the client can stop the remaining area checks',async()=>{
  const s=setup({upstream:()=>json({},429)}),data=await(await s.request()).json();
- assert.equal(data.remainingChecks,45);assert.equal(s.calls.length,5);
+ assert.equal(data.remainingChecks,DAILY_LIMIT-5);assert.equal(s.calls.length,5);
  assert.ok(data.stations.every(s=>s.errorCode==='provider_limit'&&!s.checkedAt&&s.jamMetres===undefined));
 });
 test('segment lengths use metres, shared endpoints once, clipped final kilometre',()=>{
@@ -72,54 +74,59 @@ test('worker catalogue matches the public locations exactly',async()=>{
 test('15 distinct stations can be checked back-to-back at the same time',async()=>{
  const s=setup(),ids=ALL_STATIONS.slice(0,15).map(s=>s.id);let data;
  for(let i=0;i<15;i+=5){const r=await s.request({body:JSON.stringify({stationIds:ids.slice(i,i+5)})});assert.equal(r.status,200);data=await r.json();}
- assert.equal(s.calls.length,15);assert.equal(data.remainingChecks,35);
+ assert.equal(s.calls.length,15);assert.equal(data.remainingChecks,DAILY_LIMIT-15);
 });
 
 test('single station uses one check and cannot bypass cooldown by changing groups',async()=>{
  const s=setup(),ids=ALL_STATIONS.slice(0,2).map(s=>s.id);
- let r=await s.request({body:JSON.stringify({stationIds:[ids[0]]})});assert.equal((await r.json()).remainingChecks,49);
+ let r=await s.request({body:JSON.stringify({stationIds:[ids[0]]})});assert.equal((await r.json()).remainingChecks,DAILY_LIMIT-1);
  assert.equal((await s.request({body:JSON.stringify({stationIds:ids})})).status,429);assert.equal(s.calls.length,1);
- r=await s.request({body:JSON.stringify({stationIds:[ids[1]]})});assert.equal(r.status,200);assert.equal((await r.json()).remainingChecks,48);
+ r=await s.request({body:JSON.stringify({stationIds:[ids[1]]})});assert.equal(r.status,200);assert.equal((await r.json()).remainingChecks,DAILY_LIMIT-2);
 });
 
-test('single-station refreshes still stop at exactly 50 daily station checks',async()=>{
- const s=setup();for(const station of ALL_STATIONS.slice(0,50))assert.equal((await s.request({body:JSON.stringify({stationIds:[station.id]})})).status,200);
- assert.equal((await s.request({body:JSON.stringify({stationIds:[ALL_STATIONS[50].id]})})).status,429);assert.equal(s.calls.length,50);
+test('previously exhausted 50-check usage is retained while a whole Bali scan is admitted',async()=>{
+ const s=setup();s.records.set('budget',{day:'2026-10-15',used:50,month:'2026-10',monthlyUsed:900,tomtomRuntimeFix:true});
+ let data=await(await s.request({method:'GET',path:'/api/session'})).json();
+ assert.equal(data.dailyLimit,1000);assert.equal(data.monthlyLimit,20000);assert.equal(data.dailyUsed,50);assert.equal(data.monthlyUsed,900);
+ assert.equal(data.remainingChecks,950);assert.equal(s.calls.length,0);
+ for(let i=0;i<ALL_STATIONS.length;i+=5){const response=await s.request({body:JSON.stringify({stationIds:ALL_STATIONS.slice(i,i+5).map(s=>s.id)})});assert.equal(response.status,200);}
+ data=await(await s.request({method:'GET',path:'/api/session'})).json();
+ assert.equal(s.calls.length,293);assert.equal(data.dailyUsed,343);assert.equal(data.monthlyUsed,1193);assert.equal(data.archive.pendingChecks,293);
 });
 
 test('migration preserves previous spending and cooldowns across overlapping selections',async()=>{
  const s=setup(),day='2026-10-15',id=STATIONS[0].id,nextAt=Date.parse(day+'T00:15:00+08:00');
  s.records.set('budget',{day,count:3,groups:{[STATIONS.map(s=>s.id).sort().join(',')]:nextAt}});
- let data=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(data.remainingChecks,35);assert.equal(data.stationNextAt[id],nextAt);
+ let data=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(data.remainingChecks,DAILY_LIMIT-15);assert.equal(data.stationNextAt[id],nextAt);
  assert.equal((await s.request({body:JSON.stringify({stationIds:[id]})})).status,429);
  assert.equal((await s.request({body:JSON.stringify({stationIds:[ALL_STATIONS[10].id]})})).status,200);
- data=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(data.remainingChecks,34);
+ data=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(data.remainingChecks,DAILY_LIMIT-16);
 });
 
 test('concurrent distinct requests cannot exceed the final daily check',async()=>{
- const s=setup();s.records.set('budget',{day:'2026-10-15',used:49,stationNextAt:{},groups:{}});
+ const s=setup();s.records.set('budget',{day:'2026-10-15',used:DAILY_LIMIT-1,stationNextAt:{},groups:{}});
  const results=await Promise.all(ALL_STATIONS.slice(0,2).map(station=>s.request({body:JSON.stringify({stationIds:[station.id]})})));
- assert.deepEqual(results.map(r=>r.status).sort(),[200,429]);assert.equal(s.calls.length,1);assert.equal(s.records.get('budget').used,50);
+ assert.deepEqual(results.map(r=>r.status).sort(),[200,429]);assert.equal(s.calls.length,1);assert.equal(s.records.get('budget').used,DAILY_LIMIT);
 });
 
-test('monthly limit survives daily resets and atomically blocks the 901st check',async()=>{
- const s=setup();s.records.set('budget',{day:'2026-10-15',used:0,month:'2026-10',monthlyUsed:899,stationNextAt:{},groups:{}});
+test('monthly limit survives daily resets and atomically blocks beyond its configured ceiling',async()=>{
+ const s=setup();s.records.set('budget',{day:'2026-10-15',used:0,month:'2026-10',monthlyUsed:MONTHLY_LIMIT-1,stationNextAt:{},groups:{}});
  const results=await Promise.all(ALL_STATIONS.slice(0,2).map(station=>s.request({body:JSON.stringify({stationIds:[station.id]})})));
- assert.deepEqual(results.map(r=>r.status).sort(),[200,429]);assert.equal(s.calls.length,1);assert.equal(s.records.get('budget').monthlyUsed,900);
+ assert.deepEqual(results.map(r=>r.status).sort(),[200,429]);assert.equal(s.calls.length,1);assert.equal(s.records.get('budget').monthlyUsed,MONTHLY_LIMIT);
  s.advance(86400000);assert.equal((await s.request()).status,429);assert.equal(s.calls.length,1);
- const limits=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(limits.remainingChecks,50);assert.equal(limits.remainingMonthlyChecks,0);assert.equal(limits.monthlyResetAt,Date.parse('2026-11-01T00:00:00+08:00'));
+ const limits=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(limits.remainingChecks,DAILY_LIMIT);assert.equal(limits.remainingMonthlyChecks,0);assert.equal(limits.monthlyResetAt,Date.parse('2026-11-01T00:00:00+08:00'));
  s.advance(16*86400000);assert.equal((await s.request()).status,200);assert.equal(s.records.get('budget').monthlyUsed,5);
 });
 
 test('failed upstream requests consume the monthly budget, without retries',async()=>{
- const s=setup({upstream:()=>json({},500)});s.records.set('budget',{day:'2026-10-15',used:0,month:'2026-10',monthlyUsed:895});
+ const s=setup({upstream:()=>json({},500)});s.records.set('budget',{day:'2026-10-15',used:0,month:'2026-10',monthlyUsed:MONTHLY_LIMIT-5});
  const data=await(await s.request()).json();assert.equal(data.remainingMonthlyChecks,0);assert.equal(s.calls.length,5);
  s.advance(COOLDOWN);assert.equal((await s.request()).status,429);assert.equal(s.calls.length,5);
 });
 
 test('migrating the first usage day preserves charges even if first reconnect is tomorrow',async()=>{
  const s=setup();s.records.set('budget',{day:'2026-10-15',used:22,stationNextAt:{},groups:{}});s.advance(86400000);
- const data=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(data.monthlyUsed,22);assert.equal(data.remainingChecks,50);assert.equal(s.records.get('budget').monthlyUsed,22);
+ const data=await(await s.request({method:'GET',path:'/api/session'})).json();assert.equal(data.monthlyUsed,22);assert.equal(data.remainingChecks,DAILY_LIMIT);assert.equal(s.records.get('budget').monthlyUsed,22);
 });
 
 test('disabled or missing kill-switch configuration exposes no key and makes no paid calls',async()=>{
@@ -159,17 +166,17 @@ test('runtime incident restores only recorded broken-deployment admissions, exac
  s.advance(11.5*3600000);
  s.records.set('budget',{day:'2026-10-15',used:46,month:'2026-10',monthlyUsed:46,groups:{[oldId]:oldAt,[failedIds.join(',')]:failedAt},stationNextAt:{[oldId]:oldAt,...Object.fromEntries(failedIds.map(id=>[id,failedAt]))}});
  const session=()=>s.request({method:'GET',path:'/api/session'}).then(r=>r.json());
- const data=await session();assert.equal(data.remainingChecks,6);assert.equal(data.remainingMonthlyChecks,856);assert.equal(data.stationNextAt[oldId],oldAt);assert.equal(data.stationNextAt[failedIds[0]],undefined);
- assert.equal((await session()).remainingChecks,6);assert.equal(s.records.get('budget').recoveredChecks,2);
+ const data=await session();assert.equal(data.remainingChecks,DAILY_LIMIT-44);assert.equal(data.remainingMonthlyChecks,MONTHLY_LIMIT-44);assert.equal(data.stationNextAt[oldId],oldAt);assert.equal(data.stationNextAt[failedIds[0]],undefined);
+ assert.equal((await session()).remainingChecks,DAILY_LIMIT-44);assert.equal(s.records.get('budget').recoveredChecks,2);
  assert.equal((await s.request({body:JSON.stringify({stationIds:failedIds})})).status,200);
- assert.equal((await session()).remainingChecks,4);assert.equal((await session()).remainingMonthlyChecks,854);
+ assert.equal((await session()).remainingChecks,DAILY_LIMIT-46);assert.equal((await session()).remainingMonthlyChecks,MONTHLY_LIMIT-46);
 });
 
 
 test('saved results survive a new object, exhausted budget and a paused provider',async()=>{
  const s=setup(),id=STATIONS[0].id;
  const data=await(await s.request({body:JSON.stringify({stationIds:[id]})})).json(),checkedAt=data.stations[0].checkedAt;
- const counters=s.records.get('budget');s.records.set('budget',{...counters,used:50,monthlyUsed:900});
+ const counters=s.records.get('budget');s.records.set('budget',{...counters,used:DAILY_LIMIT,monthlyUsed:MONTHLY_LIMIT});
  s.advance(3600000);s.env.PAID_FEATURES_ENABLED='false';
  const restarted=new TrafficBudget({storage:memoryStorage(s.records)});
  s.env.TRAFFIC_BUDGET.get=()=>restarted;
@@ -212,6 +219,12 @@ test('archive credential can export and acknowledge, but cannot read owner sessi
 
 test('missing archive configuration and full backlog stop paid calls before spending',async()=>{
  const s=setup();delete s.env.ARCHIVE_EXPORT_KEY;assert.equal((await s.request()).status,503);assert.equal(s.calls.length,0);
- s.env.ARCHIVE_EXPORT_KEY='x'.repeat(43);s.records.set('archive-meta',{pending:Object.fromEntries(Array.from({length:200},(_,i)=>['event-'+i,{bytes:100,complete:true}]))});
+ s.env.ARCHIVE_EXPORT_KEY='x'.repeat(43);s.records.set('archive-meta',{pending:Object.fromEntries(Array.from({length:MAX_PENDING},(_,i)=>['event-'+i,{bytes:100,complete:true}]))});
+ assert.equal((await s.request()).status,503);assert.equal(s.calls.length,0);assert.equal(s.records.get('budget').used,0);
+});
+
+
+test('archive byte ceiling still blocks before spending even below the record-count limit',async()=>{
+ const s=setup();s.records.set('archive-meta',{pending:{full:{bytes:MAX_PENDING_BYTES,complete:true}}});
  assert.equal((await s.request()).status,503);assert.equal(s.calls.length,0);assert.equal(s.records.get('budget').used,0);
 });
