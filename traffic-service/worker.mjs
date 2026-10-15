@@ -3,6 +3,7 @@ export const OWNER='18115558';
 export const COOLDOWN=15*60*1000, DAILY_LIMIT=50, MONTHLY_LIMIT=900;
 const AUTH='https://bali-cinema-owner-refresh.honeymooninbali.workers.dev';
 import CATALOGUE from './stations.mjs';
+import {createSampler,PROVIDER,RADIUS} from './traffic.mjs';
 export const ALL_STATIONS=CATALOGUE;
 export const STATIONS=CATALOGUE.filter(s=>['nusa-dua','bypass-30x','bypass-27','dharmawangsa','jimbaran-02'].includes(s.id));
 export function requestStations(text){
@@ -36,7 +37,7 @@ export function measure(route,end){
 }
 
 // One globally named object. Admission serializes the shared daily budget and
-// per-station cooldown across tabs. Google content is never persisted.
+// per-station cooldown across tabs. Provider content is never persisted.
 export class TrafficBudget {
   constructor(state,env,{now=Date.now}={}){this.storage=state.storage;this.now=now;this.pending=Promise.resolve();}
   fetch(request){const run=this.pending.then(()=>this.admit(request));this.pending=run.catch(()=>{});return run;}
@@ -73,7 +74,7 @@ export class TrafficBudget {
     return json(limits(used+ids.length,monthlyUsed+ids.length));
   }
 }
-export function createHandler({fetch:send=globalThis.fetch,now=Date.now}={}){
+export function createHandler({fetch:send=globalThis.fetch,now=Date.now,samplerFactory=createSampler}={}){
  return async(request,env)=>{
   let response;
   try{
@@ -94,22 +95,19 @@ export function createHandler({fetch:send=globalThis.fetch,now=Date.now}={}){
           const budget=env.TRAFFIC_BUDGET.get(env.TRAFFIC_BUDGET.idFromName('owner-global'));
           if(path==='/api/session'){
             const allowance=await budget.fetch(new Request('https://budget/',{method:'GET'}));
-            response=allowance.ok?json({ownerId:OWNER,login:'Arthur-Freedom',mapsKey:env.GOOGLE_MAPS_BROWSER_KEY,...await allowance.json()}):json({error:'Spending protection is temporarily unavailable.'},503);
+            response=allowance.ok?json({ownerId:OWNER,login:'Arthur-Freedom',provider:PROVIDER,radiusMetres:RADIUS,...await allowance.json()}):json({error:'Spending protection is temporarily unavailable.'},503);
           }
-          else if(!env.GOOGLE_ROUTES_KEY)response=json({error:'Traffic service is not configured.'},503);
+          else if(!env.TOMTOM_API_KEY)response=json({error:'Traffic service is not configured.'},503);
           else{
             const allowance=await budget.fetch(new Request('https://budget/',{method:'POST',body:JSON.stringify({group:requestedStations.map(s=>s.id).sort().join(',')})})),limits=await allowance.json();
             if(!allowance.ok)response=json(limits,allowance.status);
             else{
-              const waypoint=coordinate=>({location:{latLng:{latitude:coordinate[1],longitude:coordinate[0]}}});
+              const sample=samplerFactory({fetch:send,key:env.TOMTOM_API_KEY});
               const stations=await Promise.all(requestedStations.map(async station=>{
                 try{
-                  const result=await send('https://routes.googleapis.com/directions/v2:computeRoutes',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'Content-Type':'application/json','X-Goog-Api-Key':env.GOOGLE_ROUTES_KEY,'X-Goog-FieldMask':'routes.polyline.encodedPolyline,routes.travelAdvisory.speedReadingIntervals'},body:JSON.stringify({origin:waypoint(station.start),destination:waypoint(station.end),travelMode:'DRIVE',routingPreference:'TRAFFIC_AWARE_OPTIMAL',extraComputations:['TRAFFIC_ON_POLYLINE'],polylineQuality:'HIGH_QUALITY',computeAlternativeRoutes:false})});
-                  if(result.status===429)return {id:station.id,error:'Google request limit reached.',errorCode:'provider_limit'};
-                  if(!result.ok)throw Error('Upstream failed');
-                  const measured=measure((await result.json()).routes?.[0]||{},station.end);
+                  const measured=await sample(station);
                   return {id:station.id,...measured,checkedAt:new Date(now()).toISOString()};
-                }catch{return {id:station.id,error:'Traffic unavailable for this approach.'};}
+                }catch(error){return error.code==='provider_limit'?{id:station.id,error:'TomTom request limit reached.',errorCode:'provider_limit'}:{id:station.id,error:'Insufficient traffic coverage near this station.'};}
               }));
               response=json({stations,...limits});
             }

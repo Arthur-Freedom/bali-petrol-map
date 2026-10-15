@@ -2,88 +2,73 @@
 
 [Open the map](https://arthur-freedom.github.io/bali-petrol-map/)
 
-Maps 293 fuel locations across Bali with an area selector for Kuta, Legian, Seminyak, Canggu, Pererenan, Denpasar, Ubud, Gianyar and 19 other areas. Locations include full petrol stations and smaller fuel retailers; mapping is not exhaustive or a guarantee of operation. The public site remains on GitHub Pages. Live traffic refreshes are available only to GitHub owner **Arthur-Freedom**, numeric ID **18115558**.
+293 mapped fuel locations across Bali with automatic comparison of nearby road congestion. Live refresh is restricted to GitHub owner **Arthur-Freedom**, numeric ID **18115558**. Road traffic is a proxy: the app does not claim to measure petrol queues, waiting minutes, stock or actual opening.
 
 ## Use
 
-Choose an area; the count explicitly shows the current area versus all 293 Bali locations. Sign in with GitHub, then press **Refresh area** to check every due station in that area automatically. Requests run back-to-back in batches of up to five; no group arrows or waiting between different stations. Choose **5 oldest checks** for unchecked stations first, followed by the oldest successful readings. A station's popup offers **Refresh this station** and **Open in Google Maps**. The latter opens its known place ID, or its coordinate pin when no Google place ID is available, without requesting directions or sending the user's location.
+Choose an area and refresh all due stations, the five oldest checks (unchecked first), or one selected station. Requests run immediately in batches of five. The 15-minute cooldown applies only to the same station. Counts distinguish the area from all 293 locations.
 
-Ordinary scrolling zooms the map without Ctrl; Ctrl-wheel over the map is prevented from zooming the page. Selecting a row gives the map pin a strong blue outline, foreground stacking and a station-name caption. Optional repeat checks run every 15 minutes while the tab is visible and pause when the area, search or refresh mode changes. Changing area during a refresh stops subsequent batches after the current request finishes. Page loads do not automatically request paid Routes data.
-
-Road congestion is a rough busyness indicator. The wait calculator, manual check forms, manual observation workflow and saved-observation controls have been removed. Missing traffic remains unknown. Google-listed opening hours appear as secondary **Listed closed/open · unverified** notes and never override ranking. Only an explicitly sourced, recent firsthand closure could block a station; there is currently no report-entry UI. Traffic updates never renew opening timestamps. The original five listing observations retain their actual times; imported locations have no assumed opening status.
-
-## Owner protection and spending limits
-
-The Cloudflare Worker validates the opaque device session through the cinema app's existing owner-auth service. That service checks the GitHub numeric identity, including on every refresh. This is enforced before any Google call; hiding a button or checking CORS is not the authorization mechanism. Any other GitHub user is rejected.
-
-The Routes API key is restricted to Routes and held in a Worker secret. It is never sent to browsers, committed, or logged. A separate Maps JavaScript display key is returned after owner authentication and is restricted to Maps JavaScript and `https://arthur-freedom.github.io/*` referrers. Display keys are necessarily visible to the owner's browser; they cannot invoke Routes.
-
-A globally shared SQLite-backed Durable Object enforces a 15-minute cooldown **per station**, **50 station checks per Bali day**, and **900 checks per Bali calendar month**, including concurrent devices. A single-station request uses one check; 15 stations use 15 checks. Daily resets do not reset the monthly balance. Failed Google requests consume both budgets; admission is persisted before calling Google and failures are not automatically retried. Migration preserves the first usage day's existing charges and cooldowns, including when the owner reconnects the next day. Ambiguous older legacy records exhaust the monthly balance until reviewed.
-
-Different stations can be checked immediately. Overlapping or reordered requests cannot bypass a station's cooldown. Each server request accepts at most five allowlisted station IDs and reads at most 2,048 body bytes, including chunked requests. The client fetches current limits before starting a refresh and limits the selection to the remaining daily and monthly budgets, shown beside the button. Invalid, duplicate, unknown or more than five IDs are rejected before Google calls. After Google's free allowance, five Compute Routes Enterprise requests currently cost US$0.075. Google map displays have a separate allowance and price. The 900-check application limit leaves headroom below the published 1,000 monthly free Enterprise requests, but other projects share the billing account's free allowances and diagnostic calls are outside the application's counter.
-
-### Google-side limits
-
-On 15 October 2026, project `chessinbali` was changed from effectively unlimited daily quotas to the following provider-enforced limits. These apply to both services across this project, including requests that bypass the application:
-
-| Feature | Daily limit | Per-minute limit |
-| --- | ---: | ---: |
-| Compute Routes | 50 | 50 |
-| 2D map loads | 100 | 10 |
-| Compute Route Matrix elements | 0 | — |
-| 3D map loads | 0 | — |
-| Maps Grounding Widget | 0 | — |
-
-Inspect the effective values with `python scripts/protect-google-budget.py`; use `--apply` to restore these ceilings. The script uses an authenticated gcloud account, never reads API keys, and refuses to increase an existing stricter quota. Provider quotas can reset at a different time from the application's Bali-day counters, so Google can reject a request even when the app shows a remaining balance. These are request limits, not a promise about unrelated Google services or the whole billing account.
-
-Set `PAID_FEATURES_ENABLED = "false"` in the Worker configuration and redeploy to stop issuing Google display keys and making traffic calls. Missing configuration also fails closed. For an already disclosed display key or urgent complete provider shutdown, reduce the relevant Google quotas to zero or revoke the dedicated key; the application switch cannot revoke a key already in a browser. A spending-guard failure blocks both Routes calls and display-key release. Anonymous visits use the public OpenStreetMap map and make no paid Google requests.
-
-The service uses the existing **Workers Free** account, with no paid plan, observability or upgrades. Budget storage contains only counts, timestamps and catalogue station IDs for cooldown enforcement (plus legacy group IDs for open older clients). Google traffic content is held only in browser memory and is not persisted to GitHub, browser storage, or server storage. All API responses are `no-store`. Google-derived traffic is displayed only on a Google map. The public station catalogue uses an OpenFreeMap / OpenStreetMap basemap.
-
-## Authentication
-
-`dist/owner-session.js` executes before external assets, removes the OAuth fragment immediately, and stores only an opaque session handle. The cinema and petrol apps share the existing remembered owner session on their common Pages origin. Sign-out revokes that device session for both apps. The auth service permits exact return paths for these two apps only; no extra repository permissions are requested.
-
-GitHub credentials remain encrypted in the cinema service's private session object. Google calls accept no user-provided URLs, stations or coordinates. Refresh requests accept only a `stationIds` array of one to five unique allowlisted IDs, a valid session and the expected origin. The old empty-body request remains compatible with the original five stations. Unauthorized failures are sanitized and do not call Google.
-
-## Refresh recovery
-
-API requests time out after 35 seconds and never retry automatically. A failed in-flight station check keeps its prior values and original timestamp, marks it failed, and removes it from current recommendations. Missing, duplicate, unrequested, malformed, or implausibly dated readings are not accepted as successful checks. An incomplete response or a Google quota error stops the remaining area batches and optional repeat checks. Sign-out aborts pending browser requests; an old session response cannot revoke a newer session or restore signed-out readings. Google script loading has a separate 25-second timeout and explicit retry, with paid refresh controls locked until the map is ready.
-
-These checks establish error handling, not real-world traffic accuracy. The disagreement between Google road colours and all-NORMAL route intervals remains unresolved; a successful HTTP response alone is not evidence that automatic station comparisons work. An alternative traffic feed must be validated against real Bali roads before claiming the core comparison goal is complete.
+Ordinary scrolling zooms the map. A selected pin has a blue outline and name caption. On phones, selecting a list row scrolls to the map; details appear immediately below it. Google Maps links open the place without directions or the user's location. Listed opening hours remain unverified and never exclude a station from comparison.
 
 ## Measurement
 
-`traffic-service/worker.mjs` calls Compute Routes with `TRAFFIC_AWARE_OPTIMAL` and `TRAFFIC_ON_POLYLINE`. It decodes the route geometry, validates interval coverage and the endpoint, and sums geodesic metres within the final kilometre (or the available approach when shorter). It counts interval edges rather than points and clips the boundary segment. The list ranks the proportion of the sample reported SLOW or TRAFFIC_JAM, then the TRAFFIC_JAM proportion. The chosen approach does not cover every entrance/direction or queues inside the forecourt. It reflects car traffic, not a specific motorcycle queue.
+The Worker uses **TomTom Orbis v2 vector flow tiles**, decoded with pinned `@mapbox/vector-tile` and `pbf`. Google Routes returned all-NORMAL intervals despite visible congestion and is no longer called. No paid Google basemap is loaded.
 
-Zero reported slowdown is neutral **No slowdown returned**, not evidence of a clear road or short queue. Orange-only readings are **Slow traffic reported**; any reported jam is **Congestion reported**. Equal returned readings show a tie, never a spurious best station. Google traffic readings expire for current ranking after one hour. The queried-at timestamp does not claim that every source signal was observed at that exact instant.
+Each allowlisted station uses at most four zoom-15 tiles covering a 250-metre radius. A batch shares duplicate requests in memory. Geometry is clipped first to tile bounds (removing margins), then to the station circle. Exact duplicate directed edges are removed; opposite directions count separately. Motorways, motorway ramps and tracks are excluded. Results require at least 150 metres of covered road directions and a covered road within 100 metres of the station; otherwise coverage is unavailable.
 
-The owner map displays the native Google Maps `TrafficLayer` with `autoRefresh:true`. It has its own coverage/update timing and may disagree with the Routes API. Sampled routes no longer paint solid green over the map: only the selected station's sample appears, as a thin blue dotted line. Road colours are the native layer; station pins summarize the separately queried route. Native layer refreshes do not call the application's paid Routes endpoint.
+- Red: relative speed at or below 35% of free-flow speed.
+- Orange: above 35% but below 70%.
+- Green: 70–100%.
+- Dark: reported **road** closure, also counted in congested metres.
 
-### Historical data
+Rankings compare the percentage of covered road-direction metres that are slow or congested, rounded to whole percentages, then the congested percentage. Equal scores show ties. Coverage varies; nearby through traffic and junctions affect the score. This does not identify forecourt entrances or distinguish motorcycles from cars.
 
-The standard Google Routes policies restrict caching traffic results; the permitted coordinate/place-ID exceptions do not provide permission for a permanent congestion archive. No traffic archive or GitHub data commits are enabled. A future time-of-day history should use a source licensed for historical storage or independently collected observations, stored in a private database with timestamps, coverage and provenance. GitHub remains appropriate for application source and the public station catalogue. Road congestion metres must not be relabelled as verified fuel-queue metres or converted into uncalibrated waiting minutes.
+Colours and rankings use the **same response**, updated together on refresh. After 15 minutes, readings leave current recommendations and the coloured overlay; details retain their original timestamp. Zero says “No slowdown detected”, not that a petrol queue is absent. Checked-at is query time, not a guaranteed observation time for every road signal.
+
+Live tests on 15 October 2026 returned different congestion levels at the original five stations, including congested sections near Bypass 54.803.27. This establishes functioning local coverage, not independently measured queue accuracy.
+
+## Access and spending protection
+
+The Worker verifies the opaque device session through the existing Bali Cinema auth service before each session/refresh response, enforcing the GitHub numeric identity server-side. CORS and hidden buttons are additional controls, not authentication. The TomTom key stays in a Worker secret and never reaches browsers, logs, the repository or a URL.
+
+A globally named SQLite-backed Durable Object serializes **50 station checks per Bali day, 900 per month and a 15-minute per-station cooldown** across devices. Existing Google-era charges remain counted. Admission is persisted before provider calls; failed attempts count. Overlapping/reordered requests cannot bypass cooldowns. Corrupt counters and unavailable budget storage fail closed.
+
+At most four tiles per station means **at most 200 provider calls/day and 3,600/month through this app**, usually fewer through batch sharing. Provider concurrency is capped at four; the batch has a 20-second timeout, bounded bytes/geometry and no retries. Provider 429 responses stop queued calls and subsequent client batches. These limits do not cover calls made with the key outside the app.
+
+Requests accept one to five unique catalogue IDs and at most 2,048 body bytes, never arbitrary coordinates, URLs or tiles. An empty object still selects the original five. Responses are `no-store`. Page views, signing in and map movement make **no TomTom or Google Maps API calls**.
+
+TomTom publishes 200,000 free monthly traffic vector tiles; actual account/evaluation eligibility and expiry depend on the user's plan. No paid plan, card, top-up or automatic upgrade is configured by this app. Set `PAID_FEATURES_ENABLED = "false"` and redeploy to stop traffic; missing configuration also fails closed.
+
+Previous Google project protections remain separate: Routes 50/day and 50/min; 2D map loads 100/day and 10/min; matrix, 3D and grounding-widget daily quotas zero. `python scripts/protect-google-budget.py` inspects them; `--apply` restores ceilings without raising stricter limits. The current app no longer consumes these APIs. Other account/project charges are outside these counters.
+
+## Authentication and recovery
+
+`owner-session.js` runs before external assets, immediately removes the OAuth fragment and retains only an opaque session handle. Cinema and petrol maps share the Pages origin; signing out revokes this device session for both. GitHub credentials remain encrypted in the cinema service.
+
+Browser requests time out after 35 seconds. Missing, duplicate, unrequested, malformed, remote or implausibly dated readings cannot become successful results. A failed refresh retains old timestamps and leaves current recommendations. Incomplete responses and provider limits stop remaining batches and repeats. Sign-out cancels requests; old-session responses cannot restore data or revoke a newer session.
+
+Optional repeats run every 15 minutes while visible and pause after scope changes or errors. Reloading does not request traffic. The public station finder works without authentication or traffic coverage.
+
+## Privacy and history
+
+Traffic stays in request/browser memory. No raw tiles, traffic observations or derived history are archived to GitHub, browser storage or a database. The server stores only refresh counts/times. Long-term history needs storage rights confirmed for the selected TomTom plan. Your location is requested only by “Show stations near me” and stays in the browser; TomTom receives fixed station-area tile coordinates.
+
+Traffic attribution: © TomTom. Basemap: OpenFreeMap/OpenStreetMap. Expanded stations: © OpenStreetMap contributors, ODbL. Original five listing observations came from Google Maps and keep their original timestamps.
 
 ## Development and deployment
 
-On phones, choosing a station in the list scrolls to and focuses the map with its highlighted pin. Selected-station details follow immediately below the map, before the station list. Selection respects the device's reduced-motion preference.
+Static source is `dist/`; no build is required. Install dependencies with `npm ci --prefix traffic-service --ignore-scripts`. Run `node --test tests/*.test.cjs traffic-service/*.test.mjs`. Public preview: `python -m http.server 8794 --directory dist`. Auth and CORS intentionally accept only the production origin.
 
-Static source is `dist/`; no build is required. Run `python -m http.server 8794 --directory dist` for public UI checks. Owner login, Google display restrictions and CORS intentionally work only at the production Pages origin. Pushes to `main` test and publish Pages through `.github/workflows/pages.yml`. The owner can also dispatch that workflow to republish the app; it no longer accepts manual observations.
+Tests cover auth, concurrent budgets, rollovers, preserved charges, cooldowns, geographic clipping, tile seams, direction counting, MVT decoding, missing coverage, provider failures, call bounds, single/area/oldest refresh, expiry and session races. Test fixtures are synthetic, not retained provider data.
 
-Run `node --test tests/*.test.cjs traffic-service/worker.test.mjs`. Tests cover 15-station refreshes without delays, single-station requests, oldest-first selection, budget migration, concurrent and overlapping cooldowns, exact daily limits, stopping on area changes, place links, identity rejection, Bali-day rollover, data minimization, interval lengths and incomplete coverage, unverified opening reports, catalogue coverage, source alignment and fragment removal.
+Pushes to `main` test and publish Pages. From `traffic-service/`, deploy using `npx wrangler@4 deploy`. Supply `TOMTOM_API_KEY` through Wrangler secret stdin, never command arguments or plaintext files. Keep the `OWNER_AUTH` binding, budget object and migration IDs unchanged. Deploy client and Worker together for schema changes; legacy clients fail closed because no Google display key is returned.
 
-Worker deployment: from `traffic-service/`, `npx wrangler@4 deploy`. Secrets `GOOGLE_ROUTES_KEY` and `GOOGLE_MAPS_BROWSER_KEY` must be passed through stdin to Wrangler, never placed in files or command arguments. Google project is `chessinbali`; keys are dedicated to this app. The auth service binding is `bali-cinema-owner-refresh`.
+## Catalogue
 
-## Sources and terms
+`dist/stations.json` contains public locations and overlapping area presets; `traffic-service/stations.mjs` is the matching server allowlist. Legacy approach-start coordinates are unused. Entries include smaller retailers; hours, stock and full SPBU service are not implied.
 
-[Google traffic on polylines](https://developers.google.com/maps/documentation/routes/traffic_on_polylines), [Google pricing](https://developers.google.com/maps/billing-and-pricing/pricing), [Routes policies](https://developers.google.com/maps/documentation/routes/policies).
+OSM `amenity=fuel` nodes/ways/relations are filtered to Bali province boundary 1615621, excluding disused, abandoned and private entries. Nearby duplicates within 65 m are consolidated. Every entry retains a source. To regenerate, obtain Overpass fuel data and Nominatim Bali **state** GeoJSON into ignored `.local/osm-fuel.json` and `.local/bali-boundary.json`, then run `node scripts/import-stations.cjs`. Deploy both Worker and Pages after catalogue changes. See [DATA-LICENSE.md](DATA-LICENSE.md).
 
-Google Maps use is subject to [Google Maps terms](https://www.google.com/help/terms_maps/) and [Google privacy policy](https://policies.google.com/privacy). This independent tool provides indicative traffic comparisons without guaranteeing fuel, opening hours or waiting times.
+## References
 
-## Expanded station catalogue
-
-`dist/stations.json` contains the public catalogue and radius-based area presets. Area counts overlap neighbouring districts. `traffic-service/stations.mjs` is the generated server allowlist with the same IDs and coordinates. The original five stations retain their previous approach origins. New entries use a reproducible candidate origin approximately 1.3 km north; Google snaps it to its navigable road network. This is a single approach proxy, not every entrance or a verified driveway. Missing traffic, routes shorter than 500 m, or endpoints more than 150 m from the station fail as unavailable.
-
-Expanded locations come from OpenStreetMap `amenity=fuel` nodes/ways/relations, filtered to Bali province's administrative boundary (relation 1615621), excluding explicitly disused, abandoned and private entries. Nearby mapped duplicates within 65 m are consolidated. The catalogue preserves a source link per location. It includes unnamed fuel retailers; opening, current stock and full SPBU service are not implied. Coordinates and area names should be checked when adding or correcting a location.
-
-To regenerate, fetch the public Overpass fuel data and Nominatim Bali **state** GeoJSON into ignored `.local/osm-fuel.json` and `.local/bali-boundary.json`, then run `node scripts/import-stations.cjs`. Seed metadata is in `scripts/seed-stations.json`; this contains no traffic observations. After a catalogue update, deploy the Worker and publish Pages together. OpenStreetMap-derived catalogue data is available under ODbL; see [DATA-LICENSE.md](DATA-LICENSE.md).
+[Orbis flow tiles](https://docs.tomtom.com/traffic-api/documentation/tomtom-orbis-maps/v2/traffic-flow/vector-flow-tiles), [TomTom pricing](https://docs.tomtom.com/pricing), [key guidance](https://docs.tomtom.com/platform/documentation/api-best-practices/api-key-management-best-practices), [terms](https://docs.tomtom.com/legal/terms-and-conditions).

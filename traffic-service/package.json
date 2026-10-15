@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@mapbox/vector-tile": "2.0.4",
+    "pbf": "4.0.1"
+  }
+}

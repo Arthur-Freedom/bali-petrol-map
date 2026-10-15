@@ -9,8 +9,12 @@ const traffic=points=>route(points,[{endPolylinePointIndex:points.length-1,speed
 function setup({owner=OWNER,authStatus=200,upstream}={}){
  let time=Date.parse('2026-10-15T00:00:00+08:00'),calls=[],authCalls=0;
  const records=new Map(),budget=new TrafficBudget({storage:{get:async k=>records.get(k),put:async(k,v)=>records.set(k,v)}},{},{now:()=>time});
- const env={PAID_FEATURES_ENABLED:'true',GOOGLE_ROUTES_KEY:'secret-key',GOOGLE_MAPS_BROWSER_KEY:'map-key',OWNER_AUTH:{fetch:async()=>{authCalls++;return json({ownerId:owner},authStatus)}},TRAFFIC_BUDGET:{idFromName:s=>s,get:()=>budget}};
- const handler=createHandler({now:()=>time,fetch:async(url,options)=>{calls.push({url,options});if(upstream)return upstream();const body=JSON.parse(options.body),end=body.destination.location.latLng;return json({routes:[traffic([[end.longitude-.012,end.latitude],[end.longitude,end.latitude]])]});}});
+ const env={PAID_FEATURES_ENABLED:'true',TOMTOM_API_KEY:'secret-key',OWNER_AUTH:{fetch:async()=>{authCalls++;return json({ownerId:owner},authStatus)}},TRAFFIC_BUDGET:{idFromName:s=>s,get:()=>budget}};
+ const handler=createHandler({now:()=>time,samplerFactory:({key})=>async station=>{
+  calls.push({station,key});
+  if(upstream){const response=upstream();if(!response.ok)throw Object.assign(Error('Upstream failed'),{code:response.status===429?'provider_limit':undefined});}
+  return {provider:'tomtom-orbis-v2',radiusMetres:250,coveredMetres:500,jamMetres:0,slowMetres:0,closedMetres:0,nearestRoadMetres:0,segments:[{from:station.end,to:[station.end[0]+.001,station.end[1]],relativeSpeed:1,closed:false,speed:'NORMAL'}]};
+ }});
  const request=({token='remembered.'+'a'.repeat(43),origin=ORIGIN,body='{}',method='POST',path='/api/refresh'}={})=>handler(new Request('https://test'+path,{method,headers:{Origin:origin,Authorization:'Bearer '+token,'Content-Type':'application/json'},...(method==='POST'?{body}:{})}),env);
  return {request,calls,records,budget,env,authCalls:()=>authCalls,advance:n=>time+=n};
 }
@@ -18,11 +22,11 @@ test('unauthenticated, wrong identity, spoofed origin and arbitrary body make ze
  for(const options of [{token:''},{token:'fake'},{origin:'https://evil.example'},{body:'{"stations":[1]}'}]){const s=setup();assert.ok((await s.request(options)).status>=400);assert.equal(s.calls.length,0);assert.equal(s.records.size,0);}
  for(const opts of [{owner:'999'},{authStatus:401},{authStatus:503}]){const s=setup(opts);assert.ok((await s.request()).status>=400);assert.equal(s.calls.length,0);assert.equal(s.records.size,0);}
 });
-test('concurrent owner refreshes admit only five fixed Google queries and never return the key',async()=>{
+test('concurrent owner refreshes admit only five fixed station checks and never return the key',async()=>{
  const s=setup(),responses=await Promise.all([s.request(),s.request()]);assert.deepEqual(responses.map(x=>x.status).sort(),[200,429]);assert.equal(s.calls.length,5);assert.equal(s.authCalls(),2);
  const response=responses.find(r=>r.ok),text=await response.text();assert.ok(!text.includes('secret-key'));assert.equal(response.headers.get('Cache-Control'),'no-store');
  const data=JSON.parse(text);assert.equal(data.stations.length,5);assert.ok(data.stations.every(x=>x.jamMetres===0&&x.checkedAt));assert.equal(data.remaining,9);
- for(let i=0;i<5;i++){const body=JSON.parse(s.calls[i].options.body);assert.equal(body.destination.location.latLng.longitude,STATIONS[i].end[0]);assert.equal(body.routingPreference,'TRAFFIC_AWARE_OPTIMAL');assert.equal(s.calls[i].options.redirect,'manual');}
+ for(let i=0;i<5;i++){assert.deepEqual(s.calls[i].station,STATIONS[i]);assert.equal(s.calls[i].key,'secret-key');}
  assert.deepEqual([...s.records.keys()],['budget']);assert.ok(!JSON.stringify([...s.records]).includes('segments'));
 });
 test('daily budget survives cooldowns and resets at Bali midnight',async()=>{
@@ -33,7 +37,7 @@ test('partial upstream failure does not invent clear roads or a fresh timestamp'
  const s=setup({upstream:()=>json({error:{message:'secret-key internal'}},403)}),r=await s.request(),data=await r.json();assert.ok(data.stations.every(s=>s.error&&!s.checkedAt&&s.jamMetres===undefined));assert.ok(!JSON.stringify(data).includes('secret-key'));assert.equal(data.remaining,9);
 });
 
-test('Google quota errors are distinguishable so the client can stop the remaining area checks',async()=>{
+test('TomTom quota errors are distinguishable so the client can stop the remaining area checks',async()=>{
  const s=setup({upstream:()=>json({},429)}),data=await(await s.request()).json();
  assert.equal(data.remainingChecks,45);assert.equal(s.calls.length,5);
  assert.ok(data.stations.every(s=>s.errorCode==='provider_limit'&&!s.checkedAt&&s.jamMetres===undefined));
@@ -77,7 +81,7 @@ test('single station uses one check and cannot bypass cooldown by changing group
  r=await s.request({body:JSON.stringify({stationIds:[ids[1]]})});assert.equal(r.status,200);assert.equal((await r.json()).remainingChecks,48);
 });
 
-test('single-station refreshes still stop at exactly 50 daily Google queries',async()=>{
+test('single-station refreshes still stop at exactly 50 daily station checks',async()=>{
  const s=setup();for(const station of ALL_STATIONS.slice(0,50))assert.equal((await s.request({body:JSON.stringify({stationIds:[station.id]})})).status,200);
  assert.equal((await s.request({body:JSON.stringify({stationIds:[ALL_STATIONS[50].id]})})).status,429);assert.equal(s.calls.length,50);
 });
@@ -123,7 +127,7 @@ test('disabled or missing kill-switch configuration exposes no key and makes no 
  }
 });
 
-test('spending-guard failure and corrupt counters fail closed before key release or Google calls',async()=>{
+test('spending-guard failure and corrupt counters fail closed before key release or provider calls',async()=>{
  for(const mode of ['unavailable','corrupt'])for(const options of [{},{method:'GET',path:'/api/session'}]){
   const s=setup();if(mode==='unavailable')s.env.TRAFFIC_BUDGET.get=()=>({fetch:async()=>json({},503)});else s.records.set('budget',{day:'2026-10-15',used:-1,month:'2026-10',monthlyUsed:-1});
   const r=await s.request(options);assert.equal(r.status,503);assert.ok(!(await r.text()).includes('map-key'));assert.equal(s.calls.length,0);
@@ -139,4 +143,12 @@ test('spoofed origin with a plausible fake session and wrong owner never reveal 
   const s=setup(options),response=await s.request({method:'GET',path:'/api/session'});
   assert.ok([401,403].includes(response.status));assert.ok(!(await response.text()).includes('map-key'));assert.equal(s.calls.length,0);assert.equal(s.records.size,0);
  }
+});
+
+test('owner session returns provider metadata but no API credentials',async()=>{
+ const s=setup(),data=await(await s.request({method:'GET',path:'/api/session'})).json();
+ assert.equal(data.provider,'tomtom-orbis-v2');assert.equal(data.radiusMetres,250);assert.equal(data.mapsKey,undefined);assert.ok(!JSON.stringify(data).includes('secret-key'));assert.equal(s.calls.length,0);
+});
+test('missing TomTom secret fails before reserving a check',async()=>{
+ const s=setup();delete s.env.TOMTOM_API_KEY;assert.equal((await s.request()).status,503);assert.equal(s.calls.length,0);assert.equal(s.records.size,0);
 });
