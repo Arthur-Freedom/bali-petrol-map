@@ -20,6 +20,7 @@ jobs:
       - run: npm ci --prefix traffic-service --ignore-scripts --no-audit --no-fund
       - name: Check application, catalogue and traffic security
         run: |
+          node --check dist/draw-area.js
           node --check dist/app.js
           node --check dist/core.js
           node --check dist/live.js

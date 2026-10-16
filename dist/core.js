@@ -48,8 +48,15 @@
  function ordered(stations,origin,now=Date.now()){
    return [...stations].sort((a,b)=>{const x=status(a,now),y=status(b,now);return Number(x.blocked)-Number(y.blocked)||Number(!x.rankable)-Number(!y.rankable)||(x.rankable&&y.rankable?compareTraffic(a,b):0)||Number(!(x.measured&&x.fresh))-Number(!(y.measured&&y.fresh))||Number(!x.measured)-Number(!y.measured)||(origin?distance(origin,a.coordinates)-distance(origin,b.coordinates):0)||a.shortName.localeCompare(b.shortName);});
  }
- function inScope(stations,area,query=''){
-   const q=query.trim().toLowerCase();return stations.filter(s=>(!area||distance(area.center,s.coordinates)<=area.radius)&&(!q||[s.name,s.shortName,s.area,s.address].join(' ').toLowerCase().includes(q)));
+ function rectangle(a,b){
+   if(![a,b].every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)&&Math.abs(p[0])<=180&&Math.abs(p[1])<=90))return null;
+   const bounds=[Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.max(a[0],b[0]),Math.max(a[1],b[1])];
+   return bounds[0]<bounds[2]&&bounds[1]<bounds[3]?bounds:null;
+ }
+ function inBounds(point,bounds){return Array.isArray(bounds)&&bounds.length===4&&bounds.every(Number.isFinite)&&point[0]>=bounds[0]&&point[0]<=bounds[2]&&point[1]>=bounds[1]&&point[1]<=bounds[3];}
+ function hasSaved(s){return Number.isFinite(s.jamMetres)&&Number.isFinite(Date.parse(s.checkedAt));}
+ function inScope(stations,area,query='',savedOnly=false){
+   const q=query.trim().toLowerCase();return stations.filter(s=>(!area||(area.bounds?inBounds(s.coordinates,area.bounds):distance(area.center,s.coordinates)<=area.radius))&&(!savedOnly||hasSaved(s))&&(!q||[s.name,s.shortName,s.area,s.address].join(' ').toLowerCase().includes(q)));
  }
  function placeUrl(s){const query=`${s.coordinates[1]},${s.coordinates[0]}`;return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}${s.placeId?'&query_place_id='+encodeURIComponent(s.placeId):''}`;}
  function refreshPlan(stations,center,budget={},mode='area',now=Date.now()){
@@ -84,5 +91,5 @@
    return validApproach(reading.approach,point,center)&&Array.isArray(segments)&&segments.length>0&&segments.length<=3000&&segments.every(s=>s&&point(s.from)&&point(s.to)&&(!center||distance(center,s.from)<=.251&&distance(center,s.to)<=.251)&&Number.isFinite(s.relativeSpeed)&&s.relativeSpeed>=0&&s.relativeSpeed<=1&&typeof s.closed==='boolean'&&(!s.closed||s.relativeSpeed===0)&&s.speed===(s.relativeSpeed<=.35?'TRAFFIC_JAM':s.relativeSpeed<.7?'SLOW':'NORMAL'));
  }
  function validSavedReading(reading,id,now=Date.now(),center){return validReading(reading,id,now,center,Infinity);}
- const api={distance,fresh,opening,status,approachRoute,approachLabel,approachSummary,nearbyLabel,withTrend,trendLabel,slowdown,slowPercent,compareTraffic,ordered,inScope,refreshPlan,placeUrl,mergeLive,validReading,validSavedReading};if(typeof module!=='undefined'&&module.exports)module.exports=api;root.Petrol=api;
+ const api={distance,fresh,opening,status,approachRoute,approachLabel,approachSummary,nearbyLabel,withTrend,trendLabel,slowdown,slowPercent,compareTraffic,ordered,rectangle,inBounds,hasSaved,inScope,refreshPlan,placeUrl,mergeLive,validReading,validSavedReading};if(typeof module!=='undefined'&&module.exports)module.exports=api;root.Petrol=api;
 })(typeof window!=='undefined'?window:globalThis);

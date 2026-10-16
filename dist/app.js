@@ -2,12 +2,12 @@
 const $=id=>document.getElementById(id),P=window.Petrol;
 const colours={neutral:'#617687',medium:'#af771a',long:'#a54135',unknown:'#727d82',unavailable:'#535d64'};
 const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let dataset,stations=[],selected=null,map=null,markers=[],accessMarkers=[],origin=null,locationFix=null,locationMarker=null,mapReady=false,toastTimer;
+let dataset,stations=[],selected=null,map=null,markers=[],accessMarkers=[],origin=null,locationFix=null,locationMarker=null,mapReady=false,toastTimer,customBounds=null,drawController=null,fitSavedAfterLoad=false;
 function notify(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4500);}
 function ageLabel(date){if(!date)return 'Not checked';const minutes=Math.max(0,Math.floor((Date.now()-Date.parse(date))/60000));return minutes<1?'Just now':minutes<60?`${minutes} min ago`:minutes<1440?`${Math.floor(minutes/60)} hr ago`:`${Math.floor(minutes/1440)} days ago`;}
 function dateLabel(date){return new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Makassar'}).format(new Date(date))+' WITA';}
-function scopeArea(){if($('area').value==='nearby'&&origin)return {id:'nearby',name:'Near me',center:origin,radius:8};return dataset?.areas.find(a=>a.id===$('area').value)||null;}
-function scopedStations(){return P.inScope(stations,scopeArea(),$('search').value);}
+function scopeArea(){if($('area').value==='drawn'&&customBounds)return {id:'drawn',bounds:customBounds,center:[(customBounds[0]+customBounds[2])/2,(customBounds[1]+customBounds[3])/2]};if($('area').value==='nearby'&&origin)return {id:'nearby',name:'Near me',center:origin,radius:8};return dataset?.areas.find(a=>a.id===$('area').value)||null;}
+function scopedStations(includeWithoutData=false){return P.inScope(stations,scopeArea(),$('search').value,!includeWithoutData&&$('saved-only').checked);}
 function scopeCenter(){return scopeArea()?.center||origin||[115.210,-8.798];}
 function activeStations(){return P.ordered(scopedStations(),scopeCenter());}
 function signal(s){return P.status(s);}
@@ -25,12 +25,13 @@ function renderAccess(){
 }
 function updateMarker(s,element,visible,zoom){const q=signal(s),chosen=s.id===selected;element.style.display=visible?'':'none';element.style.setProperty('--pin',colours[q.tone]);element.style.zIndex=chosen?'1000':'1';element.dataset.compact=String(zoom<11.5&&!chosen);element.dataset.caption=String(chosen);element.dataset.side='right';element.setAttribute('aria-pressed',String(chosen));element.setAttribute('aria-label',(chosen?'Selected: ':'')+s.shortName+', '+q.label+', '+q.opening.label);element.querySelector('.pin-caption').textContent=chosen?'Selected · '+s.shortName:q.label;}
 function renderList(){
- const list=activeStations();
+ const list=activeStations(),loading=!!window.PetrolLive?.loadingSaved();
+ $('saved-data-status').hidden=!loading;$('saved-data-status').textContent='Loading saved traffic… No traffic checks used.';
  $('count').textContent=String(list.length);$('coverage-label').textContent=stations.length+' mapped locations across Bali';
- $('area-count').textContent=`${list.length} ${$('search').value.trim()?'matching stations':scopeArea()?'in this area':'shown'} · ${stations.length} across Bali`;
+ $('area-count').textContent=$('saved-only').checked?`${list.length} with saved traffic · of ${scopedStations(true).length} mapped ${scopeArea()?'here':'across Bali'}`:`${list.length} ${$('search').value.trim()?'matching stations':scopeArea()?'in this area':'shown'} · ${stations.length} across Bali`;
  $('access-count').textContent=`${list.filter(s=>s.access?.status==='mapped').length} have mapped accesses · others show nearby-road context`;
  $('list-caption').textContent='Shorter mapped slow stretches first · uncertain readings below';
- $('stations').innerHTML=list.length?list.map(s=>{const q=signal(s),r=P.approachRoute(s);return `<li><button class="station-row" data-station="${s.id}" aria-pressed="${s.id===selected}" style="--pin:${colours[q.tone]}"><span class="station-number">${s.number}</span><span><span class="row-heading"><strong>${e(s.shortName)}</strong><span class="distance">${P.distance(scopeCenter(),s.coordinates).toFixed(1)} km</span></span><span class="row-sub">${e(s.address)}</span><span class="row-busyness"><strong>${e(P.approachSummary(s))}</strong>${q.measured?`<span>${e(P.nearbyLabel(s))}</span>`:''}</span><span class="row-evidence">${s.checkedAt?(q.fresh?e(ageLabel(s.checkedAt)):'Last measurement · '+e(dateLabel(s.checkedAt)))+(s.refreshFailed?' · latest check failed':''):s.refreshFailed?(s.errorCode==='no_coverage'?'No nearby traffic coverage':'Traffic check failed'):'No traffic reading yet'}</span>${q.rankable?`<span class="row-trend">${e(P.trendLabel(s))}</span>`:''}${q.opening.state!=='unknown'?`<span class="opening-note">${e(q.opening.label)}</span>`:''}</span></button></li>`;}).join(''):'<li class="empty">No mapped stations match this area or search. Try a nearby area or All Bali.</li>';
+ $('stations').innerHTML=list.length?list.map(s=>{const q=signal(s),r=P.approachRoute(s);return `<li><button class="station-row" data-station="${s.id}" aria-pressed="${s.id===selected}" style="--pin:${colours[q.tone]}"><span class="station-number">${s.number}</span><span><span class="row-heading"><strong>${e(s.shortName)}</strong><span class="distance">${P.distance(scopeCenter(),s.coordinates).toFixed(1)} km</span></span><span class="row-sub">${e(s.address)}</span><span class="row-busyness"><strong>${e(P.approachSummary(s))}</strong>${q.measured?`<span>${e(P.nearbyLabel(s))}</span>`:''}</span><span class="row-evidence">${s.checkedAt?(q.fresh?e(ageLabel(s.checkedAt)):'Last measurement · '+e(dateLabel(s.checkedAt)))+(s.refreshFailed?' · latest check failed':''):s.refreshFailed?(s.errorCode==='no_coverage'?'No nearby traffic coverage':'Traffic check failed'):'No traffic reading yet'}</span>${q.rankable?`<span class="row-trend">${e(P.trendLabel(s))}</span>`:''}${q.opening.state!=='unknown'?`<span class="opening-note">${e(q.opening.label)}</span>`:''}</span></button></li>`;}).join(''):`<li class="empty">${loading?'Loading saved traffic…':$('saved-only').checked?'No saved traffic loaded in this area. Clear the saved-only filter to see all mapped stations, or try All saved traffic.':'No mapped stations match this area or search. Clear the rectangle, choose All Bali, or try another search.'}</li>`;
  document.querySelectorAll('[data-station]').forEach(b=>b.addEventListener('click',()=>selectStation(b.dataset.station,true,true)));
  const ids=new Set(list.map(s=>s.id));markers.forEach(({id,element})=>updateMarker(stations.find(s=>s.id===id),element,ids.has(id),map?.getZoom()||0));renderAccess();window.PetrolLive?.updateMarkers();
  const current=list.filter(s=>signal(s).rankable);$('recommendation').hidden=current.length<2;
@@ -40,7 +41,7 @@ function renderList(){
  updateSnapshot();window.PetrolLive?.controls();
 }
 function renderDetail(){
- const s=stations.find(s=>s.id===selected);$('detail').hidden=!s;if(!s)return;const q=signal(s),op=q.opening,r=P.approachRoute(s),routes=s.approach?.routes||[];
+ const s=stations.find(s=>s.id===selected);$('detail').hidden=!s||!!drawController?.active;if(!s)return;const q=signal(s),op=q.opening,r=P.approachRoute(s),routes=s.approach?.routes||[];
  $('detail').style.setProperty('--pin',colours[q.tone]);
  const access=s.access?.status==='mapped';
  const main=q.measured?(r&&r.continuousSlowMetres!==null?`<div class="busy-measure"><span>Continuous slow stretch · sampled approach</span><strong>${r.continuousSlowMetres===0?(s.approach.status==='matched'?'None detected':'Uncertain'):e(P.approachLabel(r))}</strong></div><p class="approach-severity">${e(q.label)}${r.relativeSpeed!==null?` · ${Math.round(r.relativeSpeed*100)}% of free-flow speed`:''}</p><p class="traffic-evidence">${e(r.name)} · heading ${e(r.direction)}<br>${r.coveredMetres} / 200 m covered${routes.length>1?` · longest slow stretch of ${routes.length} mapped approaches`:''}</p>${r.extent==='limit'?'<p class="traffic-caveat">Slow traffic reaches the 200 m limit. It may extend farther.</p>':r.extent==='gap'?'<p class="traffic-caveat">A coverage gap or an uncertain road connection prevents measuring the full slow stretch.</p>':''}${r.otherSlowMetres?`<p class="traffic-caveat">Another ≈ ${Math.round(r.otherSlowMetres/10)*10} m is slow farther back, separated from the access by faster traffic or missing coverage.</p>`:''}`:`<div class="busy-measure"><span>Traffic approaching the station</span><strong>${e(q.label)}</strong></div><p class="traffic-evidence">${access?'The incoming road could not be matched completely to traffic data.':'A connected entrance road could not be identified reliably in the available map data.'}</p>`)+`<div class="nearby-reading"><strong>${e(P.nearbyLabel(s))}</strong><span>All covered road directions within 250 m</span>${r?.continuousSlowMetres===0&&P.slowdown(s)>0?'<p>The bold sampled approach reports flowing traffic. The thin orange/red lines show slow traffic outside that continuous approach stretch. Neither reading measures the petrol queue.</p>':''}</div><p class="quality-note">${q.rankable?'Mapped access · experimental road signal':q.fresh?'Excluded from station comparison':'Outdated or latest check failed · excluded'}<br>${access?'The A marker shows the mapped road access. Entrance and turn access have not been checked on site.':'Nearby road colours are still available as context.'}</p>${r?`<p class="trend-note">${e(P.trendLabel(s))}${q.fresh&&s.trend?.checks>=2?'<br><span>Slow traffic seen in both checks; conditions between them are unknown.</span>':''}</p>`:''}<p class="checked">Queried ${dateLabel(s.checkedAt)} · ${e(ageLabel(s.checkedAt))}</p><details class="road-context"><summary>Road colours and measurement scope</summary><p>${P.slowPercent(s)}% of covered road directions are slow within 250 m: ≈ ${s.jamMetres} m congested, ${s.slowMetres} m slow. This wider total is not used to rank stations. Faint map lines show these roads; bold lines show matched incoming approaches.</p><p>Query time is when we fetched the data. TomTom does not give an observation time for each road in this feed.</p></details>`:`<div class="busy-measure"><span>Traffic approaching the station</span><strong>${s.refreshFailed?'Traffic unavailable':access?'Ready to check':'Entrance not mapped'}</strong></div><p class="traffic-evidence" id="empty-reading-note">${access?'Refresh to measure incoming roads at the mapped access. The blue dashed line shows the approach to check.':'Refresh for nearby-road context. This station stays out of the approach ranking until its access can be mapped.'}</p>`;
@@ -94,15 +95,15 @@ function locate(){
   changeScope();revealMap();
  },error=>fail(error.code),{enableHighAccuracy:true,timeout:15000,maximumAge:0});
 }
-function fitAll(){if(!map)return;const list=scopedStations();if(!list.length){if($('area').value==='nearby')focusLocation();return;}const bounds=new maplibregl.LngLatBounds();list.forEach(s=>bounds.extend(s.coordinates));if($('area').value==='nearby'&&origin)bounds.extend(origin);map.fitBounds(bounds,{padding:{top:110,bottom:65,left:55,right:70},maxZoom:14,duration:0});}
+function fitAll(){if(!map)return;if(customBounds){map.fitBounds([[customBounds[0],customBounds[1]],[customBounds[2],customBounds[3]]],{padding:70,maxZoom:16,duration:0});return;}const list=scopedStations();if(!list.length){if($('area').value==='nearby')focusLocation();return;}const bounds=new maplibregl.LngLatBounds();list.forEach(s=>bounds.extend(s.coordinates));if($('area').value==='nearby'&&origin)bounds.extend(origin);map.fitBounds(bounds,{padding:{top:110,bottom:65,left:55,right:70},maxZoom:14,duration:0});}
 function initMap(){
- mapReady=false;locationMarker?.remove();locationMarker=null;
+ mapReady=false;drawController?.destroy();drawController=null;$('draw-area').disabled=true;locationMarker?.remove();locationMarker=null;
  if(!window.maplibregl){$('map-error').hidden=false;return;}
  try{
   map=new maplibregl.Map({container:'map',style:'https://tiles.openfreemap.org/styles/positron',center:[115.201,-8.787],zoom:12,minZoom:7,maxZoom:18,attributionControl:false,cooperativeGestures:false,scrollZoom:true});
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');map.addControl(new maplibregl.AttributionControl({compact:false}),'bottom-right');
   markers=stations.map(s=>{const element=document.createElement('button');element.className='map-pin';element.innerHTML=`<span class="pin-number">${s.number}</span><span class="pin-caption"></span>`;element.dataset.side=s.id==='bypass-27'?'left':'right';element.addEventListener('click',()=>selectStation(s.id,true,true));return {id:s.id,element,marker:new maplibregl.Marker({element}).setLngLat(s.coordinates).addTo(map)};});
-  map.on('load',()=>{mapReady=true;$('map-error').hidden=true;renderLocation();if($('area').value==='nearby'&&locationFix)focusLocation();else fitAll();renderList();});map.on('zoomend',()=>renderList());
+  map.on('load',()=>{mapReady=true;$('map-error').hidden=true;initDrawing();renderRectangle();renderLocation();if($('area').value==='nearby'&&locationFix)focusLocation();else fitAll();renderList();});map.on('zoomend',()=>renderList());map.on('movestart',ev=>{if(ev.originalEvent)fitSavedAfterLoad=false;});
   setTimeout(()=>{if(!mapReady&&!window.PetrolLive?.active)$('map-error').hidden=false;},12000);renderList();
  }catch{$('map-error').hidden=false;}
 }
@@ -114,8 +115,40 @@ async function loadData(){
  renderList();renderDetail();initMap();$('locate').disabled=false;
  }catch{$('stations').innerHTML='<li class="empty">Station locations could not load. Reload the page to retry.</li>';}
 }
-function changeScope(){selected=null;const url=new URL(location.href);url.hash='';url.searchParams.set('area',$('area').value);history.replaceState(null,'',url);window.PetrolLive?.scopeChanged();renderList();renderDetail();if($('area').value==='nearby'&&locationFix)focusLocation();else fitAll();}
-$('area').addEventListener('change',()=>{$('search').value='';changeScope();});$('search').addEventListener('input',()=>{window.PetrolLive?.scopeChanged();renderList();});
+function renderRectangle(){
+ $('drawn-scope').hidden=!customBounds;
+ if(!map||!mapReady)return;
+ const b=customBounds,data={type:'FeatureCollection',features:b?[{type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[[[b[0],b[1]],[b[2],b[1]],[b[2],b[3]],[b[0],b[3]],[b[0],b[1]]]]}}]:[]};
+ if(map.getSource('chosen-area'))map.getSource('chosen-area').setData(data);
+ else if(b){map.addSource('chosen-area',{type:'geojson',data});map.addLayer({id:'chosen-area-fill',type:'fill',source:'chosen-area',paint:{'fill-color':'#174a9b','fill-opacity':.045}});map.addLayer({id:'chosen-area-outline',type:'line',source:'chosen-area',paint:{'line-color':'#174a9b','line-width':2,'line-dasharray':[3,2]}});}
+}
+function endDrawing(){$('show-all').disabled=false;document.querySelector('.map-wrap').classList.remove('is-drawing');$('draw-area').textContent='Draw area';$('draw-area').setAttribute('aria-pressed','false');$('draw-status').hidden=true;renderDetail();$('draw-area').focus({preventScroll:true});}
+function initDrawing(){
+ if(!window.PetrolDraw)return;
+ drawController=window.PetrolDraw({map,surface:$('area-draw-surface'),box:$('area-draw-box'),cursor:$('area-draw-cursor'),status:$('draw-status'),onCancel:endDrawing,onComplete(bounds){
+  customBounds=bounds;if(!$('area').querySelector('[value="drawn"]'))$('area').insertAdjacentHTML('afterbegin','<option value="drawn">Drawn rectangle</option>');
+  $('area').value='drawn';$('search').value='';$('traffic-view').value='all';endDrawing();changeScope({fit:false});notify(`${scopedStations(true).length} stations inside your rectangle. Saved traffic loads automatically.`);
+ }});$('draw-area').disabled=false;
+}
+function changeScope({fit=true}={}){
+ fitSavedAfterLoad=false;drawController?.cancel();selected=null;
+ if($('area').value!=='drawn'){customBounds=null;$('area').querySelector('[value="drawn"]')?.remove();}
+ const url=new URL(location.href);url.hash='';url.searchParams.set('area',$('area').value==='drawn'?'all':$('area').value);history.replaceState(null,'',url);
+ renderRectangle();window.PetrolLive?.scopeChanged();renderList();renderDetail();if(fit){if($('area').value==='nearby'&&locationFix)focusLocation();else fitAll();}
+}
+$('area').addEventListener('change',()=>{$('search').value='';changeScope();});
+$('search').addEventListener('input',()=>changeScope({fit:false}));
+$('saved-only').addEventListener('change',()=>changeScope({fit:false}));
+$('all-saved').addEventListener('click',()=>{
+ $('area').value='all';$('search').value='';$('saved-only').checked=true;$('traffic-view').value='all';changeScope();fitSavedAfterLoad=!!window.PetrolLive?.loadingSaved();revealMap();
+});
+$('clear-rectangle').addEventListener('click',()=>{$('area').value='all';changeScope();});
+$('traffic-view').addEventListener('change',()=>window.PetrolLive?.updateMarkers());
+$('draw-area').addEventListener('click',()=>{
+ if(!drawController)return;if(drawController.active){drawController.cancel();return;}
+ fitSavedAfterLoad=false;$('show-all').disabled=true;$('draw-status').hidden=false;drawController.start();document.querySelector('.map-wrap').classList.add('is-drawing');$('draw-area').textContent='Cancel drawing';$('draw-area').setAttribute('aria-pressed','true');$('detail').hidden=true;
+});
+window.PetrolView={savedLoaded(){if(fitSavedAfterLoad){fitSavedAfterLoad=false;fitAll();}}};
 $('show-all').addEventListener('click',fitAll);
 $('locate').addEventListener('click',locate);
 $('retry-map').addEventListener('click',()=>{map?.remove();map=null;markers=[];initMap();});

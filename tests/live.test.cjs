@@ -35,7 +35,7 @@ test('area button actually checks all 15 back-to-back without timers or paid pag
  const s=await setup();assert.equal(s.posts.length,0);assert.equal(s.$('traffic-refresh').textContent,'Refresh area · 15');
  await s.events.get('traffic-refresh:click')();
  assert.deepEqual(s.posts.map(p=>p.length),[5,5,5]);assert.equal(new Set(s.posts.flat()).size,15);
- assert.equal(s.context.PetrolLive.readings.size,15);assert.equal(s.$('traffic-refresh').disabled,true);
+ assert.equal(s.context.PetrolLive.readings.size,15);assert.equal(s.$('traffic-refresh').disabled,true);assert.match(s.$('traffic-refresh').textContent,/Refresh available in 15 min/);assert.match(s.$('refresh-summary').textContent,/Saved readings are shown/);
  assert.match(s.$('owner-status').textContent,/15 of 15 stations updated/);assert.match(s.$('check-budget').textContent,/35 station checks/);
 });
 
@@ -45,12 +45,15 @@ test('selected-station refresh sends exactly that one ID, then oldest skips its 
  assert.equal(s.posts.length,2);assert.equal(s.posts[1].length,5);assert.ok(!s.posts[1].includes('s3'));
 });
 
-test('selecting a station hides overlapping snapshots from neighbouring stations until selection clears',async()=>{
+test('all shown traffic survives selection and can be isolated explicitly without new checks',async()=>{
  const s=await setup();await s.events.get('traffic-refresh:click')();
  assert.equal(new Set(s.sources.get('station-traffic').data.features.map(f=>f.properties.id)).size,15);
  s.context.selected='s3';s.context.PetrolLive.updateMarkers();
+ assert.equal(new Set(s.sources.get('station-traffic').data.features.map(f=>f.properties.id)).size,15);
+ s.$('traffic-view').value='selected';s.context.PetrolLive.updateMarkers();
  assert.deepEqual([...new Set(s.sources.get('station-traffic').data.features.map(f=>f.properties.id))],['s3']);
  assert.match(s.$('map-layer-note').textContent,/Only this station/);
+ assert.equal(s.posts.length,3);
  s.context.selected=null;s.context.PetrolLive.updateMarkers();
  assert.equal(new Set(s.sources.get('station-traffic').data.features.map(f=>f.properties.id)).size,15);
 });
@@ -243,4 +246,19 @@ test('server allowance replaces the old 50-check cap and shows accurate usage',a
  await s.events.get('traffic-refresh:click')();
  assert.equal(s.posts.flat().length,15);assert.equal(s.context.PetrolLive.readings.size,15);
  assert.match(s.$('check-budget').textContent,/935 station checks left today.*65\/1000 used/);
+});
+
+test('saved-only mode still discovers unloaded archived readings and scope changes never request live traffic',async()=>{
+ const first=await setup();await first.context.PetrolLive.refreshStation('s3');const saved=first.context.PetrolLive.readings.get('s3'),urls=[];
+ const s=await setup({initialHandle:'',onRequest:({url,context})=>{
+  urls.push(url);context.scopedStations=(includeWithoutData=false)=>includeWithoutData?context.stations:context.stations.filter(P.hasSaved);
+  return new Response(JSON.stringify(url.includes('index.json')?{schemaVersion:1,stations:{s3:{checkedAt:saved.checkedAt}}}:saved));
+ }});
+ assert.equal(urls.length,2);assert.equal(s.context.scopedStations().length,1);assert.equal(s.posts.length,0);
+ s.context.PetrolLive.scopeChanged();await new Promise(setImmediate);assert.equal(urls.length,2);assert.equal(s.posts.length,0);assert.equal(s.context.PetrolLive.loadingSaved(),false);
+});
+test('rectangle scope refresh and traffic display use only stations inside the selected bounds',async()=>{
+ const s=await setup(),area={bounds:[115.002,-8.001,115.004,-7.999]};
+ s.context.scopedStations=()=>P.inScope(s.context.stations,area);s.context.PetrolLive.scopeChanged();await s.events.get('traffic-refresh:click')();
+ assert.deepEqual(Array.from(s.posts[0]),['s2','s3','s4']);assert.deepEqual([...new Set(s.sources.get('station-traffic').data.features.map(f=>f.properties.id))],['s2','s3','s4']);
 });

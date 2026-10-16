@@ -8,7 +8,9 @@
 
 Choose an area and refresh all due stations, the five oldest checks (unchecked first), or one selected station. Requests run immediately in batches of five. The 15-minute cooldown applies only to the same station. Counts distinguish the area from all 293 locations.
 
-Ordinary scrolling zooms the map. A selected pin has a blue outline and name caption. On phones, selecting a list row scrolls to the map; details appear immediately below it. Google Maps links open the place without directions or the user's location. Listed opening hours remain unverified and never exclude a station from comparison.
+“All saved traffic” selects every station across Bali with a successful saved measurement, including outdated or retained readings after a failed check. The saved-only filter also works in preset areas and drawn rectangles. “Draw area” accepts dragging, two taps, or arrow keys + Enter; Escape cancels. Inclusive geographic bounds filter station locations, not individual road segments. Browsing only downloads existing saved readings and never requests paid traffic.
+
+Ordinary scrolling zooms the map. A selected pin has a blue outline and name caption. On phones, the music player sits below the map in normal page flow. Selecting a list row scrolls to the map; details appear immediately below it. Google Maps links open the place without directions or the user's location. Listed opening hours remain unverified and never exclude a station from comparison.
 
 “Near me” requests a fresh, high-accuracy location fix and focuses on a labelled blue position dot with the browser's accuracy circle. Estimates wider than 250 m are labelled “Approximate location”. The sidebar confirms accuracy and fix time; tap the button again to update. On phones it brings the map into view. The station list still covers 8 km, and “Fit this area” shows those stations plus the position. Location stays in page memory and is never added to the URL or traffic archive. Permission failures preserve an existing fix with an explicit warning.
 
@@ -91,7 +93,7 @@ Traffic attribution: © TomTom. Basemap: OpenFreeMap/OpenStreetMap. Expanded sta
 
 ## Development and deployment
 
-Station selection draws only that station's traffic snapshot, avoiding overlapping colours from neighbouring checks made at other times. The list and detail show the sampled approach separately from all nearby slow/congested road directions within 250 m. A zero continuous approach is labelled “No slowdown detected on approach”; nearby slow roads stay visible and neither measurement claims to establish a petrol queue length.
+The default map view shows traffic from all stations in the current scope, including when one station is selected. The Show traffic control can isolate the selected station's snapshot. All-station readings can have different query times; outdated data stays dashed. The list and detail show the sampled approach separately from all nearby slow/congested road directions within 250 m. A zero continuous approach is labelled “No slowdown detected on approach”; nearby slow roads stay visible and neither measurement claims to establish a petrol queue length.
 
 If GitHub verification is temporarily unavailable, the owner can retry or use “Reconnect with GitHub” directly without signing out first. Transient failures retain the session and displayed measurements. The shared sign-in service renews expiring tokens in its native Worker runtime; invalid refresh credentials ask for sign-in and never unlock traffic without verification.
 
