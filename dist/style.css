@@ -48,3 +48,19 @@
 .location-status[data-state=error]{color:#7e622e}
 #locate[data-located=true]{color:#174a8a;border-color:#8aaed9;background:#edf4fd}
 @media(max-width:760px){.location-status{font-size:12px}}
+
+/* Compact soundtrack control, kept clear of the map's zoom and station details. */
+.music-player{position:absolute;top:22px;right:64px;z-index:2;display:flex;align-items:center;gap:12px;width:188px;height:62px;padding:9px 12px;background:#1d292c;border-radius:12px;box-shadow:0 3px 8px #172d2526}
+.music-player #music-toggle{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:#fafcf9;color:#1d292c}
+.music-player #music-toggle:hover{background:#e4eee8}
+.music-player #music-toggle:focus-visible{outline-color:#efbb83;outline-offset:4px}
+.music-player svg{width:21px;height:21px;fill:currentColor;pointer-events:none}
+#music-wave{display:block;width:112px;height:32px;min-width:0;flex:1;pointer-events:none}
+.music-player[data-state=loading] #music-wave{opacity:.45}
+#music-message{position:absolute;top:calc(100% + 7px);right:0;width:210px;margin:0;padding:9px 11px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink);font-size:11px;line-height:1.5}
+.music-volume-label{display:flex;justify-content:space-between;margin-top:16px;font-size:12px;color:var(--muted)}
+#music-volume{width:100%;min-height:36px;accent-color:var(--green)}
+#music-track{margin-top:7px}
+@media(min-width:761px){.map-label{top:96px}}
+@media(max-width:760px){.music-player{top:12px;right:12px;width:170px;height:56px;padding:6px 10px;gap:10px}.map-label{top:83px;max-width:calc(100% - 68px)}.maplibregl-ctrl-top-right{top:89px}.map-toolbar{right:auto}}
+@media(max-width:400px){.music-player{width:150px}}

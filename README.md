@@ -12,6 +12,16 @@ Ordinary scrolling zooms the map. A selected pin has a blue outline and name cap
 
 “Near me” requests a fresh, high-accuracy location fix and focuses on a labelled blue position dot with the browser's accuracy circle. Estimates wider than 250 m are labelled “Approximate location”. The sidebar confirms accuracy and fix time; tap the button again to update. On phones it brings the map into view. The station list still covers 8 km, and “Fit this area” shows those stations plus the position. Location stays in page memory and is never added to the URL or traffic archive. Permission failures preserve an existing fix with an explicit warning.
 
+## Background music
+
+An optional compact music player offers the same four background tracks as Live
+Lane, with an audio-reactive visualizer. Press Play to begin a shuffled rotation;
+choose a song or adjust volume in Settings → Relaxing music. Audio files load only
+after Play, and never autoplay on page load. Volume is remembered locally. Pausing,
+reduced-motion preferences and background tabs stop the visualizer's animation.
+Music is served as static Pages assets without traffic API calls. Credits and
+the separate soundtrack licences are in `dist/music/CREDITS.md`.
+
 ## Measurement
 
 The Worker uses **TomTom Orbis v2 vector flow tiles**, decoded with pinned `@mapbox/vector-tile` and `pbf`. Google Routes returned all-NORMAL intervals despite visible congestion and is no longer called. No paid Google basemap is loaded.
