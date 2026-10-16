@@ -1,9 +1,10 @@
 (function(root){
  'use strict';
  function distance(a,b){const r=Math.PI/180,x=(b[1]-a[1])*r,y=(b[0]-a[0])*r,h=Math.sin(x/2)**2+Math.cos(a[1]*r)*Math.cos(b[1]*r)*Math.sin(y/2)**2;return 6371*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));}
- function fresh(date,now=Date.now()){const t=Date.parse(date);return Number.isFinite(t)&&now-t<900000&&t<=now+60000;}
+ const TRAFFIC_FRESH_MS=2*60*60*1000;
+ function fresh(date,now=Date.now(),maxAge=TRAFFIC_FRESH_MS){const t=Date.parse(date);return Number.isFinite(t)&&now-t<maxAge&&t<=now+60000;}
  function opening(s,now=Date.now()){
-   const state=s.operatingStatus||'unknown',source=s.operatingSource||'unknown',recent=fresh(s.operatingCheckedAt,now),firsthand=source==='firsthand';
+   const state=s.operatingStatus||'unknown',source=s.operatingSource||'unknown',recent=fresh(s.operatingCheckedAt,now,15*60*1000),firsthand=source==='firsthand';
    const label=state==='unknown'?'Opening unconfirmed':firsthand?(recent?'Reported ':'Earlier report: ')+state:'Listed '+state+' · unverified';
    return {label,state,source,recent,checkedAt:s.operatingCheckedAt,blocked:state==='closed'&&firsthand&&recent};
  }

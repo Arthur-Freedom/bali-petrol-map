@@ -18,6 +18,7 @@ test('a flowing approach and slow surrounding roads remain distinct visible meas
 test('only a recent explicit firsthand closure can block, never a legacy unsourced closure',()=>{
  const s=station('x',0,{operatingStatus:'closed',operatingCheckedAt:at});assert.equal(P.status(s,now).blocked,false);
  assert.equal(P.status({...s,operatingSource:'firsthand'},now).blocked,true);
+ assert.equal(P.status({...s,operatingSource:'firsthand'},Date.parse(at)+23*60000).blocked,false);
  assert.equal(P.status({...s,operatingSource:'firsthand',operatingCheckedAt:'2026-10-14T00:00:00+08:00'},now).blocked,false);
 });
 test('traffic refresh never freshens opening information or invents waiting minutes',()=>{
@@ -93,8 +94,18 @@ test('traffic responses require current timestamps, complete numbers and usable 
  assert.equal(P.validReading(reading,'another-station',clock),false);
 });
 
-test('readings expire after 15 minutes and geometry must stay near the requested station',()=>{
- assert.equal(P.fresh(at,Date.parse(at)+900000),false);
+test('traffic stays comparable for two hours while refresh eligibility remains independent',()=>{
+ const s=station('one',100),base=Date.parse(at);
+ for(const age of [23*60000,2*60*60000-1]){
+  const clock=base+age;
+  assert.equal(P.fresh(at,clock),true);assert.equal(P.status(s,clock).rankable,true);
+  assert.equal(P.refreshPlan([s],[115,-8],{remainingChecks:1,stationNextAt:{one:base+15*60000}},'area',clock).targets.length,1);
+ }
+ assert.equal(P.fresh(at,base+2*60*60000),false);assert.equal(P.status(s,base+2*60*60000).rankable,false);
+ assert.equal(P.fresh('not a date',base),false);assert.equal(P.fresh(new Date(base+61000).toISOString(),base),false);
+});
+
+test('traffic geometry must stay near the requested station and use the expected provider',()=>{
  const reading={id:'one',approach:unmapped(),provider:'tomtom-orbis-v2',radiusMetres:250,nearestRoadMetres:0,closedMetres:0,jamMetres:0,slowMetres:0,coveredMetres:500,checkedAt:at,segments:[{from:[115,-8],to:[115.001,-8],speed:'NORMAL',relativeSpeed:1,closed:false}]};
  assert.equal(P.validReading(reading,'one',Date.parse(at),[116,-8]),false);
  assert.equal(P.validReading({...reading,provider:'google'},'one',Date.parse(at)),false);

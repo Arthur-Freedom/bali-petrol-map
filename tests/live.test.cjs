@@ -82,7 +82,9 @@ test('map colours use exactly the validated readings, with selection emphasis an
  let features=s.sources.get('station-traffic').data.features;
  assert.equal(features.length,1);assert.equal(features[0].properties.color,'#43855c');assert.equal(features[0].properties.selected,false);
  s.context.selected='s3';s.context.PetrolLive.updateMarkers();features=s.sources.get('station-traffic').data.features;assert.equal(features[0].properties.selected,true);assert.equal(s.posts.length,1);
- s.context.PetrolLive.readings.get('s3').checkedAt=new Date(Date.now()-900001).toISOString();s.context.PetrolLive.updateMarkers();
+ const savedAt=new Date(Date.now()-23*60000).toISOString();s.context.PetrolLive.readings.get('s3').checkedAt=savedAt;s.context.PetrolLive.updateMarkers();
+ features=s.sources.get('station-traffic').data.features;assert.equal(features[0].properties.stale,false);assert.equal(s.$('earlier-legend').hidden,true);assert.equal(s.context.PetrolLive.readings.get('s3').checkedAt,savedAt);assert.equal(s.posts.length,1);
+ s.context.PetrolLive.readings.get('s3').checkedAt=new Date(Date.now()-2*60*60000-1).toISOString();s.context.PetrolLive.updateMarkers();
  features=s.sources.get('station-traffic').data.features;assert.equal(features.length,1);assert.equal(features[0].properties.stale,true);assert.equal(features[0].properties.color,'#43855c');assert.equal(s.$('earlier-legend').hidden,false);assert.match(s.$('map-layer-note').textContent,/outdated/);
  assert.deepEqual(Array.from(s.layers.find(l=>l.id==='traffic-earlier-colours').paint['line-dasharray']),[2,2]);
  s.context.PetrolLive.clear();assert.equal(s.sources.get('station-traffic').data.features.length,0);assert.equal(s.$('road-legend').hidden,true);
@@ -99,7 +101,7 @@ test('using the last daily check retains the measurement and blocks all further 
 
 test('outdated nearby-road dashes follow continuous geometry without joining gaps or colour changes',async()=>{
  const s=await setup();await s.context.PetrolLive.refreshStation('s3');const reading=s.context.PetrolLive.readings.get('s3');
- reading.checkedAt=new Date(Date.now()-3600000).toISOString();
+ reading.checkedAt=new Date(Date.now()-3*60*60000).toISOString();
  const point=n=>[115.003+n*.00001,-8],edge=(a,b,speed='SLOW')=>({from:point(a),to:point(b),speed,closed:false});
  reading.segments=[edge(1,0),edge(2,1),edge(4,3),edge(5,4,'TRAFFIC_JAM')];
  s.context.PetrolLive.updateMarkers();const approach=s.sources.get('station-traffic').data.features;
@@ -228,7 +230,7 @@ test('an archive save failure retains current values but stops remaining paid ba
 
 test('signed-out visitors load the public GitHub backup without calling the Worker or TomTom',async()=>{
  const first=await setup();await first.context.PetrolLive.refreshStation('s3');
- const saved={...first.context.PetrolLive.readings.get('s3'),checkedAt:new Date(Date.now()-3600000).toISOString()},urls=[];
+ const saved={...first.context.PetrolLive.readings.get('s3'),checkedAt:new Date(Date.now()-3*60*60000).toISOString()},urls=[];
  const s=await setup({initialHandle:'',onRequest:({url})=>{
    urls.push(url);assert.ok(url.startsWith('https://raw.githubusercontent.com/Arthur-Freedom/bali-petrol-map/refs/heads/traffic-history/'));
    return new Response(JSON.stringify(url.includes('index.json')?{schemaVersion:1,updatedAt:saved.checkedAt,stations:{s3:{checkedAt:saved.checkedAt,lastAttemptStatus:'success'}}}:saved));
