@@ -57,7 +57,7 @@
      if(!visible.has(data.id)||!data.checkedAt)continue;
      if(onlySelected&&data.id!==selected)continue;
      const stale=data.refreshFailed||!P.fresh(data.checkedAt);
-     const addSegments=(segments,focus)=>{
+     const addSegments=segments=>{
        let previous;const same=(a,b)=>a.every((n,i)=>Math.abs(n-b[i])<1e-10);
        for(const segment of segments){
          const color=segment.closed?'#343f49':segment.speed==='TRAFFIC_JAM'?'#b74335':segment.speed==='SLOW'?'#df931c':'#43855c',points=previous?.geometry.coordinates;
@@ -65,25 +65,24 @@
          // restart on every five-metre sample. Never join across a gap.
          if(previous?.properties.color===color&&same(points.at(-1),segment.from)){points.push(segment.to);continue;}
          if(previous?.properties.color===color&&same(points[0],segment.to)){points.unshift(segment.from);continue;}
-         previous={type:'Feature',properties:{id:data.id,selected:data.id===selected,focus,stale:!!stale,color},geometry:{type:'LineString',coordinates:[segment.from,segment.to]}};features.push(previous);
+         previous={type:'Feature',properties:{id:data.id,selected:data.id===selected,slow:segment.speed!=='NORMAL',stale:!!stale,color},geometry:{type:'LineString',coordinates:[segment.from,segment.to]}};features.push(previous);
        }
      };
-     addSegments(data.segments||[],false);
-     for(const route of data.approach?.routes||[])addSegments(route.segments,true);
+     addSegments(data.segments||[]);
    }
    const data={type:'FeatureCollection',features};
    if(map.getSource('station-traffic'))map.getSource('station-traffic').setData(data);
    else{
      map.addSource('station-traffic',{type:'geojson',data,attribution:'Traffic © <a href="https://www.tomtom.com/" target="_blank" rel="noopener">TomTom</a>'});
-     map.addLayer({id:'traffic-outline',type:'line',source:'station-traffic',filter:['==',['get','stale'],false],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#fff','line-width':['case',['get','selected'],9,6],'line-opacity':['case',['get','focus'],.9,0]}});
-     map.addLayer({id:'traffic-colours',type:'line',source:'station-traffic',filter:['==',['get','stale'],false],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['get','color'],'line-width':['case',['get','focus'],['case',['get','selected'],6,3],1.5],'line-opacity':['case',['get','focus'],.95,['case',['get','selected'],.5,.25]]}});
-     map.addLayer({id:'traffic-earlier-outline',type:'line',source:'station-traffic',filter:['==',['get','stale'],true],paint:{'line-color':'#fff','line-width':['case',['get','selected'],9,6],'line-dasharray':[2,2],'line-opacity':['case',['get','focus'],.7,0]}});
-     map.addLayer({id:'traffic-earlier-colours',type:'line',source:'station-traffic',filter:['==',['get','stale'],true],paint:{'line-color':['get','color'],'line-width':['case',['get','focus'],['case',['get','selected'],6,3],1.5],'line-dasharray':[2,2],'line-opacity':['case',['get','focus'],.65,['case',['get','selected'],.4,.2]]}});
+     map.addLayer({id:'traffic-outline',type:'line',source:'station-traffic',filter:['==',['get','stale'],false],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#fff','line-width':['case',['get','selected'],9,6],'line-opacity':['case',['get','selected'],.9,.5]}});
+     map.addLayer({id:'traffic-colours',type:'line',source:'station-traffic',filter:['==',['get','stale'],false],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['get','color'],'line-width':['case',['get','slow'],['case',['get','selected'],5,3.5],['case',['get','selected'],3,2]],'line-opacity':['case',['get','slow'],.95,.55]}});
+     map.addLayer({id:'traffic-earlier-outline',type:'line',source:'station-traffic',filter:['==',['get','stale'],true],paint:{'line-color':'#fff','line-width':['case',['get','selected'],9,6],'line-dasharray':[2,2],'line-opacity':['case',['get','selected'],.7,.4]}});
+     map.addLayer({id:'traffic-earlier-colours',type:'line',source:'station-traffic',filter:['==',['get','stale'],true],paint:{'line-color':['get','color'],'line-width':['case',['get','slow'],['case',['get','selected'],5,3.5],['case',['get','selected'],3,2]],'line-dasharray':[2,2],'line-opacity':['case',['get','slow'],.75,.4]}});
    }
    const earlier=features.some(f=>f.properties.stale);$('earlier-legend').hidden=!earlier;
-   if(live.active){$('map-layer-title').textContent=earlier?'LAST TRAFFIC MEASUREMENTS':onlySelected?'SELECTED STATION’S TRAFFIC':'SAVED TRAFFIC · SHOWN STATIONS';$('map-layer-note').textContent=(onlySelected?'Only this station’s reading · ':'All shown stations · dates may differ · ')+(earlier?'Dashed: outdated':'Bold: approaches · thin: nearby roads');}
+   if(live.active){$('map-layer-title').textContent=earlier?'LAST TRAFFIC MEASUREMENTS':onlySelected?'SELECTED STATION’S TRAFFIC':'SAVED TRAFFIC · SHOWN STATIONS';$('map-layer-note').textContent=(onlySelected?'Only this station’s reading · ':'All shown stations · dates may differ · ')+(earlier?'Dashed: outdated':'Orange / red: counted nearby slowdown');}
  }
- function showTraffic(){live.active=true;$('road-legend').hidden=false;$('map-layer-title').textContent='TRAFFIC AT MAPPED ACCESSES';$('map-layer-note').textContent='Bold: incoming approaches · faint: nearby roads';drawTraffic();}
+ function showTraffic(){live.active=true;$('road-legend').hidden=false;$('map-layer-title').textContent='NEARBY ROAD SLOWDOWN';$('map-layer-note').textContent='Orange / red roads count toward the displayed total';drawTraffic();}
  async function loadPublicSaved(){
    if(publicLoading||owner.get())return;publicLoading=true;const generation=epoch,scope=scopeVersion;
    try{

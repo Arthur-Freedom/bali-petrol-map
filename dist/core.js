@@ -8,22 +8,23 @@
    return {label,state,source,recent,checkedAt:s.operatingCheckedAt,blocked:state==='closed'&&firsthand&&recent};
  }
  function status(s,now=Date.now()){
-   const measured=Number.isFinite(s.jamMetres),recent=fresh(s.checkedAt,now)&&!s.refreshFailed,op=opening(s,now);
-   const route=approachRoute(s),matched=s.approach?.status==='matched',rankable=measured&&recent&&matched&&!op.blocked;
-   const closed=s.approach?.routes?.some(r=>r.closedMetres>0);
-   const tone=op.blocked?'unavailable':!matched?'unknown':closed?'unavailable':route?.jamMetres>0?'long':route?.continuousSlowMetres>0?'medium':'neutral';
-   const base=op.blocked?'Reported closed':!measured?(s.refreshFailed?'Traffic unavailable':'Not checked'):!matched?(s.approach?.status==='partial'?'Approach partly covered':'Entrance not mapped'):closed?'Road closure on an approach':route?.continuousSlowMetres===0?'No slowdown detected on approach':route?.jamMetres>0?'Congested approach':'Slow approach';
+   const measured=Number.isFinite(s.jamMetres)&&Number.isFinite(s.slowMetres),recent=fresh(s.checkedAt,now)&&!s.refreshFailed,op=opening(s,now);
+   const rankable=measured&&recent&&s.coveredMetres>=150&&!op.blocked,closed=s.closedMetres>0;
+   const tone=op.blocked||closed?'unavailable':!measured?'unknown':s.jamMetres>0?'long':s.slowMetres>0?'medium':'neutral';
+   const base=op.blocked?'Reported closed':!measured?(s.refreshFailed?'Traffic unavailable':'Not checked'):closed?'Road closure reported nearby':s.jamMetres>0?'Congested roads nearby':s.slowMetres>0?'Slow roads nearby':'No slow roads reported';
    return {tone,label:measured&&!recent&&!op.blocked?'Earlier: '+base.toLowerCase():base,fresh:recent,measured,rankable,blocked:op.blocked,opening:op};
  }
  function approachRoute(s){return s.approach?.routes?.find(r=>r.id===s.approach.selectedId)||null;}
  function approachLabel(route){if(!route||route.continuousSlowMetres===null)return 'Unknown';const n=route.continuousSlowMetres,m=n===0?0:Math.max(10,Math.round(n/10)*10);return route.extent==='limit'?`${m}+ m`:route.extent==='gap'&&n>0?`At least ${m} m`:`${n>0?'≈ ':''}${m} m`;}
- function approachSummary(s){const r=approachRoute(s);if(!r||r.continuousSlowMetres===null)return status(s).label;if(r.continuousSlowMetres===0)return s.approach.status==='matched'?'No slowdown detected on approach':'Approach partly covered';return approachLabel(r)+' slow on approach';}
+ function approachSummary(s){const r=approachRoute(s);if(!r||r.continuousSlowMetres===null)return s.approach?.status==='partial'?'Approach partly covered':'Entrance not mapped';if(r.continuousSlowMetres===0)return s.approach.status==='matched'?'No slowdown detected on approach':'Approach partly covered';return approachLabel(r)+' slow on approach';}
  function nearbyLabel(s){if(!Number.isFinite(s.jamMetres)||!Number.isFinite(s.slowMetres))return 'Nearby traffic unknown';const n=slowdown(s);return n>0?`Nearby: ≈ ${Math.max(10,Math.round(n/10)*10)} m slow / congested`:'Nearby: no slowdown detected';}
  function slowdown(s){return Math.max(0,s.jamMetres||0)+Math.max(0,s.slowMetres||0);}
  function slowPercent(s){return Math.min(100,Math.round(slowdown(s)/Math.max(1,s.coveredMetres||1000)*100));}
+ function nearbyValue(s){if(!Number.isFinite(s.jamMetres)||!Number.isFinite(s.slowMetres))return 'Unknown';const n=slowdown(s);return n>0?`≈ ${Math.max(10,Math.round(n/10)*10)} m`:'No slow roads reported';}
+ function nearbySummary(s){const value=nearbyValue(s);return slowdown(s)>0?value+' slow / congested nearby':value;}
  function compareTraffic(a,b){
-   const x=approachRoute(a),y=approachRoute(b);if(a.approach?.status!=='matched'||b.approach?.status!=='matched'||!x||!y)return 0;
-   return Number(a.approach.routes.some(r=>r.closedMetres>0))-Number(b.approach.routes.some(r=>r.closedMetres>0))||Math.round(x.continuousSlowMetres/10)-Math.round(y.continuousSlowMetres/10)||(x.extent==='limit'&&y.extent==='limit'?0:Math.round(x.jamMetres/10)-Math.round(y.jamMetres/10));
+   if(![a.jamMetres,a.slowMetres,b.jamMetres,b.slowMetres].every(Number.isFinite))return 0;
+   return Number(a.closedMetres>0)-Number(b.closedMetres>0)||Math.round(slowdown(a)/10)-Math.round(slowdown(b)/10)||Math.round(a.jamMetres/10)-Math.round(b.jamMetres/10);
  }
  function withTrend(previous,next){
    const a=approachRoute(previous||{}),b=approachRoute(next),dt=Date.parse(next.checkedAt)-Date.parse(previous?.checkedAt);
@@ -91,5 +92,5 @@
    return validApproach(reading.approach,point,center)&&Array.isArray(segments)&&segments.length>0&&segments.length<=3000&&segments.every(s=>s&&point(s.from)&&point(s.to)&&(!center||distance(center,s.from)<=.251&&distance(center,s.to)<=.251)&&Number.isFinite(s.relativeSpeed)&&s.relativeSpeed>=0&&s.relativeSpeed<=1&&typeof s.closed==='boolean'&&(!s.closed||s.relativeSpeed===0)&&s.speed===(s.relativeSpeed<=.35?'TRAFFIC_JAM':s.relativeSpeed<.7?'SLOW':'NORMAL'));
  }
  function validSavedReading(reading,id,now=Date.now(),center){return validReading(reading,id,now,center,Infinity);}
- const api={distance,fresh,opening,status,approachRoute,approachLabel,approachSummary,nearbyLabel,withTrend,trendLabel,slowdown,slowPercent,compareTraffic,ordered,rectangle,inBounds,hasSaved,inScope,refreshPlan,placeUrl,mergeLive,validReading,validSavedReading};if(typeof module!=='undefined'&&module.exports)module.exports=api;root.Petrol=api;
+ const api={distance,fresh,opening,status,approachRoute,approachLabel,approachSummary,nearbyLabel,nearbyValue,nearbySummary,withTrend,trendLabel,slowdown,slowPercent,compareTraffic,ordered,rectangle,inBounds,hasSaved,inScope,refreshPlan,placeUrl,mergeLive,validReading,validSavedReading};if(typeof module!=='undefined'&&module.exports)module.exports=api;root.Petrol=api;
 })(typeof window!=='undefined'?window:globalThis);

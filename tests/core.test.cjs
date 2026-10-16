@@ -1,10 +1,10 @@
 const test=require('node:test'),assert=require('node:assert/strict'),P=require('../dist/core.js'),catalog=require('../dist/stations.json');
 const now=Date.parse('2026-10-15T02:10:00+08:00'),at='2026-10-15T02:00:00+08:00';
 const unmapped=()=>({method:'entrance-road-v1',status:'unmapped',routes:[],selectedId:null});
-const station=(id,jamMetres,extra={})=>{const jam=Math.min(200,jamMetres||0),slow=Math.min(200-jam,extra.slowMetres||0),run=jam+slow;return {id,name:id,shortName:id,coordinates:[115,-8],jamMetres,checkedAt:at,approach:Number.isFinite(jamMetres)?{method:'entrance-road-v1',status:'matched',selectedId:'road',routes:[{id:'road',continuousSlowMetres:run,jamMetres:jam,slowMetres:slow,closedMetres:0,targetMetres:200,pathMetres:200,coveredMetres:200,complete:true,extent:run===200?'limit':'ended'}]}:unmapped(),...extra};};
+const station=(id,jamMetres,extra={})=>{const jam=Math.min(200,jamMetres||0),slow=Math.min(200-jam,extra.slowMetres||0),run=jam+slow;return {id,name:id,shortName:id,coordinates:[115,-8],jamMetres,slowMetres:0,coveredMetres:2000,closedMetres:0,checkedAt:at,approach:Number.isFinite(jamMetres)?{method:'entrance-road-v1',status:'matched',selectedId:'road',routes:[{id:'road',continuousSlowMetres:run,jamMetres:jam,slowMetres:slow,closedMetres:0,targetMetres:200,pathMetres:200,coveredMetres:200,complete:true,extent:run===200?'limit':'ended'}]}:unmapped(),...extra};};
 test('Google listed closures never override congestion or exclude a station',()=>{
  const low=station('quiet',0,{operatingStatus:'closed',operatingSource:'google_listing',operatingCheckedAt:at}),busy=station('busy',700);
- assert.equal(P.status(low,now).label,'No slowdown detected on approach');assert.equal(P.status(low,now).blocked,false);assert.equal(P.opening(low,now).label,'Listed closed · unverified');assert.equal(P.ordered([busy,low],null,now)[0].id,'quiet');
+ assert.equal(P.status(low,now).label,'No slow roads reported');assert.equal(P.status(low,now).blocked,false);assert.equal(P.opening(low,now).label,'Listed closed · unverified');assert.equal(P.ordered([busy,low],null,now)[0].id,'quiet');
 });
 
 test('a flowing approach and slow surrounding roads remain distinct visible measurements',()=>{
@@ -25,7 +25,7 @@ test('traffic refresh never freshens opening information or invents waiting minu
 });
 test('unknown, failed and stale readings cannot beat current observations',()=>{
  const old=station('old',0,{checkedAt:'2026-10-14T00:00:00+08:00'}),failed=station('failed',0,{refreshFailed:true}),unknown=station('unknown',null),fresh=station('fresh',900);
- assert.equal(P.ordered([old,failed,unknown,fresh],null,now)[0].id,'fresh');assert.equal(P.status(old,now).label,'Earlier: no slowdown detected on approach');assert.equal(P.status(unknown,now).label,'Not checked');
+ assert.equal(P.ordered([old,failed,unknown,fresh],null,now)[0].id,'fresh');assert.equal(P.status(old,now).label,'Earlier: no slow roads reported');assert.equal(P.status(unknown,now).label,'Not checked');
 });
 test('all requested areas contain mapped locations and API batches cap at five',()=>{
  for(const id of ['kuta','legian','seminyak','canggu','denpasar','pererenan','ubud','gianyar']){const area=catalog.areas.find(a=>a.id===id),list=P.inScope(catalog.stations,area);assert.ok(list.length>0,id);assert.ok(P.refreshPlan(list,area.center).batches.every(b=>b.length<=5));}
@@ -67,16 +67,16 @@ test('Google Maps links open the place or coordinate pin, never a directions req
 
 test('all-NORMAL responses stay neutral, and orange-only traffic affects classification and ranking',()=>{
  const zero=station('zero',0,{slowMetres:0}),orange=station('orange',0,{slowMetres:600}),red=station('red',10,{slowMetres:0});
- assert.equal(P.status(zero,now).tone,'neutral');assert.equal(P.status(zero,now).label,'No slowdown detected on approach');
+ assert.equal(P.status(zero,now).tone,'neutral');assert.equal(P.status(zero,now).label,'No slow roads reported');
  assert.equal(P.status(orange,now).tone,'medium');assert.equal(P.status(red,now).tone,'long');
  assert.deepEqual(P.ordered([orange,zero,red],null,now).map(s=>s.id),['zero','red','orange']);
  assert.equal(P.compareTraffic(zero,station('also-zero',0,{slowMetres:0})),0);
 });
 
-test('extra nearby roads cannot dilute an identical entrance signal or make a longer slowdown rank better',()=>{
+test('extra sampled roads cannot dilute the nearby slowdown total, and entrance mapping does not suppress valid traffic',()=>{
  const a=station('few-roads',0,{slowMetres:150,coveredMetres:500}),b=station('many-roads',0,{slowMetres:150,coveredMetres:2000}),c=station('longer',0,{slowMetres:200,coveredMetres:3000});
  assert.equal(P.compareTraffic(a,b),0);assert.ok(P.compareTraffic(a,c)<0);assert.equal(P.status(a,now).waitMinutes,undefined);
- const unknown=station('no-access',0,{approach:unmapped()});assert.equal(P.status(unknown,now).rankable,false);assert.equal(P.ordered([unknown,c],null,now)[0].id,'longer');
+ const unknown=station('no-access',0,{approach:unmapped()});assert.equal(P.status(unknown,now).rankable,true);assert.equal(P.ordered([unknown,c],null,now)[0].id,'no-access');
 });
 
 test('refresh planning respects the monthly balance even after the daily counter resets',()=>{
@@ -101,16 +101,16 @@ test('readings expire after 15 minutes and geometry must stay near the requested
  assert.equal(P.validReading({...reading,segments:[{...reading.segments[0],relativeSpeed:.1}]},'one',Date.parse(at)),false);
 });
 
-test('partial coverage, a failed refresh and stale zeros cannot rank as a clear approach',()=>{
- const busy=station('busy',150),partial=station('partial',0);partial.approach.status='partial';
+test('insufficient nearby coverage, a failed refresh and stale zeros cannot win the current road comparison',()=>{
+ const busy=station('busy',150),partial=station('partial',0);partial.approach.status='partial';partial.coveredMetres=100;
  const failed=station('failed',0,{refreshFailed:true}),old=station('old',0,{checkedAt:'2026-10-14T00:00:00Z'});
  assert.equal(P.ordered([partial,failed,old,busy],null,now)[0].id,'busy');
  for(const s of [partial,failed,old])assert.equal(P.status(s,now).rankable,false);
 });
-test('reported approach closures rank after passable approaches without claiming the station is closed',()=>{
- const closed=station('closure',20),long=station('long',200);closed.approach.routes[0].closedMetres=20;
- assert.ok(P.compareTraffic(closed,long)>0);assert.equal(P.status(closed,now).label,'Road closure on an approach');assert.equal(P.status(closed,now).blocked,false);
- const side={...long,approach:{...long.approach,routes:[...long.approach.routes,{...closed.approach.routes[0],id:'other'}]}};assert.ok(P.compareTraffic(side,long)>0);
+test('reported nearby road closures rank last without claiming the station is closed',()=>{
+ const closed=station('closure',20),long=station('long',200);closed.closedMetres=20;closed.approach.routes[0].closedMetres=20;
+ assert.ok(P.compareTraffic(closed,long)>0);assert.equal(P.status(closed,now).label,'Road closure reported nearby');assert.equal(P.status(closed,now).blocked,false);
+ const side={...long,closedMetres:20,approach:{...long.approach,routes:[...long.approach.routes,{...closed.approach.routes[0],id:'other'}]}};assert.ok(P.compareTraffic(side,long)>0);
 });
 test('trend requires comparable directions, coverage, timestamps and successful readings',()=>{
  const old=station('s',50),next=station('s',100,{checkedAt:new Date(Date.parse(at)+900000).toISOString()});
@@ -119,10 +119,10 @@ test('trend requires comparable directions, coverage, timestamps and successful 
  const limit=station('s',200),limit2={...limit,checkedAt:next.checkedAt};assert.equal(P.withTrend(limit,limit2).trend.state,'at_limit');
  const b=P.withTrend(old,next);assert.equal(b.trend.checks,2);assert.equal(b.trend.previousAt,at);assert.equal(b.history,undefined);
 });
-test('bounded and uncertain lengths are labelled honestly, and capped readings tie',()=>{
+test('approach bounds remain honest without overriding the primary nearby-road comparison',()=>{
  const limit=station('s',200),r=P.approachRoute(limit);assert.equal(P.approachLabel(r),'200+ m');
  assert.equal(P.approachLabel({...r,extent:'gap',continuousSlowMetres:80}),'At least 80 m');assert.equal(P.approachLabel({...r,continuousSlowMetres:null}),'Unknown');
- const orange=station('orange',0,{slowMetres:200});assert.equal(P.compareTraffic(limit,orange),0);
+ const orange=station('orange',0,{slowMetres:200});assert.ok(P.compareTraffic(limit,orange)>0);
 });
 
 
@@ -130,4 +130,18 @@ test('daily rollover uses the server ceiling rather than restoring the old 50-ch
  const list=Array.from({length:75},(_,i)=>station('s'+i,null));
  const plan=P.refreshPlan(list,[115,-8],{dailyLimit:1000,remainingChecks:0,resetAt:now-1,monthlyLimit:20000,remainingMonthlyChecks:500},'area',now);
  assert.equal(plan.targets.length,75);assert.equal(plan.batches.length,15);assert.equal(plan.remainingChecks,500);
+});
+
+
+test('the archived Jimbaran screenshot shows 320 m nearby even when its southbound approach is zero',()=>{
+ const reading=require('./fixtures/jimbaran-20261016.json'),base=catalog.stations.find(s=>s.id===reading.id),s=P.mergeLive(base,reading),clock=Date.parse(reading.checkedAt)+60000;
+ assert.equal(P.validSavedReading(reading,base.id,clock,base.coordinates),true);
+ assert.equal(P.approachRoute(s).continuousSlowMetres,0);assert.equal(P.slowdown(s),319);
+ assert.equal(P.nearbyValue(s),'≈ 320 m');assert.equal(P.nearbySummary(s),'≈ 320 m slow / congested nearby');
+ assert.equal(P.status(s,clock).label,'Slow roads nearby');assert.equal(P.status(s,clock).tone,'medium');
+ const less={...s,id:'less',shortName:'Less nearby slowdown',slowMetres:100};
+ assert.ok(P.compareTraffic(s,less)>0);assert.equal(P.ordered([s,less],null,clock)[0].id,'less');
+ const slow=reading.segments.filter(x=>x.speed!=='NORMAL');assert.ok(slow.every(x=>x.to[1]>x.from[1]));
+ assert.ok(Math.abs(slow.reduce((n,x)=>n+P.distance(x.from,x.to)*1000,0)-319)<1);
+ assert.equal(P.nearbyValue({...s,jamMetres:null,slowMetres:null}),'Unknown');
 });

@@ -97,12 +97,12 @@ test('using the last daily check retains the measurement and blocks all further 
  assert.equal(s.posts.length,1);assert.equal(s.context.PetrolLive.readings.get('s3').checkedAt,time);assert.equal(s.sources.get('station-traffic').data.features.length,1);
 });
 
-test('outdated approach dashes follow continuous geometry without joining gaps or colour changes',async()=>{
+test('outdated nearby-road dashes follow continuous geometry without joining gaps or colour changes',async()=>{
  const s=await setup();await s.context.PetrolLive.refreshStation('s3');const reading=s.context.PetrolLive.readings.get('s3');
  reading.checkedAt=new Date(Date.now()-3600000).toISOString();
  const point=n=>[115.003+n*.00001,-8],edge=(a,b,speed='SLOW')=>({from:point(a),to:point(b),speed,closed:false});
- reading.approach.routes=[{segments:[edge(1,0),edge(2,1),edge(4,3),edge(5,4,'TRAFFIC_JAM')]}];
- s.context.PetrolLive.updateMarkers();const approach=s.sources.get('station-traffic').data.features.filter(f=>f.properties.focus);
+ reading.segments=[edge(1,0),edge(2,1),edge(4,3),edge(5,4,'TRAFFIC_JAM')];
+ s.context.PetrolLive.updateMarkers();const approach=s.sources.get('station-traffic').data.features;
  assert.equal(approach.length,3);assert.deepEqual(JSON.parse(JSON.stringify(approach[0].geometry.coordinates)),[point(2),point(1),point(0)]);
  assert.ok(approach.every(f=>f.properties.stale));assert.notEqual(approach[1].properties.color,approach[2].properties.color);
 });
@@ -261,4 +261,15 @@ test('rectangle scope refresh and traffic display use only stations inside the s
  const s=await setup(),area={bounds:[115.002,-8.001,115.004,-7.999]};
  s.context.scopedStations=()=>P.inScope(s.context.stations,area);s.context.PetrolLive.scopeChanged();await s.events.get('traffic-refresh:click')();
  assert.deepEqual(Array.from(s.posts[0]),['s2','s3','s4']);assert.deepEqual([...new Set(s.sources.get('station-traffic').data.features.map(f=>f.properties.id))],['s2','s3','s4']);
+});
+
+
+test('the map shows the original slow roads without covering them with synthetic approach samples',async()=>{
+ const s=await setup();await s.context.PetrolLive.refreshStation('s3');
+ const reading=s.context.PetrolLive.readings.get('s3'),road=reading.segments[0];
+ road.speed='SLOW';road.relativeSpeed=.59;
+ reading.approach.routes=[{segments:[{...road,speed:'NORMAL',relativeSpeed:.78}]}];
+ s.context.PetrolLive.updateMarkers();const features=s.sources.get('station-traffic').data.features;
+ assert.equal(features.length,1);assert.equal(features[0].properties.color,'#df931c');assert.equal(features[0].properties.slow,true);
+ assert.equal(s.posts.length,1);
 });

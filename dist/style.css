@@ -82,3 +82,5 @@
 .is-drawing .map-toolbar{z-index:10}.is-drawing .map-label{visibility:hidden}
 @media(min-width:761px) and (max-width:1000px){.music-player{top:auto;bottom:115px;right:16px}.map-label{top:84px}}
 @media(max-width:760px){#all-saved,.saved-controls label{min-height:44px;font-size:12px}.traffic-view-control select{min-height:44px;font-size:16px}.traffic-view-control label{font-size:12px}.drawn-scope .text-button{min-height:44px}.draw-status{top:64px;left:12px;right:12px;max-width:calc(100% - 24px);font-size:11px}.map-toolbar button{min-height:44px}.map-toolbar{gap:5px}.map-toolbar span{margin-left:3px}}
+
+.queue-note{font-size:11px;line-height:1.6;color:var(--muted);margin:12px 0;padding:10px 0;border-block:1px solid var(--line)}.queue-note strong{color:var(--ink)}
