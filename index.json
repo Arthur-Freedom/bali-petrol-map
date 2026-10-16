@@ -113,6 +113,13 @@
       "lastAttemptStatus": "success",
       "path": "latest/osm-node-1830362205.json"
     },
+    "osm-node-1963471634": {
+      "checkedAt": "2026-10-16T06:28:08.916Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:09.297Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-1963471634.json"
+    },
     "osm-node-2279234528": {
       "checkedAt": "2026-10-16T06:28:06.346Z",
       "errorCode": null,
@@ -251,6 +258,32 @@
       "lastAttemptStatus": "success",
       "path": "latest/osm-node-3784338063.json"
     },
+    "osm-node-3787237309": {
+      "errorCode": "no_coverage",
+      "lastAttemptAt": "2026-10-16T06:28:07.919Z",
+      "lastAttemptStatus": "failed"
+    },
+    "osm-node-3791203569": {
+      "checkedAt": "2026-10-16T06:28:08.920Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:09.297Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-3791203569.json"
+    },
+    "osm-node-3828371871": {
+      "checkedAt": "2026-10-16T06:28:10.266Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:10.622Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-3828371871.json"
+    },
+    "osm-node-3834339466": {
+      "checkedAt": "2026-10-16T06:28:10.421Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:10.622Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-3834339466.json"
+    },
     "osm-node-4157284889": {
       "checkedAt": "2026-10-16T06:28:00.239Z",
       "errorCode": null,
@@ -272,10 +305,45 @@
       "lastAttemptStatus": "success",
       "path": "latest/osm-node-4236778069.json"
     },
+    "osm-node-4249837879": {
+      "checkedAt": "2026-10-16T06:28:09.067Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:09.297Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-4249837879.json"
+    },
+    "osm-node-4422250828": {
+      "checkedAt": "2026-10-16T06:28:10.425Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:10.622Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-4422250828.json"
+    },
+    "osm-node-4438497483": {
+      "checkedAt": "2026-10-16T06:28:07.552Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:07.919Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-4438497483.json"
+    },
+    "osm-node-4593932705": {
+      "checkedAt": "2026-10-16T06:28:10.576Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:10.622Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-4593932705.json"
+    },
     "osm-node-4630425094": {
       "errorCode": "no_coverage",
       "lastAttemptAt": "2026-10-16T06:28:02.634Z",
       "lastAttemptStatus": "failed"
+    },
+    "osm-node-4938684923": {
+      "checkedAt": "2026-10-16T06:28:10.421Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:10.622Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-4938684923.json"
     },
     "osm-node-4954534046": {
       "checkedAt": "2026-10-16T06:27:53.350Z",
@@ -297,6 +365,20 @@
       "lastAttemptAt": "2026-10-16T06:28:00.287Z",
       "lastAttemptStatus": "success",
       "path": "latest/osm-node-4959546626.json"
+    },
+    "osm-node-5015970023": {
+      "checkedAt": "2026-10-16T06:28:09.078Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:09.297Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-5015970023.json"
+    },
+    "osm-node-5103311413": {
+      "checkedAt": "2026-10-16T06:28:09.244Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:09.297Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-5103311413.json"
     },
     "osm-node-5104508763": {
       "checkedAt": "2026-10-16T06:28:01.430Z",
@@ -326,6 +408,13 @@
       "lastAttemptStatus": "success",
       "path": "latest/osm-node-5529682390.json"
     },
+    "osm-node-5546845704": {
+      "checkedAt": "2026-10-16T06:28:07.552Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:07.919Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-5546845704.json"
+    },
     "osm-node-5575035954": {
       "checkedAt": "2026-10-16T06:27:58.847Z",
       "errorCode": null,
@@ -346,6 +435,20 @@
       "lastAttemptAt": "2026-10-16T06:27:54.818Z",
       "lastAttemptStatus": "success",
       "path": "latest/osm-node-610371788.json"
+    },
+    "osm-node-6316044085": {
+      "checkedAt": "2026-10-16T06:28:07.706Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:07.919Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-6316044085.json"
+    },
+    "osm-node-6400253085": {
+      "checkedAt": "2026-10-16T06:28:07.867Z",
+      "errorCode": null,
+      "lastAttemptAt": "2026-10-16T06:28:07.919Z",
+      "lastAttemptStatus": "success",
+      "path": "latest/osm-node-6400253085.json"
     },
     "osm-node-6460723863": {
       "errorCode": "no_coverage",
@@ -449,5 +552,5 @@
       "path": "latest/osm-way-714724146.json"
     }
   },
-  "updatedAt": "2026-10-16T06:28:06.547Z"
+  "updatedAt": "2026-10-16T06:28:10.622Z"
 }
