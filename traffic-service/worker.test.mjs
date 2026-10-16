@@ -24,6 +24,12 @@ test('unauthenticated, wrong identity, spoofed origin and arbitrary body make ze
  for(const options of [{token:''},{token:'fake'},{origin:'https://evil.example'},{body:'{"stations":[1]}'}]){const s=setup();assert.ok((await s.request(options)).status>=400);assert.equal(s.calls.length,0);assert.equal(s.records.size,0);}
  for(const opts of [{owner:'999'},{authStatus:401},{authStatus:503}]){const s=setup(opts);assert.ok((await s.request()).status>=400);assert.equal(s.calls.length,0);assert.equal(s.records.size,0);}
 });
+
+test('auth outages and invalid sessions return different recovery codes before spending budget',async()=>{
+ for(const [authStatus,code] of [[401,'auth_required'],[403,'auth_required'],[503,'auth_unavailable']]){
+  const s=setup({authStatus}),response=await s.request();assert.equal(response.status,authStatus);assert.equal((await response.json()).code,code);assert.equal(s.calls.length,0);assert.equal(s.records.size,0);
+ }
+});
 test('concurrent owner refreshes admit only five fixed station checks and never return the key',async()=>{
  const s=setup(),responses=await Promise.all([s.request(),s.request()]);assert.deepEqual(responses.map(x=>x.status).sort(),[200,429]);assert.equal(s.calls.length,5);assert.equal(s.authCalls(),2);
  const response=responses.find(r=>r.ok),text=await response.text();assert.ok(!text.includes('secret-key'));assert.equal(response.headers.get('Cache-Control'),'no-store');

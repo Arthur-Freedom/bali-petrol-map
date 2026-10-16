@@ -120,7 +120,7 @@ export function createHandler({fetch:send=globalThis.fetch,now=Date.now,samplerF
       if(!/^Bearer remembered\.[A-Za-z0-9_-]{43}$/.test(authorization))response=json({error:'Sign in as Arthur-Freedom to refresh traffic.'},401);
       else{
         const verified=await env.OWNER_AUTH.fetch(new Request(AUTH+'/api/session',{headers:{Origin:ORIGIN,Authorization:authorization}}));
-        if(!verified.ok)response=json({error:verified.status===401||verified.status===403?'Please sign in as Arthur-Freedom.':'GitHub verification is temporarily unavailable.'},verified.status===401||verified.status===403?verified.status:503);
+        if(!verified.ok)response=json({error:verified.status===401||verified.status===403?'Your GitHub sign-in needs renewing. Use Sign in with GitHub; there is no need to sign out first.':'GitHub connection is temporarily unavailable. Your saved sign-in is retained. Retry, or reconnect with GitHub.',code:verified.status===401||verified.status===403?'auth_required':'auth_unavailable'},verified.status===401||verified.status===403?verified.status:503);
         else if(String((await verified.json()).ownerId)!==OWNER)response=json({error:'Only Arthur-Freedom can refresh traffic.'},403);
         else{
           const budget=env.TRAFFIC_BUDGET.get(env.TRAFFIC_BUDGET.idFromName('owner-global'));

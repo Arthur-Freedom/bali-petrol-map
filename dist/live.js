@@ -5,6 +5,7 @@
  let publicIndex=null,publicLoading=false;const publicLoaded=new Set();
  let verified=false,pending=false,budget={dailyLimit:50,dailyUsed:0,remainingChecks:50,stationNextAt:{},monthlyLimit:900,remainingMonthlyChecks:900},archive=null,progress=null,scopeVersion=0,auto=false,autoNextAt=0,epoch=0;
  const requests=new Set();
+ let connecting=false,connectionFailed=false;
  function stopRequests(){for(const controller of requests)controller.abort();requests.clear();}
  function stopAuto(){auto=false;$('auto-refresh').checked=false;}
  function failedReadings(batch){for(const {id} of batch){const previous=live.readings.get(id);live.readings.set(id,{...previous,id,refreshFailed:true,errorCode:'provider_unavailable'});}applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();}
@@ -21,6 +22,9 @@
    if(budget.monthlyResetAt&&Date.now()>=budget.monthlyResetAt)budget={...budget,remainingMonthlyChecks:budget.monthlyLimit,monthlyResetAt:0};
    $('owner-login').hidden=verified;$('traffic-refresh').hidden=!verified;$('owner-logout').hidden=!owner.get();$('auto-wrap').hidden=!verified;
    $('owner-login').textContent=owner.get()?'Retry connection':'Sign in with GitHub';
+   $('owner-login').disabled=connecting;
+   if(connecting)$('owner-login').textContent='Connecting…';
+   $('owner-reconnect').hidden=verified||connecting||!owner.get()||!connectionFailed;
    const p=plan(),count=p.targets.length;
    $('traffic-refresh').disabled=pending||!verified||!count||budget.refreshEnabled===false;
    $('traffic-refresh').textContent=pending?(progress?`Checking ${progress.done}/${progress.total}…`:'Preparing checks…'):!p.total?'No stations here':p.remainingChecks===0?(budget.remainingMonthlyChecks===0?'Monthly safety limit':'Daily refresh limit'):!count?waitLabel(p):mode()==='oldest'?`Refresh oldest ${count}`:p.limited?`Refresh next ${count}`:p.cooling?`Refresh remaining ${count}`:`Refresh area · ${count}`;
@@ -41,7 +45,7 @@
      let data;try{data=await response.json();}catch{throw Error('The traffic service returned an unreadable response. Try again.');}
      if(generation!==epoch||handle!==owner.get())throw Error('Sign-in changed; this request was stopped.');
      if(!data||Array.isArray(data)||typeof data!=='object')throw Error('The traffic service returned an incomplete response. Try again.');
-     if(!response.ok){limits(data);if(response.status===401||response.status===403){verified=false;stopAuto();owner.clear();live.clear();}throw Error(typeof data.error==='string'?data.error:'The traffic service is unavailable. Try again shortly.');}
+     if(!response.ok){limits(data);if(response.status===401||response.status===403){verified=false;stopAuto();owner.clear();live.clear();}else if(data.code==='auth_unavailable'){verified=false;connectionFailed=true;stopAuto();}throw Error(typeof data.error==='string'?data.error:'The traffic service is unavailable. Try again shortly.');}
      return data;
    }catch(error){if(controller.signal.aborted)throw Error('The request timed out or was stopped. No automatic retry was made.');if(error instanceof TypeError)throw Error('Connection lost. Check your internet connection and retry.');throw error;}
    finally{clearTimeout(timer);requests.delete(controller);}
@@ -51,6 +55,9 @@
    const visible=new Set(scopedStations().map(s=>s.id)),features=[];
    for(const data of live.readings.values()){
      if(!visible.has(data.id)||!data.checkedAt)continue;
+     // Details and lines must describe the same check, not overlapping snapshots
+     // from neighbouring stations queried at different times.
+     if(selected&&data.id!==selected)continue;
      const stale=data.refreshFailed||!P.fresh(data.checkedAt);
      const addSegments=(segments,focus)=>{
        let previous;const same=(a,b)=>a.every((n,i)=>Math.abs(n-b[i])<1e-10);
@@ -76,7 +83,7 @@
      map.addLayer({id:'traffic-earlier-colours',type:'line',source:'station-traffic',filter:['==',['get','stale'],true],paint:{'line-color':['get','color'],'line-width':['case',['get','focus'],['case',['get','selected'],6,3],1.5],'line-dasharray':[2,2],'line-opacity':['case',['get','focus'],.65,['case',['get','selected'],.4,.2]]}});
    }
    const earlier=features.some(f=>f.properties.stale);$('earlier-legend').hidden=!earlier;
-   if(live.active){$('map-layer-title').textContent=earlier?'LAST TRAFFIC MEASUREMENTS':'TRAFFIC AT MAPPED ACCESSES';$('map-layer-note').textContent=earlier?'Dashed colours: outdated · select a station for its time':'Bold: incoming approaches · faint: nearby roads';}
+   if(live.active){$('map-layer-title').textContent=earlier?'LAST TRAFFIC MEASUREMENTS':selected?'SELECTED STATION’S TRAFFIC':'TRAFFIC AT MAPPED ACCESSES';$('map-layer-note').textContent=(selected?'Only this station’s reading · ':'')+(earlier?'Dashed colours: outdated':'Bold: sampled approach · thin: nearby road directions');}
  }
  function showTraffic(){live.active=true;$('road-legend').hidden=false;$('map-layer-title').textContent='TRAFFIC AT MAPPED ACCESSES';$('map-layer-note').textContent='Bold: incoming approaches · faint: nearby roads';drawTraffic();}
  async function loadPublicSaved(){
@@ -121,10 +128,11 @@
    applyChecks();renderList();renderDetail();drawTraffic();updateSnapshot();return count;
  }
  async function connect(){
+   if(connecting)return;
    if(!owner.get()){status(owner.error||'Saved traffic is public. Only Arthur-Freedom can request new checks.');controls();loadPublicSaved();return;}
-   const generation=++epoch;verified=false;controls();status('Verifying your GitHub account…');
+   const generation=++epoch;verified=false;connecting=true;connectionFailed=false;controls();status('Verifying your GitHub account…');
    try{const data=await request('/api/session');if(generation!==epoch)return;if(data.ownerId!=='18115558'||data.provider!=='tomtom-orbis-v2')throw Error('Traffic version changed. Reload this page and reconnect.');limits(data);await window.petrolReady;if(generation!==epoch)return;if(!dataset)throw Error('Station locations could not load. Reload the page to retry.');status('Loading saved measurements…');const loaded=await loadSaved(generation);if(generation!==epoch)return;showTraffic();verified=true;status(`Signed in as Arthur-Freedom.${loaded?' Loaded '+loaded+' saved measurement'+(loaded===1?'':'s')+'.':''}`);}
-   catch(error){if(generation===epoch){verified=false;status(error.message+(live.readings.size?' Last measurements remain visible.':''));}}finally{controls();}
+   catch(error){if(generation===epoch){verified=false;connectionFailed=true;status(error.message+(live.readings.size?' Last measurements remain visible.':''));}}finally{if(generation===epoch)connecting=false;controls();}
  }
  async function refresh(id){
    if(!verified||pending||budget.refreshEnabled===false||!plan(id).targets.length)return;
@@ -149,16 +157,18 @@
      if(generation===epoch)status(`${success} of ${progress.done} stations updated.${progress.done>success?' Unavailable readings keep their original times.':''}${scope!==scopeVersion?' Area changed; remaining checks stopped.':''}`);
    }catch(error){if(generation===epoch){stopAuto();status(error.message);}}finally{pending=false;progress=null;autoNextAt=Date.now()+15*60000;controls();}
  }
- $('owner-login').addEventListener('click',()=>{if(owner.get())return connect();location.href=auth+'/auth/login?return='+encodeURIComponent('https://arthur-freedom.github.io/bali-petrol-map/');});
+ function signIn(){location.href=auth+'/auth/login?return='+encodeURIComponent('https://arthur-freedom.github.io/bali-petrol-map/');}
+ $('owner-login').addEventListener('click',()=>{if(owner.get())return connect();signIn();});
+ $('owner-reconnect').addEventListener('click',signIn);
  $('traffic-refresh').addEventListener('click',()=>refresh());
  $('refresh-mode').addEventListener('change',()=>live.scopeChanged());
  $('auto-refresh').addEventListener('change',()=>{auto=$('auto-refresh').checked;if(auto)refresh();});
  $('owner-logout').addEventListener('click',async()=>{
-   const handle=owner.get(),generation=++epoch;verified=false;stopAuto();stopRequests();owner.clear();live.clear();controls();status('Signing out…');
+   const handle=owner.get(),generation=++epoch;verified=false;connecting=false;connectionFailed=false;stopAuto();stopRequests();owner.clear();live.clear();controls();status('Signing out…');
    try{const r=await fetch(auth+'/api/logout',{method:'POST',signal:AbortSignal.timeout(15000),headers:{Authorization:'Bearer '+handle,'Content-Type':'application/json'},body:'{}'});if(!r.ok)throw Error();if(generation===epoch)status('Signed out. Live traffic is locked.');}catch{if(generation===epoch)status('Signed out on this device. Server revocation could not be confirmed; retry signing in and out when connected.');}
    if(generation===epoch)loadPublicSaved();
  });
- addEventListener('owner-session-change',()=>{++epoch;verified=false;stopAuto();stopRequests();live.clear();connect();});
+ addEventListener('owner-session-change',()=>{++epoch;verified=false;connecting=false;connectionFailed=false;stopAuto();stopRequests();live.clear();connect();});
  setInterval(()=>{controls();if(auto&&verified&&!document.hidden&&Date.now()>=autoNextAt&&plan().targets.length)refresh();},15000);
  document.addEventListener('visibilitychange',()=>{if(auto&&verified&&!document.hidden&&Date.now()>=autoNextAt&&plan().targets.length)refresh();});
  connect();

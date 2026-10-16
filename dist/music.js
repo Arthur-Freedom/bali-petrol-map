@@ -1,4 +1,4 @@
-/* Optional background soundtrack. No audio request until the listener presses Play. */
+/* Background soundtrack with browser-permitted autoplay and a remembered pause choice. */
 (() => {
  'use strict';
  const player = document.getElementById('music-player');
@@ -20,11 +20,12 @@
  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
  const pen = canvas.getContext('2d');
  let context, analyser, bins, gain, source, frame = 0, playing = false, wanted = false;
- let attempt = 0, chosen = Math.floor(Math.random() * tracks.length), remaining = [];
+ let attempt = 0, chosen = Math.floor(Math.random() * tracks.length), remaining = [], autoplay = true;
  select.value = String(chosen);
  try {
   const saved = localStorage.getItem('bali-petrol:music-volume');
   if (saved !== null && Number.isFinite(Number(saved))) volume.value = String(Math.max(0, Math.min(100, Number(saved))));
+  autoplay = localStorage.getItem('bali-petrol:music-enabled') !== '0';
  } catch { /* Playback still works when browser storage is unavailable. */ }
 
  function setVolume() {
@@ -71,11 +72,18 @@
   message.hidden = false;
   showState('error');
  }
- function prepareAudio() {
+ function prepareAudio(automatic) {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (AudioContext && !context) {
    try {
     context = new AudioContext();
+    // A suspended Web Audio graph can silence otherwise permitted media playback.
+    // Autoplay uses native audio in that case; a later Play gesture enables the graph.
+    if (automatic && context.state !== 'running') {
+     void context.close().catch(() => {});
+     context = null;
+     return;
+    }
     source = context.createMediaElementSource(audio);
     gain = context.createGain();
     source.connect(gain);
@@ -97,18 +105,24 @@
   audio.src = tracks[chosen];
   audio.load();
  }
- async function play() {
+ async function play(automatic = false) {
   wanted = true;
   const request = ++attempt;
   message.hidden = true;
   showState('loading');
   try {
-   const ready = prepareAudio();
+   const ready = prepareAudio(automatic);
    if (!audio.getAttribute('src') || audio.error) setTrack();
-   // Call play within the user gesture, including on iOS.
+   // Manual Play stays within its user gesture; automatic playback follows browser policy.
    await Promise.all([ready, audio.play()]);
-  } catch {
-   if (request === attempt && wanted) fail();
+  } catch (error) {
+   if (request !== attempt || !wanted) return;
+   if (error?.name === 'NotAllowedError') {
+    pause();
+    message.textContent = 'Tap Play to start the music.';
+    message.hidden = false;
+    showState('blocked');
+   } else fail();
   }
  }
  function pause() {
@@ -117,7 +131,11 @@
   audio.pause();
   showState('paused');
  }
- toggle.addEventListener('click', () => { if (wanted) pause(); else void play(); });
+ toggle.addEventListener('click', () => {
+  const enabled = !wanted;
+  try { localStorage.setItem('bali-petrol:music-enabled', enabled ? '1' : '0'); } catch {}
+  if (enabled) void play(); else pause();
+ });
  audio.addEventListener('playing', () => {
   if (!wanted) { audio.pause(); return; }
   message.hidden = true;
@@ -132,7 +150,7 @@
   chosen = remaining.splice(Math.floor(Math.random() * remaining.length), 1)[0];
   select.value = String(chosen);
   setTrack();
-  void play();
+  void play(true);
  });
  select.addEventListener('change', () => {
   const resume = wanted;
@@ -155,4 +173,5 @@
  window.addEventListener('pagehide', pause);
  player.hidden = false;
  showState('paused');
+ if (autoplay) void play(true);
 })();

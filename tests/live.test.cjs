@@ -45,6 +45,28 @@ test('selected-station refresh sends exactly that one ID, then oldest skips its 
  assert.equal(s.posts.length,2);assert.equal(s.posts[1].length,5);assert.ok(!s.posts[1].includes('s3'));
 });
 
+test('selecting a station hides overlapping snapshots from neighbouring stations until selection clears',async()=>{
+ const s=await setup();await s.events.get('traffic-refresh:click')();
+ assert.equal(new Set(s.sources.get('station-traffic').data.features.map(f=>f.properties.id)).size,15);
+ s.context.selected='s3';s.context.PetrolLive.updateMarkers();
+ assert.deepEqual([...new Set(s.sources.get('station-traffic').data.features.map(f=>f.properties.id))],['s3']);
+ assert.match(s.$('map-layer-note').textContent,/Only this station/);
+ s.context.selected=null;s.context.PetrolLive.updateMarkers();
+ assert.equal(new Set(s.sources.get('station-traffic').data.features.map(f=>f.properties.id)).size,15);
+});
+
+test('verification outage unlocks retry and OAuth reconnect without revoking sign-in or spending traffic checks',async()=>{
+ let outage=false;
+ const s=await setup({onRequest:()=>outage?new Response(JSON.stringify({error:'GitHub connection unavailable',code:'auth_unavailable'}),{status:503}):undefined});
+ await s.context.PetrolLive.refreshStation('s3');const time=s.context.PetrolLive.readings.get('s3').checkedAt;
+ outage=true;await s.events.get('owner-login:click')();
+ assert.equal(s.$('owner-reconnect').hidden,false);assert.equal(s.$('owner-login').disabled,false);assert.ok(s.context.PetrolOwner.get());
+ assert.equal(s.context.PetrolLive.readings.get('s3').checkedAt,time);
+ await s.events.get('owner-login:click')();assert.equal(s.posts.length,1);
+ s.events.get('owner-reconnect:click')();assert.match(s.context.location.href,/\/auth\/login\?return=/);assert.ok(s.context.PetrolOwner.get());
+ outage=false;await s.events.get('owner-login:click')();assert.equal(s.$('owner-reconnect').hidden,true);assert.equal(s.$('traffic-refresh').hidden,false);
+});
+
 test('changing areas stops further paid batches after the in-flight batch finishes',async()=>{
  const s=await setup({onPost:({context})=>context.PetrolLive.scopeChanged()});
  await s.events.get('traffic-refresh:click')();assert.equal(s.posts.length,1);assert.equal(s.context.PetrolLive.readings.size,5);

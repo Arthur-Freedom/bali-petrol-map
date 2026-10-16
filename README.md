@@ -15,9 +15,11 @@ Ordinary scrolling zooms the map. A selected pin has a blue outline and name cap
 ## Background music
 
 An optional compact music player offers the same four background tracks as Live
-Lane, with an audio-reactive visualizer. Press Play to begin a shuffled rotation;
-choose a song or adjust volume in Settings → Relaxing music. Audio files load only
-after Play, and never autoplay on page load. Volume is remembered locally. Pausing,
+Lane, with an audio-reactive visualizer. Music tries to start automatically in a
+shuffled rotation, subject to browser autoplay permission; if blocked, a normal
+Play button and tap-to-play hint remain. Choose a song or adjust volume in
+Settings → Relaxing music. Volume and an explicit Play/Pause choice are remembered
+locally, so pausing prevents autoplay on the next visit. Pausing,
 reduced-motion preferences and background tabs stop the visualizer's animation.
 Music is served as static Pages assets without traffic API calls. Credits and
 the separate soundtrack licences are in `dist/music/CREDITS.md`.
@@ -88,6 +90,10 @@ Your location is requested only by “Show stations near me” and stays in the 
 Traffic attribution: © TomTom. Basemap: OpenFreeMap/OpenStreetMap. Expanded stations and candidate access paths: © OpenStreetMap contributors, ODbL. Original five listing observations came from Google Maps and keep their original timestamps.
 
 ## Development and deployment
+
+Station selection draws only that station's traffic snapshot, avoiding overlapping colours from neighbouring checks made at other times. The list and detail show the sampled approach separately from all nearby slow/congested road directions within 250 m. A zero continuous approach is labelled “No slowdown detected on approach”; nearby slow roads stay visible and neither measurement claims to establish a petrol queue length.
+
+If GitHub verification is temporarily unavailable, the owner can retry or use “Reconnect with GitHub” directly without signing out first. Transient failures retain the session and displayed measurements. The shared sign-in service renews expiring tokens in its native Worker runtime; invalid refresh credentials ask for sign-in and never unlock traffic without verification.
 
 Static source is `dist/`; no build is required. Install dependencies with `npm ci --prefix traffic-service --ignore-scripts`. Run `node --test tests/*.test.cjs traffic-service/*.test.mjs` and `python -m unittest discover -s scripts -p 'test_archive_traffic.py'`. Public preview: `python -m http.server 8794 --directory dist`. Auth and CORS intentionally accept only the production origin.
 

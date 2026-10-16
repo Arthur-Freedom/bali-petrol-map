@@ -4,7 +4,16 @@ const unmapped=()=>({method:'entrance-road-v1',status:'unmapped',routes:[],selec
 const station=(id,jamMetres,extra={})=>{const jam=Math.min(200,jamMetres||0),slow=Math.min(200-jam,extra.slowMetres||0),run=jam+slow;return {id,name:id,shortName:id,coordinates:[115,-8],jamMetres,checkedAt:at,approach:Number.isFinite(jamMetres)?{method:'entrance-road-v1',status:'matched',selectedId:'road',routes:[{id:'road',continuousSlowMetres:run,jamMetres:jam,slowMetres:slow,closedMetres:0,targetMetres:200,pathMetres:200,coveredMetres:200,complete:true,extent:run===200?'limit':'ended'}]}:unmapped(),...extra};};
 test('Google listed closures never override congestion or exclude a station',()=>{
  const low=station('quiet',0,{operatingStatus:'closed',operatingSource:'google_listing',operatingCheckedAt:at}),busy=station('busy',700);
- assert.equal(P.status(low,now).label,'No slowdown at mapped access');assert.equal(P.status(low,now).blocked,false);assert.equal(P.opening(low,now).label,'Listed closed · unverified');assert.equal(P.ordered([busy,low],null,now)[0].id,'quiet');
+ assert.equal(P.status(low,now).label,'No slowdown detected on approach');assert.equal(P.status(low,now).blocked,false);assert.equal(P.opening(low,now).label,'Listed closed · unverified');assert.equal(P.ordered([busy,low],null,now)[0].id,'quiet');
+});
+
+test('a flowing approach and slow surrounding roads remain distinct visible measurements',()=>{
+ const s=station('zero-approach',0);s.jamMetres=80;s.slowMetres=120;
+ assert.equal(P.approachSummary(s),'No slowdown detected on approach');
+ assert.equal(P.nearbyLabel(s),'Nearby: ≈ 200 m slow / congested');
+ assert.equal(P.approachRoute(s).continuousSlowMetres,0);
+ s.approach.status='partial';assert.equal(P.approachSummary(s),'Approach partly covered');
+ assert.equal(P.nearbyLabel({}),'Nearby traffic unknown');
 });
 test('only a recent explicit firsthand closure can block, never a legacy unsourced closure',()=>{
  const s=station('x',0,{operatingStatus:'closed',operatingCheckedAt:at});assert.equal(P.status(s,now).blocked,false);
@@ -16,7 +25,7 @@ test('traffic refresh never freshens opening information or invents waiting minu
 });
 test('unknown, failed and stale readings cannot beat current observations',()=>{
  const old=station('old',0,{checkedAt:'2026-10-14T00:00:00+08:00'}),failed=station('failed',0,{refreshFailed:true}),unknown=station('unknown',null),fresh=station('fresh',900);
- assert.equal(P.ordered([old,failed,unknown,fresh],null,now)[0].id,'fresh');assert.equal(P.status(old,now).label,'Earlier: no slowdown at mapped access');assert.equal(P.status(unknown,now).label,'Not checked');
+ assert.equal(P.ordered([old,failed,unknown,fresh],null,now)[0].id,'fresh');assert.equal(P.status(old,now).label,'Earlier: no slowdown detected on approach');assert.equal(P.status(unknown,now).label,'Not checked');
 });
 test('all requested areas contain mapped locations and API batches cap at five',()=>{
  for(const id of ['kuta','legian','seminyak','canggu','denpasar','pererenan','ubud','gianyar']){const area=catalog.areas.find(a=>a.id===id),list=P.inScope(catalog.stations,area);assert.ok(list.length>0,id);assert.ok(P.refreshPlan(list,area.center).batches.every(b=>b.length<=5));}
@@ -58,7 +67,7 @@ test('Google Maps links open the place or coordinate pin, never a directions req
 
 test('all-NORMAL responses stay neutral, and orange-only traffic affects classification and ranking',()=>{
  const zero=station('zero',0,{slowMetres:0}),orange=station('orange',0,{slowMetres:600}),red=station('red',10,{slowMetres:0});
- assert.equal(P.status(zero,now).tone,'neutral');assert.equal(P.status(zero,now).label,'No slowdown at mapped access');
+ assert.equal(P.status(zero,now).tone,'neutral');assert.equal(P.status(zero,now).label,'No slowdown detected on approach');
  assert.equal(P.status(orange,now).tone,'medium');assert.equal(P.status(red,now).tone,'long');
  assert.deepEqual(P.ordered([orange,zero,red],null,now).map(s=>s.id),['zero','red','orange']);
  assert.equal(P.compareTraffic(zero,station('also-zero',0,{slowMetres:0})),0);
